@@ -1,0 +1,48 @@
+[submodule "forks/swift-perception"]
+	path = forks/swift-perception
+	url = https://github.com/jacobcxdev/swift-perception.git
+	branch = flote/service-app
+[submodule "forks/swift-clocks"]
+	path = forks/swift-clocks
+	url = https://github.com/jacobcxdev/swift-clocks.git
+	branch = flote/service-app
+[submodule "forks/combine-schedulers"]
+	path = forks/combine-schedulers
+	url = https://github.com/jacobcxdev/combine-schedulers.git
+	branch = flote/service-app
+[submodule "forks/swift-custom-dump"]
+	path = forks/swift-custom-dump
+	url = https://github.com/jacobcxdev/swift-custom-dump.git
+	branch = flote/service-app
+[submodule "forks/swift-snapshot-testing"]
+	path = forks/swift-snapshot-testing
+	url = https://github.com/jacobcxdev/swift-snapshot-testing.git
+	branch = flote/service-app
+[submodule "forks/swift-structured-queries"]
+	path = forks/swift-structured-queries
+	url = https://github.com/jacobcxdev/swift-structured-queries.git
+	branch = flote/service-app
+[submodule "forks/GRDB.swift"]
+	path = forks/GRDB.swift
+	url = https://github.com/jacobcxdev/GRDB.swift.git
+	branch = flote/service-app
+[submodule "forks/swift-dependencies"]
+	path = forks/swift-dependencies
+	url = https://github.com/jacobcxdev/swift-dependencies.git
+	branch = flote/service-app
+[submodule "forks/sqlite-data"]
+	path = forks/sqlite-data
+	url = https://github.com/jacobcxdev/sqlite-data.git
+	branch = flote/service-app
+[submodule "forks/swift-navigation"]
+	path = forks/swift-navigation
+	url = https://github.com/jacobcxdev/swift-navigation.git
+	branch = flote/service-app
+[submodule "forks/swift-sharing"]
+	path = forks/swift-sharing
+	url = https://github.com/jacobcxdev/swift-sharing.git
+	branch = flote/service-app
+[submodule "forks/swift-composable-architecture"]
+	path = forks/swift-composable-architecture
+	url = https://github.com/jacobcxdev/swift-composable-architecture.git
+	branch = flote/service-app
