@@ -46,3 +46,9 @@
 	path = forks/swift-composable-architecture
 	url = https://github.com/jacobcxdev/swift-composable-architecture.git
 	branch = flote/service-app
+[submodule "forks/skip-android-bridge"]
+	path = forks/skip-android-bridge
+	url = https://github.com/jacobcxdev/skip-android-bridge.git
+[submodule "forks/skip-ui"]
+	path = forks/skip-ui
+	url = https://github.com/jacobcxdev/skip-ui.git

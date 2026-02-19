@@ -1,0 +1,27 @@
+# Generated files
+.claude/settings.local.json
+.omc/
+**/CLAUDE.md
+!/CLAUDE.md
+
+# macOS
+.DS_Store
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+
+# Xcode
+xcuserdata/
+*.xcuserstate
+*.xcworkspace/
+
+# Gradle / Android
+.gradle/
+.android/
+.kotlin/
+**/Android/app/build/
+**/Android/app/intermediates/
+**/Android/.gradle/
+**/Android/local.properties

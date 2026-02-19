@@ -303,7 +303,9 @@ Active thread in Skip's Slack (started 2026-02-19 ~5:36 PM) with Dan Fabulich an
 - **ObservationStateRegistrar.swift**: ORIGINAL state — uses bridge registrar on Android
 - **Observing.swift**: Backed up as `Sources/ServiceApp/Observing.swift.bak` — NOT active
 - **No Skip package forks created yet** — skip-android-bridge, skip-fuse-ui, skip-ui are all upstream checkouts in `.build/`
-- All Point-Free dependency forks are on `flote/service-app` branches at `/Users/jacob/Developer/src/github/flote-works/`
+- All 12 Point-Free/GRDB forks migrated to `jacobcxdev/` GitHub account (2026-02-19)
+- Cross-repo workspace: `~/Developer/src/github/jacobcxdev/swift-crossplatform/` with submodules
+- service-app Package.swift updated to point at `jacobcxdev/` forks — resolution verified
 
 ## Task Status
 - Task #1 (Instrument reducer): COMPLETED
