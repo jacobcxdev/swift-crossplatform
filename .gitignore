@@ -4,6 +4,9 @@
 **/CLAUDE.md
 !/CLAUDE.md
 
+# Local/confidential planning context
+.planning/local/
+
 # macOS
 .DS_Store
 
