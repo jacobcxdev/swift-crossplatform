@@ -36,7 +36,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01-PLAN.md -- Bridge implementation fixes, diagnostics API, and observation tests (OBS-01 through OBS-30) ✓ 2026-02-21
-- [ ] 01-02-PLAN.md -- SPM compilation validation for all 14 forks and Android emulator integration tests (SPM-01 through SPM-06)
+- [x] 01-02-PLAN.md -- SPM compilation validation for all 14 forks and Android emulator integration tests (SPM-01 through SPM-06) ✓ 2026-02-21
 
 ### Phase 2: Foundation Libraries
 **Goal**: Point-Free's utility libraries that TCA depends on work correctly on Android
@@ -139,7 +139,7 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Observation Bridge | 1/2 | Executing | - |
+| 1. Observation Bridge | 2/2 | Executed | - |
 | 2. Foundation Libraries | 0/1 | Not started | - |
 | 3. TCA Core | 0/2 | Not started | - |
 | 4. TCA State & Bindings | 0/2 | Not started | - |
