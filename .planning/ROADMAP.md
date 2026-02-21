@@ -30,13 +30,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. An `@Observable` class property mutation in a view model triggers exactly one Compose recomposition (not hundreds) on Android
   2. Nested parent/child view hierarchies each independently track their own observed properties on Android
   3. `ViewModifier` bodies participate in observation tracking the same as `View` bodies on Android
-  4. Bridge initialization failure produces a visible error log instead of silently falling back to broken counter-based observation
+  4. Bridge initialization failure produces a fatal error (crash with clear message) instead of silently falling back to broken counter-based observation
   5. All 14 fork packages compile for Android via Skip Fuse mode with correct SPM configuration
-**Plans**: TBD
+**Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [x] 01-01-PLAN.md -- Bridge implementation fixes, diagnostics API, and observation tests (OBS-01 through OBS-30) ✓ 2026-02-21
+- [ ] 01-02-PLAN.md -- SPM compilation validation for all 14 forks and Android emulator integration tests (SPM-01 through SPM-06)
 
 ### Phase 2: Foundation Libraries
 **Goal**: Point-Free's utility libraries that TCA depends on work correctly on Android
@@ -139,7 +139,7 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Observation Bridge | 0/2 | Not started | - |
+| 1. Observation Bridge | 1/2 | Executing | - |
 | 2. Foundation Libraries | 0/1 | Not started | - |
 | 3. TCA Core | 0/2 | Not started | - |
 | 4. TCA State & Bindings | 0/2 | Not started | - |
