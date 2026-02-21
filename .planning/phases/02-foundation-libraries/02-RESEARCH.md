@@ -1,0 +1,473 @@
+# Phase 2: Foundation Libraries - Research
+
+**Researched:** 2026-02-21
+**Domain:** Cross-platform Swift utility libraries (CasePaths, IdentifiedCollections, CustomDump, IssueReporting) on Android via Skip Fuse
+**Confidence:** MEDIUM-HIGH
+
+## Summary
+
+Phase 2 covers making four Point-Free utility libraries compile and run correctly on Android. These are pure Swift logic libraries with no UI dependencies, but they touch several Swift runtime features that need verification on Android: Mirror reflection, enum ABI metadata pointer arithmetic, KeyPath, Foundation types, and dynamic library symbol loading for test framework detection.
+
+The primary risk is **CasePaths' `EnumReflection.swift`**, which uses raw pointer arithmetic against Swift's ABI metadata layout (EnumMetadata, ValueWitnessTable, FieldRecord) to extract enum associated values at runtime. While Swift's ABI metadata layout is platform-independent by design, this code has never been tested on Android and uses `@_spi(Reflection)` internal APIs. The second risk area is **CustomDump's heavy Mirror usage** -- Mirror is implemented in the Swift runtime (not Foundation) and should work on Android, but edge cases around superclass mirror traversal and enum display styles need runtime verification. **IdentifiedCollections** is pure Swift data structures over OrderedCollections and is the lowest risk. **IssueReporting** already has Linux/Android conditional compilation in its `Warn.swift` file and uses `dlsym`-based dynamic loading that works cross-platform, but its `BreakpointReporter` is Darwin-only and its `DefaultReporter` uses SwiftUI dylib scanning that will not work on Android.
+
+**Primary recommendation:** Fork the 3 new libraries, wire all forks into fuse-library, then adopt a test-first approach -- run upstream tests on Android emulator to identify actual failures before writing any `#if os(Android)` guards. Most code is expected to work without changes.
+
+<user_constraints>
+## User Constraints (from CONTEXT.md)
+
+### Locked Decisions
+- Rename all fork branches to `dev/swift-crossplatform`. Existing forks use `flote/service-app` (12 PF/GRDB forks) and `dev/observation-tracking` (2 Skip forks). All must be renamed. Update `.gitmodules` accordingly. This is the first plan (02-01).
+- Create 3 new forks: swift-case-paths, swift-identified-collections, swift-issue-reporting. Fork from upstream at latest release tag, create `dev/swift-crossplatform` branch. Add as submodules.
+- Wire ALL forks into fuse-library Package.swift with `.package(path: "../../forks/<name>")` entries. Completes SPM-05.
+- Update fork count references in STATE.md, ROADMAP.md, CLAUDE.md.
+- Full Android runtime validation required (compile AND execute on emulator).
+- Per-library test targets in fuse-library: CasePathsTests, IdentifiedCollectionsTests, CustomDumpTests, IssueReportingTests.
+- Upstream tests must pass on macOS (no regressions).
+- Test-first for Mirror/reflection: run upstream tests first, only add guards for specific failures.
+- Inline `#if` guards only (no separate platform files).
+- Gate non-essential APIs with documentation tracking.
+- Same branch (`dev/swift-crossplatform`) for all work.
+- CustomDump Apple conformances: gate with `#if canImport`.
+- IssueReporting production: `print()` to logcat on Android.
+- IssueReporting test context: Swift Testing (`#expect`/`Issue.record()`).
+- Match upstream error detail level and Apple severity behavior.
+- Macros are host-side only; validate expanded output compiles on Android.
+- swift-syntax is upstream (no fork needed).
+- swift-collections (OrderedCollections) is upstream (no fork needed).
+
+### Claude's Discretion
+- Expanded output validation approach for `@CasePathable`
+- Fix location decisions (library shims vs macro plugin) if expanded output uses unavailable APIs
+
+### Deferred Ideas (OUT OF SCOPE)
+- 100% API compatibility tracking document (documentation deliverable, not Phase 2 implementation)
+- Android-native log integration via JNI (`android.util.Log`)
+- Macro plugin Android compilation (SPM-04) -- only validate expanded output
+</user_constraints>
+
+<phase_requirements>
+## Phase Requirements
+
+| ID | Description | Research Support |
+|----|-------------|-----------------|
+| CP-01 | `@CasePathable` macro generates `AllCasePaths` and `CaseKeyPath` accessors on Android | Macro expands on host; generated code is pure Swift (CasePathable.swift). No platform deps. LOW risk. |
+| CP-02 | `.is(\.caseName)` returns correct Bool for case checking on Android | Uses CaseKeyPath subscript extraction -- pure Swift closures. No platform deps. |
+| CP-03 | `.modify(\.caseName) {}` mutates associated value in-place on Android | Same mechanism as CP-02. Pure Swift. |
+| CP-04 | `@dynamicMemberLookup` dot-syntax returns Optional on Android | Compiler feature, not runtime. Works if code compiles. |
+| CP-05 | `allCasePaths` static variable returns collection of all case key paths on Android | Generated by macro. Pure Swift struct. |
+| CP-06 | `root[case: caseKeyPath]` subscript extracts/embeds associated value on Android | Pure Swift subscript on Case struct. |
+| CP-07 | `@Reducer enum` pattern synthesizes body and scope on Android | TCA macro, but CasePaths provides the CaseKeyPath infrastructure. Phase 3 concern. |
+| CP-08 | `AnyCasePath` with custom embed/extract closures works on Android | **HIGH RISK**: `EnumReflection.swift` uses ABI metadata pointer arithmetic. See Architecture Patterns. |
+| IC-01 | `IdentifiedArrayOf<T>` initializes from array literal on Android | Pure Swift over OrderedDictionary. Lowest risk library. |
+| IC-02 | `array[id: id]` subscript read returns correct element in O(1) on Android | OrderedDictionary lookup. Pure Swift. |
+| IC-03 | `array[id: id] = nil` subscript write removes element on Android | Pure Swift mutation. |
+| IC-04 | `array.remove(id:)` returns removed element on Android | Pure Swift. |
+| IC-05 | `array.ids` property returns ordered set of all IDs on Android | OrderedSet from swift-collections. Pure Swift. |
+| IC-06 | `IdentifiedArrayOf` conforms to Codable when element is Codable on Android | Swift conditional conformance. Works if compiler works. |
+| CD-01 | `customDump(_:)` outputs structured value representation on Android | **MEDIUM RISK**: Heavy Mirror usage. Mirror is in Swift runtime (not Foundation), should work. Needs runtime verification. |
+| CD-02 | `String(customDumping:)` creates string from value dump on Android | Same engine as CD-01. |
+| CD-03 | `diff(_:_:)` computes string diff between two values on Android | Uses Mirror + isMirrorEqual. Same risk as CD-01. |
+| CD-04 | `expectNoDifference(_:_:)` asserts equality with diff output on Android | Depends on CD-03 + IssueReporting. |
+| CD-05 | `expectDifference(_:_:operation:changes:)` asserts value changes on Android | Depends on CD-03 + IssueReporting. |
+| IR-01 | `reportIssue(_:)` reports string message as runtime issue on Android | IssueReporting already has `#if os(Android)` in Warn.swift. DefaultReporter needs Android path. |
+| IR-02 | `reportIssue(_:)` reports thrown Error instance on Android | Same mechanism as IR-01. |
+| IR-03 | `withErrorReporting {}` synchronous wrapper catches and reports on Android | Uses reportIssue internally. Pure Swift try/catch. |
+| IR-04 | `await withErrorReporting {}` async wrapper catches and reports on Android | Same as IR-03 but async. Swift concurrency on Android. |
+</phase_requirements>
+
+## Standard Stack
+
+### Core (Phase 2 Libraries)
+| Library | Upstream Repo | Purpose | Fork Status |
+|---------|--------------|---------|-------------|
+| CasePaths | pointfreeco/swift-case-paths | Enum pattern matching, CaseKeyPath | NEW FORK needed |
+| IdentifiedCollections | pointfreeco/swift-identified-collections | O(1) ID-indexed arrays | NEW FORK needed |
+| CustomDump | pointfreeco/swift-custom-dump | Structured value dumping/diffing | EXISTING FORK (already in forks/) |
+| IssueReporting | pointfreeco/xctest-dynamic-overlay | Runtime error surfacing | NEW FORK needed (package name is xctest-dynamic-overlay) |
+
+### Upstream Dependencies (NO fork needed)
+| Library | Purpose | Why No Fork |
+|---------|---------|-------------|
+| swift-collections (OrderedCollections) | Backing store for IdentifiedCollections | Apple package, pure Swift, expected to work |
+| swift-syntax (509-603) | Macro expansion for CasePaths | Host-side only, never runs on Android |
+
+### Key Dependency Chain
+```
+CasePaths -> IssueReporting (via xctest-dynamic-overlay package)
+CustomDump -> IssueReporting (via xctest-dynamic-overlay package)
+CustomDump -> XCTestDynamicOverlay (deprecated layer over IssueReporting)
+IdentifiedCollections -> OrderedCollections (from swift-collections)
+```
+
+**CRITICAL: Package naming.** The upstream repo is `pointfreeco/xctest-dynamic-overlay` but it provides the `IssueReporting` product. When forking, the fork name should be `swift-issue-reporting` but the Package.swift name remains `xctest-dynamic-overlay` for compatibility. Both `swift-custom-dump` and `swift-case-paths` depend on `package: "xctest-dynamic-overlay"`.
+
+## Architecture Patterns
+
+### Recommended Project Structure for Phase 2
+
+```
+forks/
+  swift-case-paths/           # NEW fork
+  swift-identified-collections/ # NEW fork
+  swift-issue-reporting/      # NEW fork (repo name, Package.swift name = xctest-dynamic-overlay)
+  swift-custom-dump/          # EXISTING fork
+  [14 existing forks...]      # Branch renamed to dev/swift-crossplatform
+
+examples/fuse-library/
+  Package.swift               # Add .package(path:) for ALL 17+ forks
+  Tests/
+    CasePathsTests/           # NEW test target
+    IdentifiedCollectionsTests/ # NEW test target
+    CustomDumpTests/           # NEW test target
+    IssueReportingTests/       # NEW test target
+```
+
+### Pattern 1: Fork Creation Workflow
+**What:** Create new fork from upstream, branch, add as submodule
+**When:** For each of the 3 new libraries
+**Steps:**
+1. Fork upstream repo on GitHub to `jacobcxdev/<name>`
+2. Clone and create `dev/swift-crossplatform` branch from latest release tag
+3. Add as git submodule: `git submodule add -b dev/swift-crossplatform https://github.com/jacobcxdev/<name>.git forks/<name>`
+4. Add `.package(path: "../../forks/<name>")` to fuse-library Package.swift
+
+### Pattern 2: Branch Rename for Existing Forks
+**What:** Rename tracking branches from `flote/service-app` / `dev/observation-tracking` to `dev/swift-crossplatform`
+**Steps per fork:**
+1. `cd forks/<name>`
+2. `git branch -m <old-branch> dev/swift-crossplatform`
+3. `git push origin dev/swift-crossplatform`
+4. `git push origin --delete <old-branch>` (or keep as alias)
+5. Update `.gitmodules` branch entry
+6. Update parent repo submodule config
+
+### Pattern 3: Platform Guard Strategy (Inline `#if`)
+**What:** Conditional compilation for Android-incompatible code
+**When:** A specific API or framework import fails on Android
+**Example:**
+```swift
+// For Apple-only framework conformances (already present in most files):
+#if canImport(CoreImage)
+  import CoreImage
+  // conformances...
+#endif
+
+// For APIs that exist on Apple but not Android:
+#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
+  // Apple-specific code
+#endif
+
+// For Android-specific fallbacks:
+#if os(Android)
+  // Android alternative
+#else
+  // Original code
+#endif
+```
+
+### Pattern 4: Test Target Wiring in fuse-library
+**What:** Per-library test targets that import the fork and verify Android behavior
+**Example Package.swift addition:**
+```swift
+.testTarget(
+    name: "CasePathsTests",
+    dependencies: [
+        .product(name: "CasePaths", package: "swift-case-paths"),
+    ]
+),
+```
+
+### Anti-Patterns to Avoid
+- **Proactive `#if os(Android)` guards without evidence:** Do NOT add guards speculatively. Run tests first, fix what actually fails. The CONTEXT.md explicitly requires test-first for Mirror/reflection.
+- **Separate platform files (e.g., `Dump+Android.swift`):** Locked decision says inline `#if` guards only.
+- **Forking swift-collections or swift-syntax:** These are upstream dependencies that should work without modification.
+- **Modifying macro plugin code for Android:** Macros expand on macOS host. Only the expanded output needs to compile for Android.
+
+## Don't Hand-Roll
+
+| Problem | Don't Build | Use Instead | Why |
+|---------|-------------|-------------|-----|
+| Enum case extraction | Custom reflection code | CasePaths' `@CasePathable` macro | ABI metadata handling is extremely delicate |
+| Value diffing | String comparison | CustomDump's `diff()` | Mirror traversal with cycle detection, type-aware formatting |
+| Issue reporting in tests | Direct `XCTFail` calls | IssueReporting's `reportIssue()` | Handles both XCTest and Swift Testing, test context detection |
+| ID-indexed collections | Dictionary + Array combo | IdentifiedCollections | Maintains insertion order with O(1) lookup, Codable, Equatable |
+| Branch rename automation | Manual per-fork commands | Shell script loop over .gitmodules | 14+ forks, error-prone to do manually |
+| Package.swift fork wiring | Manual path assembly | Pattern from existing fuse-library | SPM path resolution must be exact |
+
+**Key insight:** These libraries exist precisely because the problems they solve have subtle edge cases. The Phase 1 fork-first strategy applies: make minimal changes, verify with tests, keep diffs small for future upstream PRs.
+
+## Common Pitfalls
+
+### Pitfall 1: Package Name vs Repo Name Confusion (IssueReporting)
+**What goes wrong:** The upstream repo is `xctest-dynamic-overlay` but the modern product is `IssueReporting`. Forking as `swift-issue-reporting` but the SPM package name in Package.swift is `xctest-dynamic-overlay`. Other packages depend on `package: "xctest-dynamic-overlay"`.
+**Why it happens:** Point-Free renamed the library but kept the repo name for backward compatibility.
+**How to avoid:** The fork MUST keep `name: "xctest-dynamic-overlay"` in Package.swift. The fork directory can be named `swift-issue-reporting` but the `.package(path:)` reference must resolve correctly. Both `swift-custom-dump` and `swift-case-paths` reference `package: "xctest-dynamic-overlay"` in their dependencies.
+**Warning signs:** SPM resolution errors mentioning "no package named xctest-dynamic-overlay".
+
+### Pitfall 2: CasePaths EnumReflection ABI Pointer Arithmetic on Android
+**What goes wrong:** `EnumReflection.swift` uses `UnsafeRawPointer` arithmetic to read Swift enum metadata (EnumMetadata, ValueWitnessTable offsets, FieldRecord). Pointer sizes or struct layouts could differ.
+**Why it happens:** The code accesses Swift's internal ABI at specific byte offsets (e.g., `10 * pointerSize + 2 * 4` for getEnumTag). While Swift's ABI is documented as platform-independent, it has never been verified on Android aarch64.
+**How to avoid:** This code is only used by the **deprecated** `AnyCasePath.init(unsafe:)` initializers. The modern `@CasePathable` macro generates direct embed/extract closures that do NOT use EnumReflection. Verify that TCA and our test code use `@CasePathable` exclusively. If `AnyCasePath(unsafe:)` is needed, it requires runtime testing on Android emulator.
+**Warning signs:** Crashes in `extractHelp` or `EnumMetadata` on Android. SIGBUS/SIGSEGV from bad pointer reads.
+**Confidence:** MEDIUM -- ABI should be same on aarch64 Android, but unverified.
+
+### Pitfall 3: CustomDump Foundation Conformances on Android
+**What goes wrong:** `Foundation.swift` has multiple Apple-only guards using `#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)`:
+- `NSException` (line 114) -- not available on Linux/Android
+- `NSExpression` (line 137) -- not available on Linux/Android
+- `NSTimeZone` cast (line 208) -- uses different path on non-Apple
+These guards already exclude Android correctly. But other conformances use `#if !os(WASI)` (Data, Date, NSNotification, URLRequest) which INCLUDE Android -- these need runtime verification.
+**Why it happens:** Foundation on Android (swift-corelibs-foundation) has `ByteCountFormatter`, `DateFormatter`, etc. but some methods may be stubs.
+**How to avoid:** Run CustomDump's upstream tests on Android. The `#if !os(WASI)` guards should be fine since Android has full Foundation. The `#if os(iOS) || os(macOS) || ...` guards correctly exclude Android already.
+**Warning signs:** Runtime crashes in `ByteCountFormatter.string(fromByteCount:)` or `DateFormatter.string(from:)`.
+
+### Pitfall 4: Duration.formatted() Not Available on Android
+**What goes wrong:** `Swift.swift` has `Duration: CustomDumpStringConvertible` guarded by `#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)`. This already excludes Android. BUT if someone tries to remove this guard thinking "Duration is in Swift stdlib", the `.formatted(.units(...))` method requires FoundationInternationalization which may not be available.
+**Why it happens:** `Duration` is a Swift stdlib type, but `.formatted()` is a Foundation extension.
+**How to avoid:** Leave the existing `#if os(iOS) || ...` guard in place. It correctly excludes Android.
+
+### Pitfall 5: IssueReporting BreakpointReporter is Darwin-Only
+**What goes wrong:** `BreakpointReporter` uses `sysctl` and `SIGTRAP` to detect/trigger debugger breakpoints. This is wrapped in `#if canImport(Darwin)`. On Android, this reporter simply won't be available.
+**Why it happens:** Debugger attachment detection is OS-specific.
+**How to avoid:** This is already handled upstream -- the `#if canImport(Darwin)` guard means it compiles away on Android. The `DefaultReporter` falls back to stderr logging on non-Darwin platforms. No changes needed.
+
+### Pitfall 6: IssueReporting DefaultReporter SwiftUI Runtime Warning Scanning
+**What goes wrong:** `DefaultReporter` scans loaded dylibs to find SwiftUI's runtime warning mechanism for purple Xcode warnings. This dylib scanning won't work on Android.
+**Why it happens:** The `runtimeWarn()` function iterates `_dyld_image_count()` which is Darwin-specific.
+**How to avoid:** The code already has fallback paths. On non-Darwin platforms, it falls back to `printError()` which writes to stderr. On Android, `print()` routes to logcat. This should work without changes, but verify at runtime.
+
+### Pitfall 7: IssueReporting Test Context Detection on Android
+**What goes wrong:** `IsTesting.swift` detects test context by checking environment variables (`XCTestBundlePath`, etc.) and process arguments. On Android emulator, these may not be set correctly when running via `skip test`.
+**Why it happens:** Skip's test runner may use different environment variables than standard Swift PM testing.
+**How to avoid:** Verify that `TestContext.current` returns a valid value during `skip test` runs. If not, may need to set environment variables in the test harness or add Android-specific detection logic.
+**Warning signs:** `reportIssue()` logging to stderr instead of failing tests; tests appearing to pass when issues are reported.
+
+### Pitfall 8: Submodule Wiring Order Matters
+**What goes wrong:** Adding all forks to Package.swift at once without respecting the dependency chain causes SPM resolution failures.
+**Why it happens:** `swift-custom-dump` depends on `xctest-dynamic-overlay` (IssueReporting). `swift-case-paths` also depends on `xctest-dynamic-overlay`. If the IssueReporting fork isn't wired first, the other packages can't resolve their dependency.
+**How to avoid:** Wire forks in dependency order: (1) swift-issue-reporting (xctest-dynamic-overlay), (2) swift-case-paths and swift-custom-dump (both depend on IssueReporting), (3) swift-identified-collections (independent, but wire together). Verify `swift build` after each addition.
+
+### Pitfall 9: SwiftUI Conformance Already Guarded with !os(Android)
+**What goes wrong:** Accidentally removing the `!os(Android)` guard from `SwiftUI.swift` conformance file in CustomDump.
+**Why it happens:** The existing fork already has `#if canImport(SwiftUI) && !os(Android)` (visible in grep results). This was likely added in a previous fork change.
+**How to avoid:** Preserve this guard. SwiftUI types (Color, etc.) don't exist on Android even though `canImport(SwiftUI)` might pass through Skip's SkipUI.
+
+## Code Examples
+
+### Fork Wiring in Package.swift
+```swift
+// examples/fuse-library/Package.swift
+// Add these dependencies (dependency order matters for resolution):
+.package(path: "../../forks/swift-issue-reporting"),  // Provides IssueReporting
+.package(path: "../../forks/swift-case-paths"),
+.package(path: "../../forks/swift-identified-collections"),
+.package(path: "../../forks/swift-custom-dump"),
+// ... existing forks ...
+
+// NOTE: swift-case-paths and swift-custom-dump reference
+// package: "xctest-dynamic-overlay" in their Package.swift.
+// SPM resolves this via the fork's Package.swift name field,
+// which must remain "xctest-dynamic-overlay".
+```
+
+### Per-Library Test Target
+```swift
+// In fuse-library Package.swift targets array:
+.testTarget(
+    name: "CasePathsTests",
+    dependencies: [
+        .product(name: "CasePaths", package: "swift-case-paths"),
+    ]
+),
+.testTarget(
+    name: "IdentifiedCollectionsTests",
+    dependencies: [
+        .product(name: "IdentifiedCollections", package: "swift-identified-collections"),
+    ]
+),
+.testTarget(
+    name: "CustomDumpTests",
+    dependencies: [
+        .product(name: "CustomDump", package: "swift-custom-dump"),
+    ]
+),
+.testTarget(
+    name: "IssueReportingTests",
+    dependencies: [
+        .product(name: "IssueReporting", package: "swift-issue-reporting"),
+    ]
+),
+```
+
+### CasePaths Test Example (Verify @CasePathable on Android)
+```swift
+import CasePaths
+import Testing
+
+@CasePathable
+enum Action {
+    case increment
+    case setText(String)
+    case child(ChildAction)
+}
+
+@CasePathable
+enum ChildAction {
+    case tap
+}
+
+@Test func casePathableIsCheck() {
+    let action = Action.setText("hello")
+    #expect(action.is(\.setText))
+    #expect(!action.is(\.increment))
+}
+
+@Test func casePathableExtract() {
+    let action = Action.setText("hello")
+    #expect(action[case: \.setText] == "hello")
+    #expect(action[case: \.increment] == nil)
+}
+
+@Test func casePathableModify() {
+    var action = Action.setText("hello")
+    action.modify(\.setText) { $0 = "world" }
+    #expect(action[case: \.setText] == "world")
+}
+```
+
+### CustomDump Test Example (Verify Mirror on Android)
+```swift
+import CustomDump
+import Testing
+
+struct User: Equatable {
+    var id: Int
+    var name: String
+}
+
+@Test func customDumpProducesOutput() {
+    let user = User(id: 1, name: "Blob")
+    var output = ""
+    customDump(user, to: &output)
+    #expect(output.contains("User("))
+    #expect(output.contains("id: 1"))
+    #expect(output.contains("name: \"Blob\""))
+}
+
+@Test func diffDetectsChanges() {
+    let user1 = User(id: 1, name: "Blob")
+    let user2 = User(id: 1, name: "Blob Jr.")
+    let result = diff(user1, user2)
+    #expect(result != nil)
+    #expect(result!.contains("name"))
+}
+```
+
+### IssueReporting Test Example
+```swift
+import IssueReporting
+import Testing
+
+@Test func reportIssueStringMessage() {
+    withKnownIssue {
+        reportIssue("Something went wrong")
+    }
+}
+
+@Test func withErrorReportingCatchesErrors() {
+    struct TestError: Error {}
+    let result: Int? = withErrorReporting {
+        throw TestError()
+    }
+    #expect(result == nil)
+}
+```
+
+### Branch Rename Script Pattern
+```bash
+#!/bin/bash
+# Rename all fork branches to dev/swift-crossplatform
+for fork in forks/*/; do
+    name=$(basename "$fork")
+    cd "$fork"
+    old_branch=$(git rev-parse --abbrev-ref HEAD)
+    if [ "$old_branch" != "dev/swift-crossplatform" ]; then
+        git branch -m "$old_branch" dev/swift-crossplatform
+        git push origin dev/swift-crossplatform
+        echo "Renamed $name: $old_branch -> dev/swift-crossplatform"
+    fi
+    cd ../..
+done
+# Then update .gitmodules branch entries
+```
+
+## State of the Art
+
+| Old Approach | Current Approach | When Changed | Impact |
+|--------------|------------------|--------------|--------|
+| XCTestDynamicOverlay (XCTFail) | IssueReporting (reportIssue) | 2024 | IssueReporting supports both XCTest and Swift Testing |
+| AnyCasePath(unsafe:) reflection | @CasePathable macro | 2023 | Macro avoids runtime ABI metadata probing entirely |
+| xctest-dynamic-overlay repo name | Still xctest-dynamic-overlay | Never changed | Package.swift name must stay xctest-dynamic-overlay |
+| Manual enum case matching | CaseKeyPath with @dynamicMemberLookup | 2023 | Type-safe, compiler-checked enum access |
+
+**Deprecated/outdated:**
+- `XCTAssertNoDifference`: Deprecated in favor of `expectNoDifference` (uses IssueReporting instead of XCTest directly)
+- `XCTAssertDifference`: Deprecated in favor of `expectDifference`
+- `AnyCasePath.init(unsafe embed:)`: Deprecated, directs users to `@CasePathable` macro. Still functional but uses risky ABI reflection.
+- `XCTestDynamicOverlay` product: Thin re-export of IssueReporting. Deprecated but still shipped for backward compat.
+
+## Open Questions
+
+1. **Does `_typeName()` (Swift stdlib) produce correct output on Android?**
+   - What we know: `_typeName` is a Swift runtime function used by CustomDump's `AnyType.swift` for type name formatting. It's part of the Swift stdlib, not Foundation.
+   - What's unclear: Whether the output format matches expectations (e.g., module-qualified names).
+   - Recommendation: Include in runtime test suite. If output differs, CustomDump's `typeName()` wrapper may need adjustment.
+
+2. **Does `AnyKeyPath.debugDescription` work on Android (Swift 5.9+)?**
+   - What we know: CustomDump's `KeyPath.swift` uses `AnyKeyPath.debugDescription` guarded by `@available(macOS 13.3, iOS 16.4, ...)`. This availability check may not work correctly on Android.
+   - What's unclear: Whether `@available` guards compile/evaluate correctly on non-Apple platforms.
+   - Recommendation: Test at runtime. The fallback path uses `_typeName` which should work.
+
+3. **Does `ProcessInfo.processInfo.arguments` work in Skip test runner?**
+   - What we know: IssueReporting's test context detection inspects process arguments for "xctest" and "swiftpm-testing-helper".
+   - What's unclear: What process arguments exist when running via `skip test`.
+   - Recommendation: Print ProcessInfo diagnostics in first test run to understand the Android test environment.
+
+4. **Will the xctest-dynamic-overlay fork name cause SPM resolution conflicts?**
+   - What we know: The fork directory will be `swift-issue-reporting` but Package.swift name is `xctest-dynamic-overlay`. Both CasePaths and CustomDump depend on `package: "xctest-dynamic-overlay"`.
+   - What's unclear: Whether SPM resolves the package name from the fork's Package.swift or from the directory name / .package(path:) reference.
+   - Recommendation: Verify SPM resolution with a minimal test. The `.package(path:)` URL is just a filesystem path; SPM reads the Package.swift `name:` field from that path. Should work but needs verification.
+
+## Sources
+
+### Primary (HIGH confidence)
+- Direct source code inspection of `forks/swift-custom-dump/Sources/` -- all conformance files, Internal/, Dump.swift, Diff.swift
+- `pointfreeco/swift-case-paths` Package.swift and source tree via GitHub API
+- `pointfreeco/xctest-dynamic-overlay` Package.swift and source tree via GitHub API
+- `pointfreeco/swift-identified-collections` Package.swift via GitHub raw content
+- `.gitmodules` in project repo -- current fork configuration
+
+### Secondary (MEDIUM confidence)
+- [Swift ABI TypeMetadata documentation](https://github.com/apple/swift/blob/main/docs/ABI/TypeMetadata.rst) -- enum metadata layout
+- [Swift ABI Stability Manifesto](https://github.com/apple/swift/blob/main/docs/ABIStabilityManifesto.md) -- platform-independent ABI design
+- [How Mirror Works (swift.org)](https://www.swift.org/blog/how-mirror-works/) -- Mirror implementation details
+- [Skip porting guide](https://skip.dev/docs/porting/) -- Foundation module split on Android
+- [Skip native Swift packages blog](https://skip.dev/blog/android-native-swift-packages/) -- C library differences on Android
+
+### Tertiary (LOW confidence)
+- swift-corelibs-foundation GitHub issues -- ByteCountFormatter, NSException existence on Linux/Android (existence confirmed, completeness unverified)
+- Web search results on Swift ABI on Android -- no specific Android ABI verification sources found
+
+## Metadata
+
+**Confidence breakdown:**
+- Standard stack: HIGH -- direct source inspection, dependency chain verified
+- Architecture: HIGH -- follows established Phase 1 fork-first pattern
+- CasePaths EnumReflection risk: MEDIUM -- ABI documented as platform-independent but unverified on Android
+- CustomDump Mirror: MEDIUM-HIGH -- Mirror is Swift runtime, should work, but complex traversal patterns need runtime verification
+- IdentifiedCollections: HIGH -- pure data structures, no platform dependencies
+- IssueReporting: MEDIUM-HIGH -- already has cross-platform conditionals, but test context detection on Android is unverified
+- Pitfalls: HIGH -- identified through direct source code analysis
+
+**Research date:** 2026-02-21
+**Valid until:** 2026-03-21 (stable libraries, infrequent releases)
