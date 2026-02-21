@@ -1,0 +1,25 @@
+// swift-tools-version: 6.1
+// This is a Skip (https://skip.dev) package.
+import PackageDescription
+
+let package = Package(
+    name: "lite-library",
+    defaultLocalization: "en",
+    platforms: [.iOS(.v17), .macOS(.v14)],
+    products: [
+        .library(name: "LiteLibrary", type: .dynamic, targets: ["LiteLibrary"]),
+    ],
+    dependencies: [
+        .package(url: "https://source.skip.tools/skip.git", from: "1.7.2"),
+        .package(url: "https://source.skip.tools/skip-foundation.git", from: "1.0.0")
+    ],
+    targets: [
+        .target(name: "LiteLibrary", dependencies: [
+            .product(name: "SkipFoundation", package: "skip-foundation")
+        ], resources: [.process("Resources")], plugins: [.plugin(name: "skipstone", package: "skip")]),
+        .testTarget(name: "LiteLibraryTests", dependencies: [
+            "LiteLibrary",
+            .product(name: "SkipTest", package: "skip")
+        ], resources: [.process("Resources")], plugins: [.plugin(name: "skipstone", package: "skip")]),
+    ]
+)
