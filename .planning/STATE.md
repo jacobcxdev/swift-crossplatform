@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 Phase: 1 of 7 (Observation Bridge)
 Plan: 0 of 2 in current phase
 Status: Ready to plan
-Last activity: 2026-02-21 -- Roadmap created with 7 phases covering 184 requirements
+Last activity: 2026-02-21 -- Phase 1 context gathered (11 implementation decisions captured)
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -46,6 +46,12 @@ Recent decisions affecting current work:
 - Fix at bridge level (skip-android-bridge/skip-ui), not app level
 - Use native `withObservationTracking` (not swift-perception) -- `libswiftObservation.so` ships with Android SDK
 - Fork-first, upstream later -- Skip team endorsed this approach
+- Bridge init/runtime JNI failures are fatal (fatalError) -- no silent degradation
+- Counter path disabled when nativeEnable() active -- zero impact on non-observation Skip users
+- PerceptionRegistrar is thin passthrough to native ObservationRegistrar on Android
+- Hybrid SPM: SKIP_BRIDGE for Skip forks, simple #if os(Android) for PF forks
+- All 14 forks must compile for Android in Phase 1
+- swiftThreadingFatal stub version-gated for auto-removal at Swift 6.3
 
 ### Pending Todos
 
@@ -60,5 +66,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Roadmap created, ready to plan Phase 1
-Resume file: None
+Stopped at: Phase 1 context gathered, ready to plan
+Resume file: .planning/phases/01-observation-bridge/01-CONTEXT.md
