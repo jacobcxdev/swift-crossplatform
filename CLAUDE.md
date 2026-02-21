@@ -33,7 +33,7 @@ skip android emulator launch --logcat '*:W'  # Launch emulator with filtered log
 
 ## Submodule Management
 
-14 fork submodules live in `forks/`. Use these from the repo root:
+17 fork submodules live in `forks/`. Use these from the repo root:
 
 ```bash
 # After fresh clone
@@ -48,8 +48,7 @@ make diff-all          # Show uncommitted changes across submodules
 
 ## Working with Forks
 
-- 12 Point-Free/GRDB forks track the `flote/service-app` branch
-- 2 Skip forks (`skip-android-bridge`, `skip-ui`) track `dev/observation-tracking`
+- All 17 forks track the `dev/swift-crossplatform` branch
 - Example projects reference forks via local path: `.package(path: "../../forks/<name>")`
 - All fork changes must gate behind `#if os(Android)` or `#if SKIP_BRIDGE` to preserve iOS behavior
 - No iOS regressions — every fork must build and test cleanly on both platforms

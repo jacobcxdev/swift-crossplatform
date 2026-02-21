@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 1: Observation Bridge
+**Current focus:** Phase 2: Foundation Libraries (in progress)
 
 ## Current Position
 
-Phase: 1 of 7 (Observation Bridge)
-Plan: 2 of 2 in current phase
-Status: Executed -- both plans complete, ready for verification
-Last activity: 2026-02-21 -- Plan 01-02 validated (Android build OK, macOS 19/19 tests, skip test Fuse limitation found)
+Phase: 2 of 7 (Foundation Libraries)
+Plan: 1 of 3 in current phase
+Status: Executing -- Plan 02-01 (fork housekeeping) complete, Plans 02-02 and 02-03 pending
+Last activity: 2026-02-21 -- Plan 02-01 executed: branch rename, 3 new forks, 17-fork Package.swift wiring
 
-Progress: [██████████] 100%
+Progress: [███░░░░░░░] 33%
 
 ## Performance Metrics
 
@@ -50,12 +50,13 @@ Recent decisions affecting current work:
 - Counter path disabled when nativeEnable() active -- zero impact on non-observation Skip users
 - PerceptionRegistrar is thin passthrough to native ObservationRegistrar on Android
 - Hybrid SPM: SKIP_BRIDGE for Skip forks, simple #if os(Android) for PF forks
-- All 14 forks must compile for Android in Phase 1
+- All 17 forks must compile for Android (expanded from 14 in Phase 2)
 - swiftThreadingFatal stub version-gated for auto-removal at Swift 6.3
 
 ### Pending Todos
 
-None yet.
+- **Perception bypass on Android (Phase 3+):** `PerceptionRegistrar` delegates to native `ObservationRegistrar`, bypassing bridge `recordAccess` hooks. Raw `@Perceptible` views (without TCA) won't trigger Compose updates. Safe for TCA (uses bridge registrar directly). Verify no non-TCA code relies on Perception for view driving. (Source: Gemini verifier)
+- **Android runtime verification (Phase 7):** 5 human tests deferred — single recomposition, nested independence, ViewModifier observation, fatal error on bridge failure, full 14-fork compilation. All require running emulator. (Source: all 3 verifiers)
 
 ### Blockers/Concerns
 
@@ -66,5 +67,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Both Phase 1 plans executed, ready for verification
-Resume file: /gsd:verify-work 1
+Stopped at: Phase 2, Plan 02-01 complete, executing remaining plans
+Resume file: /gsd:execute-phase 2

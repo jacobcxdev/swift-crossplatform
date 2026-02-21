@@ -31,7 +31,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Nested parent/child view hierarchies each independently track their own observed properties on Android
   3. `ViewModifier` bodies participate in observation tracking the same as `View` bodies on Android
   4. Bridge initialization failure produces a fatal error (crash with clear message) instead of silently falling back to broken counter-based observation
-  5. All 14 fork packages compile for Android via Skip Fuse mode with correct SPM configuration
+  5. All 17 fork packages compile for Android via Skip Fuse mode with correct SPM configuration
 **Plans**: 2 plans in 2 waves
 
 Plans:
@@ -47,10 +47,12 @@ Plans:
   2. `IdentifiedArrayOf` initializes, indexes by ID in O(1), and supports element removal on Android
   3. `customDump` and `diff` produce correct structured output for Swift values on Android
   4. `reportIssue` and `withErrorReporting` catch and surface runtime errors on Android
-**Plans**: TBD
+**Plans**: 3 plans in 3 waves
 
 Plans:
-- [ ] 02-01: TBD
+- [x] 02-01-PLAN.md -- Fork housekeeping: branch rename (dev/swift-crossplatform), 3 new forks (swift-case-paths, swift-identified-collections, xctest-dynamic-overlay), Package.swift wiring for all 17 forks, per-library test targets (CP-01, CP-05, IC-01, IC-05) ✓ 2026-02-21
+- [ ] 02-02-PLAN.md -- IssueReporting three-layer Android fix (isTesting, dlsym, fallbacks) + IdentifiedCollections validation (IR-01 through IR-04, IC-01 through IC-06)
+- [ ] 02-03-PLAN.md -- CasePaths validation + EnumMetadata ABI smoke test + CustomDump conformance guards and tests (CP-01 through CP-08, CD-01 through CD-05)
 
 ### Phase 3: TCA Core
 **Goal**: TCA Store, reducers, effects, and dependency injection work correctly on Android
@@ -140,7 +142,7 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Observation Bridge | 2/2 | Executed | - |
-| 2. Foundation Libraries | 0/1 | Not started | - |
+| 2. Foundation Libraries | 0/3 | Not started | - |
 | 3. TCA Core | 0/2 | Not started | - |
 | 4. TCA State & Bindings | 0/2 | Not started | - |
 | 5. Navigation & Presentation | 0/2 | Not started | - |
