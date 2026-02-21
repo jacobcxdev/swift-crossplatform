@@ -2,22 +2,28 @@
 
 **Researched:** 2026-02-21
 **Domain:** Cross-platform Swift utility libraries (CasePaths, IdentifiedCollections, CustomDump, IssueReporting) on Android via Skip Fuse
-**Confidence:** MEDIUM-HIGH
+**Confidence:** MEDIUM-HIGH (upgraded after deep dives)
 
 ## Summary
 
 Phase 2 covers making four Point-Free utility libraries compile and run correctly on Android. These are pure Swift logic libraries with no UI dependencies, but they touch several Swift runtime features that need verification on Android: Mirror reflection, enum ABI metadata pointer arithmetic, KeyPath, Foundation types, and dynamic library symbol loading for test framework detection.
 
-The primary risk is **CasePaths' `EnumReflection.swift`**, which uses raw pointer arithmetic against Swift's ABI metadata layout (EnumMetadata, ValueWitnessTable, FieldRecord) to extract enum associated values at runtime. While Swift's ABI metadata layout is platform-independent by design, this code has never been tested on Android and uses `@_spi(Reflection)` internal APIs. The second risk area is **CustomDump's heavy Mirror usage** -- Mirror is implemented in the Swift runtime (not Foundation) and should work on Android, but edge cases around superclass mirror traversal and enum display styles need runtime verification. **IdentifiedCollections** is pure Swift data structures over OrderedCollections and is the lowest risk. **IssueReporting** already has Linux/Android conditional compilation in its `Warn.swift` file and uses `dlsym`-based dynamic loading that works cross-platform, but its `BreakpointReporter` is Darwin-only and its `DefaultReporter` uses SwiftUI dylib scanning that will not work on Android.
+**CRITICAL FINDING (IssueReporting):** IssueReporting has a **three-layer detection failure** on Android that causes `reportIssue()` to silently write to stderr instead of failing tests. This means ALL TCA test assertions (exhaustive store testing, dependency checking) and CustomDump's `expectNoDifference`/`expectDifference` become **no-ops** on Android tests. The root cause: (1) `isTesting` returns `false` because it checks Xcode-specific env vars, (2) `dlsym` symbol resolution has no `#if os(Android)` branch, (3) all fallback paths require `canImport(Darwin)`. **This must be fixed in the fork before any meaningful Android testing.**
 
-**Primary recommendation:** Fork the 3 new libraries, wire all forks into fuse-library, then adopt a test-first approach -- run upstream tests on Android emulator to identify actual failures before writing any `#if os(Android)` guards. Most code is expected to work without changes.
+**CasePaths has two distinct risk profiles.** The `@CasePathable` macro is **100% safe** — it expands to pure Swift `guard case` pattern matching with zero platform dependencies. However, TCA's core reducer infrastructure uses `EnumMetadata` (CasePaths' `@_spi(Reflection)` ABI pointer arithmetic) in **6 files that compile on Android** — including `Binding.swift`, `EphemeralState.swift`, `PresentationID.swift`, `NavigationID.swift`, `PresentationReducer.swift`, and `StackReducer.swift`. This **cannot be gated behind `#if !os(Android)`** without breaking TCA. The ABI layout is platform-independent by design and should work on aarch64 Android, but is unverified.
+
+**CustomDump's Mirror usage is safe** (LOW risk). All Mirror APIs (`reflecting`, `children`, `displayStyle`, `subjectType`, `superclassMirror`) are Swift runtime, not Foundation. `_typeName()` is stdlib. `#available(... *)` wildcard correctly evaluates to `true` on Android. `ByteCountFormatter` and `DateFormatter` exist in swift-corelibs-foundation and work on Linux/Android (DateFormatter requires ICU, which Skip bundles). The only concrete fix needed is a potential `#if os(Android)` fallback for `ByteCountFormatter` in `Data.customDumpDescription` if it proves incomplete.
+
+**IdentifiedCollections** is pure Swift data structures over OrderedCollections and is the lowest risk — expected zero changes.
+
+**Primary recommendation:** Fork the 3 new libraries, wire all forks into fuse-library, then **fix IssueReporting's test context detection first** (this unblocks all other library testing). After that, adopt a test-first approach for the remaining libraries.
 
 <user_constraints>
 ## User Constraints (from CONTEXT.md)
 
 ### Locked Decisions
 - Rename all fork branches to `dev/swift-crossplatform`. Existing forks use `flote/service-app` (12 PF/GRDB forks) and `dev/observation-tracking` (2 Skip forks). All must be renamed. Update `.gitmodules` accordingly. This is the first plan (02-01).
-- Create 3 new forks: swift-case-paths, swift-identified-collections, swift-issue-reporting. Fork from upstream at latest release tag, create `dev/swift-crossplatform` branch. Add as submodules.
+- Create 3 new forks: swift-case-paths, swift-identified-collections, xctest-dynamic-overlay. Fork from upstream at latest release tag, create `dev/swift-crossplatform` branch. Add as submodules. **CRITICAL: IssueReporting fork directory MUST be `xctest-dynamic-overlay` (not `swift-issue-reporting`)** — SPM uses directory name as package identity, and 10+ forks depend on `package: "xctest-dynamic-overlay"`.
 - Wire ALL forks into fuse-library Package.swift with `.package(path: "../../forks/<name>")` entries. Completes SPM-05.
 - Update fork count references in STATE.md, ROADMAP.md, CLAUDE.md.
 - Full Android runtime validation required (compile AND execute on emulator).
@@ -50,29 +56,29 @@ The primary risk is **CasePaths' `EnumReflection.swift`**, which uses raw pointe
 
 | ID | Description | Research Support |
 |----|-------------|-----------------|
-| CP-01 | `@CasePathable` macro generates `AllCasePaths` and `CaseKeyPath` accessors on Android | Macro expands on host; generated code is pure Swift (CasePathable.swift). No platform deps. LOW risk. |
-| CP-02 | `.is(\.caseName)` returns correct Bool for case checking on Android | Uses CaseKeyPath subscript extraction -- pure Swift closures. No platform deps. |
-| CP-03 | `.modify(\.caseName) {}` mutates associated value in-place on Android | Same mechanism as CP-02. Pure Swift. |
+| CP-01 | `@CasePathable` macro generates `AllCasePaths` and `CaseKeyPath` accessors on Android | **VERIFIED SAFE (DD-2):** Macro expands to 100% pure Swift (`guard case` + closures). Zero platform deps. |
+| CP-02 | `.is(\.caseName)` returns correct Bool for case checking on Android | **VERIFIED SAFE (DD-2):** Uses macro-generated closures. Pure Swift. |
+| CP-03 | `.modify(\.caseName) {}` mutates associated value in-place on Android | **VERIFIED SAFE (DD-2):** Same mechanism as CP-02. |
 | CP-04 | `@dynamicMemberLookup` dot-syntax returns Optional on Android | Compiler feature, not runtime. Works if code compiles. |
-| CP-05 | `allCasePaths` static variable returns collection of all case key paths on Android | Generated by macro. Pure Swift struct. |
-| CP-06 | `root[case: caseKeyPath]` subscript extracts/embeds associated value on Android | Pure Swift subscript on Case struct. |
+| CP-05 | `allCasePaths` static variable returns collection of all case key paths on Android | **VERIFIED SAFE (DD-2):** Generated `IndexingIterator` over pure Swift struct. |
+| CP-06 | `root[case: caseKeyPath]` subscript extracts/embeds associated value on Android | **VERIFIED SAFE (DD-2):** Pure Swift subscript via `._$embed`. |
 | CP-07 | `@Reducer enum` pattern synthesizes body and scope on Android | TCA macro, but CasePaths provides the CaseKeyPath infrastructure. Phase 3 concern. |
-| CP-08 | `AnyCasePath` with custom embed/extract closures works on Android | **HIGH RISK**: `EnumReflection.swift` uses ABI metadata pointer arithmetic. See Architecture Patterns. |
+| CP-08 | `AnyCasePath` with custom embed/extract closures works on Android | **MEDIUM-HIGH RISK (DD-1):** TCA uses `EnumMetadata` ABI pointer arithmetic in 6 core files. ABI should be identical on aarch64 but unverified. Cannot gate out. |
 | IC-01 | `IdentifiedArrayOf<T>` initializes from array literal on Android | Pure Swift over OrderedDictionary. Lowest risk library. |
 | IC-02 | `array[id: id]` subscript read returns correct element in O(1) on Android | OrderedDictionary lookup. Pure Swift. |
 | IC-03 | `array[id: id] = nil` subscript write removes element on Android | Pure Swift mutation. |
 | IC-04 | `array.remove(id:)` returns removed element on Android | Pure Swift. |
 | IC-05 | `array.ids` property returns ordered set of all IDs on Android | OrderedSet from swift-collections. Pure Swift. |
 | IC-06 | `IdentifiedArrayOf` conforms to Codable when element is Codable on Android | Swift conditional conformance. Works if compiler works. |
-| CD-01 | `customDump(_:)` outputs structured value representation on Android | **MEDIUM RISK**: Heavy Mirror usage. Mirror is in Swift runtime (not Foundation), should work. Needs runtime verification. |
-| CD-02 | `String(customDumping:)` creates string from value dump on Android | Same engine as CD-01. |
-| CD-03 | `diff(_:_:)` computes string diff between two values on Android | Uses Mirror + isMirrorEqual. Same risk as CD-01. |
-| CD-04 | `expectNoDifference(_:_:)` asserts equality with diff output on Android | Depends on CD-03 + IssueReporting. |
-| CD-05 | `expectDifference(_:_:operation:changes:)` asserts value changes on Android | Depends on CD-03 + IssueReporting. |
-| IR-01 | `reportIssue(_:)` reports string message as runtime issue on Android | IssueReporting already has `#if os(Android)` in Warn.swift. DefaultReporter needs Android path. |
-| IR-02 | `reportIssue(_:)` reports thrown Error instance on Android | Same mechanism as IR-01. |
-| IR-03 | `withErrorReporting {}` synchronous wrapper catches and reports on Android | Uses reportIssue internally. Pure Swift try/catch. |
-| IR-04 | `await withErrorReporting {}` async wrapper catches and reports on Android | Same as IR-03 but async. Swift concurrency on Android. |
+| CD-01 | `customDump(_:)` outputs structured value representation on Android | **VERIFIED LOW RISK (DD-3):** All Mirror APIs are Swift stdlib. `_typeName()` is platform-independent. |
+| CD-02 | `String(customDumping:)` creates string from value dump on Android | **VERIFIED LOW RISK (DD-3):** Same engine as CD-01. |
+| CD-03 | `diff(_:_:)` computes string diff between two values on Android | **VERIFIED LOW RISK (DD-3):** `isMirrorEqual` uses only stdlib APIs. |
+| CD-04 | `expectNoDifference(_:_:)` asserts equality with diff output on Android | **BLOCKED BY IR FIX (DD-5):** Uses `reportIssue()` which is no-op in Android tests until IssueReporting fork is fixed. |
+| CD-05 | `expectDifference(_:_:operation:changes:)` asserts value changes on Android | **BLOCKED BY IR FIX (DD-5):** Same as CD-04. |
+| IR-01 | `reportIssue(_:)` reports string message as runtime issue on Android | **CRITICAL (DD-5):** Three-layer detection failure. Silently writes to stderr instead of failing tests. Fork fix required. |
+| IR-02 | `reportIssue(_:)` reports thrown Error instance on Android | **CRITICAL (DD-5):** Same mechanism as IR-01. |
+| IR-03 | `withErrorReporting {}` synchronous wrapper catches and reports on Android | **CRITICAL (DD-5):** Uses reportIssue internally. Errors caught but only logged, not test failures. |
+| IR-04 | `await withErrorReporting {}` async wrapper catches and reports on Android | **CRITICAL (DD-5):** Same as IR-03 but async. |
 </phase_requirements>
 
 ## Standard Stack
@@ -99,7 +105,7 @@ CustomDump -> XCTestDynamicOverlay (deprecated layer over IssueReporting)
 IdentifiedCollections -> OrderedCollections (from swift-collections)
 ```
 
-**CRITICAL: Package naming.** The upstream repo is `pointfreeco/xctest-dynamic-overlay` but it provides the `IssueReporting` product. When forking, the fork name should be `swift-issue-reporting` but the Package.swift name remains `xctest-dynamic-overlay` for compatibility. Both `swift-custom-dump` and `swift-case-paths` depend on `package: "xctest-dynamic-overlay"`.
+**CRITICAL: Package naming & identity.** The upstream repo is `pointfreeco/xctest-dynamic-overlay` but it provides the `IssueReporting` product. The fork directory MUST be `forks/xctest-dynamic-overlay` (not `swift-issue-reporting`) because **SPM uses the directory name as package identity** for local path dependencies. 10+ forks depend on `package: "xctest-dynamic-overlay"`. The Package.swift `name:` field must also remain `"xctest-dynamic-overlay"`. The root manifest's `.package(path:)` overrides all transitive URL references to `pointfreeco/xctest-dynamic-overlay` across the entire dependency graph.
 
 ## Architecture Patterns
 
@@ -109,7 +115,7 @@ IdentifiedCollections -> OrderedCollections (from swift-collections)
 forks/
   swift-case-paths/           # NEW fork
   swift-identified-collections/ # NEW fork
-  swift-issue-reporting/      # NEW fork (repo name, Package.swift name = xctest-dynamic-overlay)
+  xctest-dynamic-overlay/     # NEW fork (directory name MUST match package identity)
   swift-custom-dump/          # EXISTING fork
   [14 existing forks...]      # Branch renamed to dev/swift-crossplatform
 
@@ -198,18 +204,19 @@ examples/fuse-library/
 
 ## Common Pitfalls
 
-### Pitfall 1: Package Name vs Repo Name Confusion (IssueReporting)
-**What goes wrong:** The upstream repo is `xctest-dynamic-overlay` but the modern product is `IssueReporting`. Forking as `swift-issue-reporting` but the SPM package name in Package.swift is `xctest-dynamic-overlay`. Other packages depend on `package: "xctest-dynamic-overlay"`.
-**Why it happens:** Point-Free renamed the library but kept the repo name for backward compatibility.
-**How to avoid:** The fork MUST keep `name: "xctest-dynamic-overlay"` in Package.swift. The fork directory can be named `swift-issue-reporting` but the `.package(path:)` reference must resolve correctly. Both `swift-custom-dump` and `swift-case-paths` reference `package: "xctest-dynamic-overlay"` in their dependencies.
-**Warning signs:** SPM resolution errors mentioning "no package named xctest-dynamic-overlay".
+### Pitfall 1: Package Name vs Repo Name vs Directory Name (IssueReporting) (UPDATED — DD-6)
+**What goes wrong:** SPM uses the **directory name** as package identity for local path dependencies (SE-0292). If the fork directory is `swift-issue-reporting` but downstream forks reference `package: "xctest-dynamic-overlay"`, SPM can't resolve the dependency.
+**Why it happens:** Point-Free renamed the library to IssueReporting but kept the repo name `xctest-dynamic-overlay`. SPM identity matching uses directory name, not Package.swift `name:` field.
+**How to avoid:** The fork directory MUST be `forks/xctest-dynamic-overlay` (not `forks/swift-issue-reporting`). The Package.swift `name:` field must remain `"xctest-dynamic-overlay"`. **10+ forks** depend on `package: "xctest-dynamic-overlay"` — all will resolve correctly against the local path override.
+**Warning signs:** SPM resolution errors mentioning "no package named xctest-dynamic-overlay" or "multiple packages with identity xctest-dynamic-overlay".
 
-### Pitfall 2: CasePaths EnumReflection ABI Pointer Arithmetic on Android
+### Pitfall 2: CasePaths EnumReflection ABI Pointer Arithmetic on Android (UPGRADED — DD-1)
 **What goes wrong:** `EnumReflection.swift` uses `UnsafeRawPointer` arithmetic to read Swift enum metadata (EnumMetadata, ValueWitnessTable offsets, FieldRecord). Pointer sizes or struct layouts could differ.
-**Why it happens:** The code accesses Swift's internal ABI at specific byte offsets (e.g., `10 * pointerSize + 2 * 4` for getEnumTag). While Swift's ABI is documented as platform-independent, it has never been verified on Android aarch64.
-**How to avoid:** This code is only used by the **deprecated** `AnyCasePath.init(unsafe:)` initializers. The modern `@CasePathable` macro generates direct embed/extract closures that do NOT use EnumReflection. Verify that TCA and our test code use `@CasePathable` exclusively. If `AnyCasePath(unsafe:)` is needed, it requires runtime testing on Android emulator.
-**Warning signs:** Crashes in `extractHelp` or `EnumMetadata` on Android. SIGBUS/SIGSEGV from bad pointer reads.
-**Confidence:** MEDIUM -- ABI should be same on aarch64 Android, but unverified.
+**Why it happens:** The code accesses Swift's internal ABI at specific byte offsets (e.g., `10 * pointerSize + 2 * 4` for getEnumTag at offset 88 on aarch64). While ABI is platform-independent by design, it has never been verified on Android aarch64.
+**CRITICAL UPDATE (DD-1):** TCA uses `EnumMetadata` in **6 core files that compile on Android** — this is NOT limited to the deprecated `AnyCasePath(unsafe:)`. `Binding.swift:285` calls `AnyCasePath(unsafe:).extract()`, and `EphemeralState`, `PresentationID`, `NavigationID`, `PresentationReducer`, `StackReducer` all use `EnumMetadata().tag()/.project()/.caseName()` without `#if !os(Android)` guards. **Cannot gate EnumReflection out.**
+**How to avoid:** Keep EnumReflection available on Android. Add a runtime smoke test exercising `EnumMetadata` on a known enum at app/test startup. If it crashes (SIGBUS/SIGSEGV), the 6 TCA files need CasePathable-based alternatives (significant Phase 3 rework).
+**Warning signs:** Crashes in `extractHelp`, `EnumMetadata.tag()`, or `project()` on Android. SIGBUS/SIGSEGV from bad pointer reads.
+**Confidence:** MEDIUM-HIGH that ABI works — same compiler source, same 64-bit layout, same VWT offsets.
 
 ### Pitfall 3: CustomDump Foundation Conformances on Android
 **What goes wrong:** `Foundation.swift` has multiple Apple-only guards using `#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)`:
@@ -236,11 +243,12 @@ These guards already exclude Android correctly. But other conformances use `#if 
 **Why it happens:** The `runtimeWarn()` function iterates `_dyld_image_count()` which is Darwin-specific.
 **How to avoid:** The code already has fallback paths. On non-Darwin platforms, it falls back to `printError()` which writes to stderr. On Android, `print()` routes to logcat. This should work without changes, but verify at runtime.
 
-### Pitfall 7: IssueReporting Test Context Detection on Android
-**What goes wrong:** `IsTesting.swift` detects test context by checking environment variables (`XCTestBundlePath`, etc.) and process arguments. On Android emulator, these may not be set correctly when running via `skip test`.
-**Why it happens:** Skip's test runner may use different environment variables than standard Swift PM testing.
-**How to avoid:** Verify that `TestContext.current` returns a valid value during `skip test` runs. If not, may need to set environment variables in the test harness or add Android-specific detection logic.
-**Warning signs:** `reportIssue()` logging to stderr instead of failing tests; tests appearing to pass when issues are reported.
+### Pitfall 7: IssueReporting Test Context Detection on Android (CRITICAL — DD-5)
+**What goes wrong:** On Android, `reportIssue()` silently writes to stderr instead of failing tests. ALL TCA test assertions and CustomDump's `expectNoDifference`/`expectDifference` become no-ops.
+**Why it happens:** Three-layer cascading failure: (1) `isTesting` returns `false` — checks Xcode-specific env vars (`XCTestBundlePath`, etc.) that Skip doesn't set; (2) `dlsym` symbol resolution in `SwiftTesting.swift:606-628` has no `#if os(Android)` branch — Android is NOT `os(Linux)` in Swift 6.2, falls through to `return nil`; (3) `#if DEBUG && canImport(Darwin)` fallback paths are false on Android.
+**How to avoid:** Fix in xctest-dynamic-overlay fork: (A) Add `#if os(Android)` to `isTesting` with Skip-compatible process detection, (B) Add `#if os(Android)` to `unsafeBitCast(symbol:in:)` with same `dlopen`/`dlsym` as Linux branch, or (C) Register custom `IssueReporter` at test launch that calls `XCTFail` directly.
+**Warning signs:** Tests appearing to pass even when `reportIssue()` is called. No test failures from `expectNoDifference`. `stderr`/logcat shows issue messages but test suite reports 0 failures.
+**This is the #1 priority fix for Phase 2.** Without it, no meaningful Android test validation is possible.
 
 ### Pitfall 8: Submodule Wiring Order Matters
 **What goes wrong:** Adding all forks to Package.swift at once without respecting the dependency chain causes SPM resolution failures.
@@ -258,7 +266,7 @@ These guards already exclude Android correctly. But other conformances use `#if 
 ```swift
 // examples/fuse-library/Package.swift
 // Add these dependencies (dependency order matters for resolution):
-.package(path: "../../forks/swift-issue-reporting"),  // Provides IssueReporting
+.package(path: "../../forks/xctest-dynamic-overlay"),  // Provides IssueReporting (directory = package identity)
 .package(path: "../../forks/swift-case-paths"),
 .package(path: "../../forks/swift-identified-collections"),
 .package(path: "../../forks/swift-custom-dump"),
@@ -294,7 +302,7 @@ These guards already exclude Android correctly. But other conformances use `#if 
 .testTarget(
     name: "IssueReportingTests",
     dependencies: [
-        .product(name: "IssueReporting", package: "swift-issue-reporting"),
+        .product(name: "IssueReporting", package: "xctest-dynamic-overlay"),
     ]
 ),
 ```
@@ -416,36 +424,164 @@ done
 - `AnyCasePath.init(unsafe embed:)`: Deprecated, directs users to `@CasePathable` macro. Still functional but uses risky ABI reflection.
 - `XCTestDynamicOverlay` product: Thin re-export of IssueReporting. Deprecated but still shipped for backward compat.
 
+## Deep Dive Findings
+
+### DD-1: CasePaths EnumReflection — TCA Cannot Avoid It
+
+**Confidence: HIGH** (direct source code inspection of TCA fork)
+
+**Finding:** TCA uses `EnumMetadata` (CasePaths' `@_spi(Reflection)` API) in **6 core files that compile on Android**. Gating EnumReflection behind `#if !os(Android)` would break TCA.
+
+| File | Lines | Usage | Android-gated? |
+|------|-------|-------|----------------|
+| `Binding.swift` | 285 | `AnyCasePath(unsafe: { .binding($0) }).extract(from: self)` | NO — inside `#if canImport(SwiftUI)` but before `#if !os(Android)` |
+| `EphemeralState.swift` | 29, 44 | `EnumMetadata().tag()`, `.associatedValueType()` | NO |
+| `PresentationID.swift` | 15-16 | `EnumMetadata().tag()`, `.project()` | NO |
+| `NavigationID.swift` | 79-80, 111 | `EnumMetadata().tag()`, `.project()` | NO |
+| `PresentationReducer.swift` | 164-165 | `EnumMetadata().caseName()` | NO |
+| `StackReducer.swift` | 137-138 | `EnumMetadata().caseName()` | NO |
+
+**ABI safety assessment (MEDIUM-HIGH confidence):** Swift's ABI metadata layout (EnumMetadata, ValueWitnessTable, FieldRecord offsets) is defined in platform-independent C++ headers (`Metadata.h`, `ValueWitness.def`). `pointerSize` is computed dynamically. Heap object headers are 2×pointerSize on both Darwin and non-ObjC platforms (Android). The offsets used (e.g., `10 * pointerSize + 2 * 4` for `getEnumTag`) should be identical. `swift_getTypeByMangledNameInContext` is a stable runtime entry point present in `libswiftCore.so`.
+
+**Recommendation:** Keep EnumReflection available on Android (Strategy A — lowest risk). Add a runtime smoke test early in app startup that exercises `EnumMetadata` on a known enum to detect ABI incompatibilities immediately.
+
+**No other PF libraries** use EnumReflection — only TCA imports `@_spi(Reflection)`.
+
+### DD-2: @CasePathable Macro Expansion Is 100% Pure Swift
+
+**Confidence: HIGH** (verified via macro expansion tests in CasePathableMacroTests.swift)
+
+The `@CasePathable` macro generates:
+- An `AllCasePaths` struct with subscript, per-case properties, and iterator
+- Each property uses `._$embed({ Enum.caseName($0) }) { guard case .caseName(let v) = $0 else { return nil }; return v }`
+- Uses ONLY: `guard case` (language feature), closures, `Optional`, `Sendable`, `IndexingIterator`
+- **Zero** Foundation/Darwin/UIKit imports in expanded code
+- **Zero** EnumMetadata/EnumReflection references in expanded code
+
+The deprecated `AnyCasePath(unsafe:)` is the only path that uses EnumReflection. The `@CasePathable` macro completely bypasses it.
+
+### DD-3: CustomDump Mirror APIs Are Safe on Android
+
+**Confidence: HIGH** (direct source inspection)
+
+| API | Risk | Reasoning |
+|-----|------|-----------|
+| `Mirror(reflecting:)` | NONE | Swift stdlib, in `libswiftCore.so` |
+| `mirror.children` | NONE | Swift stdlib |
+| `mirror.displayStyle` | NONE | Swift stdlib, all 8 cases handled |
+| `mirror.superclassMirror` | LOW | Recursive traversal, but standard API |
+| `mirror.subjectType` | NONE | Swift stdlib |
+| `_typeName()` | NONE | Swift stdlib, platform-independent demangling |
+| `isMirrorEqual` | LOW | Fallback to `String(describing:)` for childless non-Equatable values |
+| `#available(... *)` wildcard | NONE | Correctly evaluates to `true` on Android — `AnyKeyPath.debugDescription` primary path taken |
+
+**Enum display style handling** uses `mirror.children.first?.label` for case names (from compiled type metadata) and `typeName(mirror.subjectType)` for type prefix. Both are platform-independent.
+
+### DD-4: CustomDump Foundation Conformances — ByteCountFormatter Exists
+
+**Confidence: MEDIUM-HIGH** (swift-corelibs-foundation source inspection + web research)
+
+Both formatters exist in swift-corelibs-foundation:
+- **ByteCountFormatter**: Fully implemented (~392 lines). Missing `locale` property and `copy()`. Works on Linux. Uses NumberFormatter internally (which uses ICU).
+- **DateFormatter**: Fully implemented. Requires ICU (~40MB `lib_FoundationICU.so` which Skip bundles). Works on Linux/Android.
+
+**Remaining risk areas in `Foundation.swift`:**
+| Type | Guard | Risk |
+|------|-------|------|
+| `Data` (line 35) | `#if !os(WASI)` | LOW — ByteCountFormatter exists, but test `string(fromByteCount:)` output format |
+| `Date` (line 44) | `#if !os(WASI)` | LOW — DateFormatter works, but verify `XXXXX` timezone format specifier |
+| `NSPredicate` (line 189) | None | MEDIUM — may be partial stub on Android |
+| `NSValue` (line 249) | None | MEDIUM — may be partial stub on Android |
+| `NSAttributedString` (line 71) | None | MEDIUM — may not exist on Android Foundation |
+
+### DD-5: IssueReporting Three-Layer Detection Failure on Android
+
+**Confidence: HIGH** (direct source inspection of IssueReporting fork)
+
+**This is the most critical Phase 2 finding.** On Android, `reportIssue()` silently writes to stderr instead of failing tests. The root cause is a cascading detection failure:
+
+**Layer 1 — `isTesting` returns `false` (`IsTesting.swift:29-42`):**
+Checks Xcode-specific env vars (`XCTestBundlePath`, `XCTestConfigurationFilePath`, etc.) and Darwin-specific process names (`xctest`, `.xctest`). Skip's `skip android test` sets none of these.
+
+**Layer 2 — `dlsym` has no `os(Android)` branch (`SwiftTesting.swift:606-628`):**
+```swift
+#if os(Linux)
+  dlopen("lib\(library).so", RTLD_LAZY)  // Android is NOT Linux in Swift 6.2
+#elseif canImport(Darwin)
+  dlopen(nil, RTLD_LAZY)
+#else
+  return nil  // ← Android falls here
+#endif
+```
+In Swift 6.2, `os(Android)` is distinct from `os(Linux)`. All symbol lookups return `nil`.
+
+**Layer 3 — Fallbacks require Darwin (`SwiftTesting.swift:24-33`):**
+`#if DEBUG && canImport(Darwin)` guards on direct dlsym into Testing/XCTest frameworks. False on Android.
+
+**Impact chain:**
+- `reportIssue()` → `DefaultReporter` → `isTesting == false` → `runtimeWarn()` → `printError()` → stderr (logcat)
+- `expectNoDifference()` (CD-04) → `reportIssue()` → **no-op in tests**
+- `expectDifference()` (CD-05) → `reportIssue()` → **no-op in tests**
+- ALL TCA exhaustive store assertions → `reportIssue()` → **no-op in tests**
+
+**Required fixes in xctest-dynamic-overlay fork:**
+1. Add `#if os(Android)` to `isTesting` with Skip-compatible detection (env var or process argument check)
+2. Add `#if os(Android)` branch to `unsafeBitCast(symbol:in:)` using same `dlopen`/`dlsym` pattern as Linux
+3. Alternatively: register a custom `IssueReporter` at test launch that calls XCTFail directly
+
+### DD-6: SPM Package Identity Resolution — Directory Name Is Identity
+
+**Confidence: HIGH** (SPM SE-0292 specification + empirical verification)
+
+Since SPM 5.5+ (SE-0292):
+- **Local path packages**: Identity = directory name (NOT Package.swift `name:` field)
+- **URL packages**: Identity = last URL path component (minus `.git`)
+- **`package:` in `.product()`** matches against package identity
+
+**Consequence:** The fork directory MUST be `forks/xctest-dynamic-overlay` (not `forks/swift-issue-reporting`) for the identity `xctest-dynamic-overlay` to match all 10+ downstream forks that use `package: "xctest-dynamic-overlay"`.
+
+**Verified downstream dependents:**
+swift-composable-architecture, swift-custom-dump, swift-dependencies, swift-navigation, swift-sharing, swift-perception, swift-clocks, combine-schedulers, sqlite-data, swift-structured-queries — all use `package: "xctest-dynamic-overlay"`.
+
+The root manifest's `.package(path: "../../forks/xctest-dynamic-overlay")` overrides ALL transitive URL references to `pointfreeco/xctest-dynamic-overlay` across the entire dependency graph. No changes needed in any fork's Package.swift.
+
 ## Open Questions
 
-1. **Does `_typeName()` (Swift stdlib) produce correct output on Android?**
-   - What we know: `_typeName` is a Swift runtime function used by CustomDump's `AnyType.swift` for type name formatting. It's part of the Swift stdlib, not Foundation.
-   - What's unclear: Whether the output format matches expectations (e.g., module-qualified names).
-   - Recommendation: Include in runtime test suite. If output differs, CustomDump's `typeName()` wrapper may need adjustment.
+1. **Does `_typeName()` produce correct output on Android?**
+   - **Likely RESOLVED (LOW risk):** `_typeName` is Swift stdlib (`libswiftCore.so`), not Foundation. Output format is determined by the compiler/ABI version, not the OS. The regex in `AnyType.swift` handles known mangling patterns. Include in runtime smoke test.
 
-2. **Does `AnyKeyPath.debugDescription` work on Android (Swift 5.9+)?**
-   - What we know: CustomDump's `KeyPath.swift` uses `AnyKeyPath.debugDescription` guarded by `@available(macOS 13.3, iOS 16.4, ...)`. This availability check may not work correctly on Android.
-   - What's unclear: Whether `@available` guards compile/evaluate correctly on non-Apple platforms.
-   - Recommendation: Test at runtime. The fallback path uses `_typeName` which should work.
+2. ~~**Does `AnyKeyPath.debugDescription` work on Android?**~~
+   - **RESOLVED:** The `#available(macOS 13.3, iOS 16.4, ... *)` check evaluates the `*` wildcard to `true` on Android. The primary path (`self.debugDescription`) is always taken. Swift 6.2 includes this property. No risk.
 
-3. **Does `ProcessInfo.processInfo.arguments` work in Skip test runner?**
-   - What we know: IssueReporting's test context detection inspects process arguments for "xctest" and "swiftpm-testing-helper".
-   - What's unclear: What process arguments exist when running via `skip test`.
-   - Recommendation: Print ProcessInfo diagnostics in first test run to understand the Android test environment.
+3. **How does Skip's test runner set up the process environment on Android?**
+   - What we know: `skip android test` copies the Swift test binary to the device and runs it. Uses swift-corelibs-xctest. Swift Testing not yet supported by Skip.
+   - What's unclear: Exact process arguments, whether `XCTestBundlePath` or similar env vars are set.
+   - Recommendation: Print `ProcessInfo.processInfo.environment` and `.arguments` in first Android test run to understand the exact environment. Use this to write the `isTesting` fix.
 
-4. **Will the xctest-dynamic-overlay fork name cause SPM resolution conflicts?**
-   - What we know: The fork directory will be `swift-issue-reporting` but Package.swift name is `xctest-dynamic-overlay`. Both CasePaths and CustomDump depend on `package: "xctest-dynamic-overlay"`.
-   - What's unclear: Whether SPM resolves the package name from the fork's Package.swift or from the directory name / .package(path:) reference.
-   - Recommendation: Verify SPM resolution with a minimal test. The `.package(path:)` URL is just a filesystem path; SPM reads the Package.swift `name:` field from that path. Should work but needs verification.
+4. ~~**Will the fork name cause SPM resolution conflicts?**~~
+   - **RESOLVED:** Fork directory MUST be `xctest-dynamic-overlay`. SPM uses directory name as identity. All 10+ downstream forks match on `package: "xctest-dynamic-overlay"`. Local path overrides transitive URL references.
+
+5. **NEW: Will `EnumMetadata` ABI pointer arithmetic work on Android aarch64?**
+   - What we know: ABI layout is platform-independent by design. `pointerSize = 8` on both platforms. Heap object headers are 2×pointerSize on non-ObjC platforms. VWT function pointers at documented offsets.
+   - What's unclear: No one has verified this on Android. `swift_getTypeByMangledNameInContext` must be exported from `libswiftCore.so`.
+   - Recommendation: Add early runtime smoke test exercising `EnumMetadata` on a known enum. If it crashes, we need to replace TCA's 6 usage sites with CasePathable-based alternatives (significant Phase 3 work).
+
+6. **NEW: How to fix IssueReporting's test context detection for Android?**
+   - Option A: Add `#if os(Android)` branch to `isTesting` + `unsafeBitCast(symbol:in:)` — most complete fix
+   - Option B: Register custom `IssueReporter` at test launch that calls `XCTFail` directly — sidesteps detection entirely
+   - Option C: Set custom env var in skip test command and check for it — least invasive
+   - Recommendation: Option A is the right long-term fix for the fork. Option B is a good interim fallback.
 
 ## Sources
 
 ### Primary (HIGH confidence)
 - Direct source code inspection of `forks/swift-custom-dump/Sources/` -- all conformance files, Internal/, Dump.swift, Diff.swift
-- `pointfreeco/swift-case-paths` Package.swift and source tree via GitHub API
-- `pointfreeco/xctest-dynamic-overlay` Package.swift and source tree via GitHub API
+- Direct source code inspection of TCA fork `forks/swift-composable-architecture/Sources/` -- EnumMetadata usage in 6 files
+- Direct source code inspection of IssueReporting via TCA's `.build/checkouts/xctest-dynamic-overlay/Sources/` -- full call chain traced
+- `pointfreeco/swift-case-paths` macro expansion tests (CasePathableMacroTests.swift) -- 16 test cases verified
 - `pointfreeco/swift-identified-collections` Package.swift via GitHub raw content
 - `.gitmodules` in project repo -- current fork configuration
+- SPM SE-0292 package identity specification -- identity = directory name for local paths
 
 ### Secondary (MEDIUM confidence)
 - [Swift ABI TypeMetadata documentation](https://github.com/apple/swift/blob/main/docs/ABI/TypeMetadata.rst) -- enum metadata layout
@@ -453,21 +589,29 @@ done
 - [How Mirror Works (swift.org)](https://www.swift.org/blog/how-mirror-works/) -- Mirror implementation details
 - [Skip porting guide](https://skip.dev/docs/porting/) -- Foundation module split on Android
 - [Skip native Swift packages blog](https://skip.dev/blog/android-native-swift-packages/) -- C library differences on Android
+- [Skip testing documentation](https://skip.dev/docs/testing/) -- Swift Testing not yet supported on Android
+- [ByteCountFormatter swift-corelibs-foundation PR #1227](https://github.com/swiftlang/swift-corelibs-foundation/pull/1227) -- full implementation verified
+- [Android app size and lib_FoundationICU.so](https://forums.swift.org/t/android-app-size-and-lib-foundationicu-so/78399) -- ICU bundling for DateFormatter
 
 ### Tertiary (LOW confidence)
-- swift-corelibs-foundation GitHub issues -- ByteCountFormatter, NSException existence on Linux/Android (existence confirmed, completeness unverified)
-- Web search results on Swift ABI on Android -- no specific Android ABI verification sources found
+- swift-corelibs-foundation GitHub issues -- NSPredicate, NSValue, NSAttributedString completeness on Android unverified
+- Web search results on Swift ABI on Android -- no specific Android aarch64 ABI verification sources found
+- [Android NDK dynamic linker](https://github.com/android/ndk/issues/1244) -- dlsym/dlopen behavior on Android
 
 ## Metadata
 
 **Confidence breakdown:**
 - Standard stack: HIGH -- direct source inspection, dependency chain verified
 - Architecture: HIGH -- follows established Phase 1 fork-first pattern
-- CasePaths EnumReflection risk: MEDIUM -- ABI documented as platform-independent but unverified on Android
-- CustomDump Mirror: MEDIUM-HIGH -- Mirror is Swift runtime, should work, but complex traversal patterns need runtime verification
+- CasePaths @CasePathable macro: HIGH -- 100% pure Swift, verified via macro expansion tests
+- CasePaths EnumReflection (TCA usage): MEDIUM-HIGH -- ABI platform-independent by design, 6 TCA files require it, unverified on Android aarch64
+- CustomDump Mirror: HIGH -- all Mirror APIs are Swift stdlib, `_typeName()` is platform-independent, `#available` wildcard works correctly
+- CustomDump Foundation conformances: MEDIUM-HIGH -- ByteCountFormatter/DateFormatter exist on Android, but edge cases need runtime verification
 - IdentifiedCollections: HIGH -- pure data structures, no platform dependencies
-- IssueReporting: MEDIUM-HIGH -- already has cross-platform conditionals, but test context detection on Android is unverified
-- Pitfalls: HIGH -- identified through direct source code analysis
+- IssueReporting test detection: **CRITICAL** -- three-layer failure confirmed, `reportIssue()` becomes stderr-only on Android, must fix in fork
+- IssueReporting production path: HIGH -- `printError()` → stderr → logcat works correctly
+- SPM package identity: HIGH -- SE-0292 specification, empirically verified against 10+ forks
+- Pitfalls: HIGH -- identified through direct source code analysis across all 4 libraries
 
-**Research date:** 2026-02-21
+**Research date:** 2026-02-21 (deep dives completed same day)
 **Valid until:** 2026-03-21 (stable libraries, infrequent releases)
