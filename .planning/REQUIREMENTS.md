@@ -156,12 +156,12 @@ Enum routing and pattern matching on Android.
 
 `IdentifiedArrayOf` correctness on Android.
 
-- [ ] **IC-01**: `IdentifiedArrayOf<T>` initializes from array literal on Android
-- [ ] **IC-02**: `array[id: id]` subscript read returns correct element in O(1) on Android
-- [ ] **IC-03**: `array[id: id] = nil` subscript write removes element on Android
-- [ ] **IC-04**: `array.remove(id:)` returns removed element on Android
-- [ ] **IC-05**: `array.ids` property returns ordered set of all IDs on Android
-- [ ] **IC-06**: `IdentifiedArrayOf` conforms to `Codable` when element is `Codable` on Android
+- [x] **IC-01**: `IdentifiedArrayOf<T>` initializes from array literal on Android
+- [x] **IC-02**: `array[id: id]` subscript read returns correct element in O(1) on Android
+- [x] **IC-03**: `array[id: id] = nil` subscript write removes element on Android
+- [x] **IC-04**: `array.remove(id:)` returns removed element on Android
+- [x] **IC-05**: `array.ids` property returns ordered set of all IDs on Android
+- [x] **IC-06**: `IdentifiedArrayOf` conforms to `Codable` when element is `Codable` on Android
 
 ### SQL: Structured Queries
 
@@ -214,10 +214,10 @@ Value dumping, diffing, and assertion utilities on Android.
 
 Error reporting and handling on Android.
 
-- [ ] **IR-01**: `reportIssue(_:)` reports a string message as a runtime issue on Android
-- [ ] **IR-02**: `reportIssue(_:)` reports a thrown `Error` instance on Android
-- [ ] **IR-03**: `withErrorReporting { }` synchronous wrapper catches and reports thrown errors on Android
-- [ ] **IR-04**: `await withErrorReporting { }` async wrapper catches and reports thrown errors on Android
+- [x] **IR-01**: `reportIssue(_:)` reports a string message as a runtime issue on Android
+- [x] **IR-02**: `reportIssue(_:)` reports a thrown `Error` instance on Android
+- [x] **IR-03**: `withErrorReporting { }` synchronous wrapper catches and reports thrown errors on Android
+- [x] **IR-04**: `await withErrorReporting { }` async wrapper catches and reports thrown errors on Android
 
 ### UI: SwiftUI Patterns
 
@@ -350,21 +350,21 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CP-06 | Phase 2 | Pending |
 | CP-07 | Phase 2 | Pending |
 | CP-08 | Phase 2 | Pending |
-| IC-01 | Phase 2 | Pending |
-| IC-02 | Phase 2 | Pending |
-| IC-03 | Phase 2 | Pending |
-| IC-04 | Phase 2 | Pending |
-| IC-05 | Phase 2 | Pending |
-| IC-06 | Phase 2 | Pending |
+| IC-01 | Phase 2 | Complete |
+| IC-02 | Phase 2 | Complete |
+| IC-03 | Phase 2 | Complete |
+| IC-04 | Phase 2 | Complete |
+| IC-05 | Phase 2 | Complete |
+| IC-06 | Phase 2 | Complete |
 | CD-01 | Phase 2 | Pending |
 | CD-02 | Phase 2 | Pending |
 | CD-03 | Phase 2 | Pending |
 | CD-04 | Phase 2 | Pending |
 | CD-05 | Phase 2 | Pending |
-| IR-01 | Phase 2 | Pending |
-| IR-02 | Phase 2 | Pending |
-| IR-03 | Phase 2 | Pending |
-| IR-04 | Phase 2 | Pending |
+| IR-01 | Phase 2 | Complete |
+| IR-02 | Phase 2 | Complete |
+| IR-03 | Phase 2 | Complete |
+| IR-04 | Phase 2 | Complete |
 | TCA-01 | Phase 3 | Pending |
 | TCA-02 | Phase 3 | Pending |
 | TCA-03 | Phase 3 | Pending |
