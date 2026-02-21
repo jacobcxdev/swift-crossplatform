@@ -12,10 +12,10 @@ Requirements for initial release. Each maps to roadmap phases. Every requirement
 Bridge-level observation semantics and Swift Observation correctness on Android.
 
 - [ ] **OBS-01**: View body evaluation on Android is wrapped with `withObservationTracking`, firing `onChange` exactly once per observation cycle (not once per mutation)
-- [ ] **OBS-02**: `willSet` calls are suppressed during observation recording — no per-mutation `MutableStateBacking` counter increments while `isEnabled` is true
+- [ ] **OBS-02**: `willSet` calls are suppressed during observation recording -- no per-mutation `MutableStateBacking` counter increments while `isEnabled` is true
 - [ ] **OBS-03**: A single `MutableStateBacking.update(0)` JNI call triggers exactly one Compose recomposition per observation cycle
-- [ ] **OBS-04**: Bridge initialization failure is detected and logged — if `ViewObservation.nativeEnable()` fails, a visible error is produced instead of silent fallback to broken counter path
-- [ ] **OBS-05**: Nested view hierarchies observe correctly — parent and child views each maintain their own frame on the `ObservationRecording` stack
+- [ ] **OBS-04**: Bridge initialization failure is detected and logged -- if `ViewObservation.nativeEnable()` fails, a visible error is produced instead of silent fallback to broken counter path
+- [ ] **OBS-05**: Nested view hierarchies observe correctly -- parent and child views each maintain their own frame on the `ObservationRecording` stack
 - [ ] **OBS-06**: ViewModifier bodies participate in observation tracking (not just View bodies)
 - [ ] **OBS-07**: `ObservationRegistrar` initializes correctly on Android, bridging to `SkipAndroidBridge.Observation.ObservationRegistrar`
 - [ ] **OBS-08**: `ObservationRegistrar.access(keyPath:)` records property access during observation on Android
@@ -47,7 +47,7 @@ Bridge-level observation semantics and Swift Observation correctness on Android.
 Store, reducers, effects, and composition patterns on Android.
 
 - [ ] **TCA-01**: `Store.init(initialState:reducer:)` initializes with correct initial state on Android
-- [ ] **TCA-02**: `Store.init(initialState:reducer:withDependencies:)` — `prepareDependencies` closure overrides dependencies at construction on Android
+- [ ] **TCA-02**: `Store.init(initialState:reducer:withDependencies:)` -- `prepareDependencies` closure overrides dependencies at construction on Android
 - [ ] **TCA-03**: `store.send(.action)` dispatches an action from a view and returns a `StoreTask` on Android
 - [ ] **TCA-04**: `store.scope(state:action:)` derives a child store from a parent store on Android
 - [ ] **TCA-05**: `Scope(state:action:)` reducer runs child reducer against parent state/action on Android
@@ -66,14 +66,14 @@ Store, reducers, effects, and composition patterns on Android.
 - [ ] **TCA-18**: `@ObservationStateIgnored` suppresses observation tracking for annotated state properties on Android
 - [ ] **TCA-19**: `BindableAction` protocol + `case binding(BindingAction<State>)` compiles and routes correctly on Android
 - [ ] **TCA-20**: `BindingReducer()` applies binding mutations to state on Android
-- [ ] **TCA-21**: `@Bindable var store` — `$store.property` binding projection reads/writes state through the store on Android
+- [ ] **TCA-21**: `@Bindable var store` -- `$store.property` binding projection reads/writes state through the store on Android
 - [ ] **TCA-22**: `$store.property.sending(\.action)` derives a binding that sends a specific action on mutation on Android
 - [ ] **TCA-23**: `store.scope(state:action:)` in `ForEach` renders list of child stores on Android
 - [ ] **TCA-24**: Optional scoping `store.scope(state: \.child, action: \.child)` renders conditional content on Android
 - [ ] **TCA-25**: `switch store.case { }` enum store switching renders correctly on Android (`@Reducer enum` + `.case`)
-- [ ] **TCA-26**: `@Dependency(\.dismiss) var dismiss` — `await dismiss()` causes presenting feature to pop/dismiss on Android
+- [ ] **TCA-26**: `@Dependency(\.dismiss) var dismiss` -- `await dismiss()` causes presenting feature to pop/dismiss on Android
 - [ ] **TCA-27**: `@Presents` macro synthesizes property wrapper accessors for optional child state on Android
-- [ ] **TCA-28**: `PresentationAction.dismiss` — parent reducer sets optional child state to `nil` on Android
+- [ ] **TCA-28**: `PresentationAction.dismiss` -- parent reducer sets optional child state to `nil` on Android
 - [ ] **TCA-29**: `Reducer.onChange(of:_:)` runs nested reducer when a derived value changes on Android
 - [ ] **TCA-30**: `Reducer._printChanges()` logs state diffs to console on Android
 - [ ] **TCA-31**: `@ViewAction(for:)` macro synthesizes `send(_:)` for view actions on Android
@@ -88,7 +88,7 @@ Dependency injection and resolution on Android.
 
 - [ ] **DEP-01**: `@Dependency(\.keyPath)` resolves a dependency from `DependencyValues` inside a reducer on Android
 - [ ] **DEP-02**: `@Dependency(Type.self)` resolves a dependency by type conformance on Android
-- [ ] **DEP-03**: `DependencyKey` protocol — `liveValue` is used in production context on Android
+- [ ] **DEP-03**: `DependencyKey` protocol -- `liveValue` is used in production context on Android
 - [ ] **DEP-04**: `DependencyKey.testValue` is used in test context on Android
 - [ ] **DEP-05**: `DependencyKey.previewValue` is used in preview context on Android
 - [ ] **DEP-06**: `DependencyValues` extension with computed property registers a custom dependency on Android
@@ -149,7 +149,7 @@ Enum routing and pattern matching on Android.
 - [ ] **CP-04**: `@dynamicMemberLookup` dot-syntax returns `Optional<AssociatedValue>` on Android
 - [ ] **CP-05**: `allCasePaths` static variable returns collection of all case key paths on Android
 - [ ] **CP-06**: `root[case: caseKeyPath]` subscript extracts/embeds associated value on Android
-- [ ] **CP-07**: `@Reducer enum` pattern — enum reducers synthesize `body` and `scope` on Android
+- [ ] **CP-07**: `@Reducer enum` pattern -- enum reducers synthesize `body` and `scope` on Android
 - [ ] **CP-08**: `AnyCasePath` with custom embed/extract closures works on Android
 
 ### IC: Identified Collections
@@ -298,7 +298,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | Swift Perception backport on Android | Native `libswiftObservation.so` ships with Android Swift SDK; no backport needed |
 | Automated fork rebasing | Manual upstream sync is sufficient for v1; automation is v2 |
 | Snapshot testing on Android | Not used by TestStore or TCA testing infrastructure |
-| Deprecated TCA APIs | ViewStore, WithViewStore, @PresentationState, TaskResult, ForEachStore, IfLetStore, SwitchStore — use modern equivalents |
+| Deprecated TCA APIs | ViewStore, WithViewStore, @PresentationState, TaskResult, ForEachStore, IfLetStore, SwitchStore -- use modern equivalents |
 
 ## Traceability
 
@@ -306,197 +306,197 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| OBS-01 | TBD | Pending |
-| OBS-02 | TBD | Pending |
-| OBS-03 | TBD | Pending |
-| OBS-04 | TBD | Pending |
-| OBS-05 | TBD | Pending |
-| OBS-06 | TBD | Pending |
-| OBS-07 | TBD | Pending |
-| OBS-08 | TBD | Pending |
-| OBS-09 | TBD | Pending |
-| OBS-10 | TBD | Pending |
-| OBS-11 | TBD | Pending |
-| OBS-12 | TBD | Pending |
-| OBS-13 | TBD | Pending |
-| OBS-14 | TBD | Pending |
-| OBS-15 | TBD | Pending |
-| OBS-16 | TBD | Pending |
-| OBS-17 | TBD | Pending |
-| OBS-18 | TBD | Pending |
-| OBS-19 | TBD | Pending |
-| OBS-20 | TBD | Pending |
-| OBS-21 | TBD | Pending |
-| OBS-22 | TBD | Pending |
-| OBS-23 | TBD | Pending |
-| OBS-24 | TBD | Pending |
-| OBS-25 | TBD | Pending |
-| OBS-26 | TBD | Pending |
-| OBS-27 | TBD | Pending |
-| OBS-28 | TBD | Pending |
-| OBS-29 | TBD | Pending |
-| OBS-30 | TBD | Pending |
-| TCA-01 | TBD | Pending |
-| TCA-02 | TBD | Pending |
-| TCA-03 | TBD | Pending |
-| TCA-04 | TBD | Pending |
-| TCA-05 | TBD | Pending |
-| TCA-06 | TBD | Pending |
-| TCA-07 | TBD | Pending |
-| TCA-08 | TBD | Pending |
-| TCA-09 | TBD | Pending |
-| TCA-10 | TBD | Pending |
-| TCA-11 | TBD | Pending |
-| TCA-12 | TBD | Pending |
-| TCA-13 | TBD | Pending |
-| TCA-14 | TBD | Pending |
-| TCA-15 | TBD | Pending |
-| TCA-16 | TBD | Pending |
-| TCA-17 | TBD | Pending |
-| TCA-18 | TBD | Pending |
-| TCA-19 | TBD | Pending |
-| TCA-20 | TBD | Pending |
-| TCA-21 | TBD | Pending |
-| TCA-22 | TBD | Pending |
-| TCA-23 | TBD | Pending |
-| TCA-24 | TBD | Pending |
-| TCA-25 | TBD | Pending |
-| TCA-26 | TBD | Pending |
-| TCA-27 | TBD | Pending |
-| TCA-28 | TBD | Pending |
-| TCA-29 | TBD | Pending |
-| TCA-30 | TBD | Pending |
-| TCA-31 | TBD | Pending |
-| TCA-32 | TBD | Pending |
-| TCA-33 | TBD | Pending |
-| TCA-34 | TBD | Pending |
-| TCA-35 | TBD | Pending |
-| DEP-01 | TBD | Pending |
-| DEP-02 | TBD | Pending |
-| DEP-03 | TBD | Pending |
-| DEP-04 | TBD | Pending |
-| DEP-05 | TBD | Pending |
-| DEP-06 | TBD | Pending |
-| DEP-07 | TBD | Pending |
-| DEP-08 | TBD | Pending |
-| DEP-09 | TBD | Pending |
-| DEP-10 | TBD | Pending |
-| DEP-11 | TBD | Pending |
-| DEP-12 | TBD | Pending |
-| SHR-01 | TBD | Pending |
-| SHR-02 | TBD | Pending |
-| SHR-03 | TBD | Pending |
-| SHR-04 | TBD | Pending |
-| SHR-05 | TBD | Pending |
-| SHR-06 | TBD | Pending |
-| SHR-07 | TBD | Pending |
-| SHR-08 | TBD | Pending |
-| SHR-09 | TBD | Pending |
-| SHR-10 | TBD | Pending |
-| SHR-11 | TBD | Pending |
-| SHR-12 | TBD | Pending |
-| SHR-13 | TBD | Pending |
-| SHR-14 | TBD | Pending |
-| NAV-01 | TBD | Pending |
-| NAV-02 | TBD | Pending |
-| NAV-03 | TBD | Pending |
-| NAV-04 | TBD | Pending |
-| NAV-05 | TBD | Pending |
-| NAV-06 | TBD | Pending |
-| NAV-07 | TBD | Pending |
-| NAV-08 | TBD | Pending |
-| NAV-09 | TBD | Pending |
-| NAV-10 | TBD | Pending |
-| NAV-11 | TBD | Pending |
-| NAV-12 | TBD | Pending |
-| NAV-13 | TBD | Pending |
-| NAV-14 | TBD | Pending |
-| NAV-15 | TBD | Pending |
-| NAV-16 | TBD | Pending |
-| CP-01 | TBD | Pending |
-| CP-02 | TBD | Pending |
-| CP-03 | TBD | Pending |
-| CP-04 | TBD | Pending |
-| CP-05 | TBD | Pending |
-| CP-06 | TBD | Pending |
-| CP-07 | TBD | Pending |
-| CP-08 | TBD | Pending |
-| IC-01 | TBD | Pending |
-| IC-02 | TBD | Pending |
-| IC-03 | TBD | Pending |
-| IC-04 | TBD | Pending |
-| IC-05 | TBD | Pending |
-| IC-06 | TBD | Pending |
-| SQL-01 | TBD | Pending |
-| SQL-02 | TBD | Pending |
-| SQL-03 | TBD | Pending |
-| SQL-04 | TBD | Pending |
-| SQL-05 | TBD | Pending |
-| SQL-06 | TBD | Pending |
-| SQL-07 | TBD | Pending |
-| SQL-08 | TBD | Pending |
-| SQL-09 | TBD | Pending |
-| SQL-10 | TBD | Pending |
-| SQL-11 | TBD | Pending |
-| SQL-12 | TBD | Pending |
-| SQL-13 | TBD | Pending |
-| SQL-14 | TBD | Pending |
-| SQL-15 | TBD | Pending |
-| SD-01 | TBD | Pending |
-| SD-02 | TBD | Pending |
-| SD-03 | TBD | Pending |
-| SD-04 | TBD | Pending |
-| SD-05 | TBD | Pending |
-| SD-06 | TBD | Pending |
-| SD-07 | TBD | Pending |
-| SD-08 | TBD | Pending |
-| SD-09 | TBD | Pending |
-| SD-10 | TBD | Pending |
-| SD-11 | TBD | Pending |
-| SD-12 | TBD | Pending |
-| CD-01 | TBD | Pending |
-| CD-02 | TBD | Pending |
-| CD-03 | TBD | Pending |
-| CD-04 | TBD | Pending |
-| CD-05 | TBD | Pending |
-| IR-01 | TBD | Pending |
-| IR-02 | TBD | Pending |
-| IR-03 | TBD | Pending |
-| IR-04 | TBD | Pending |
-| UI-01 | TBD | Pending |
-| UI-02 | TBD | Pending |
-| UI-03 | TBD | Pending |
-| UI-04 | TBD | Pending |
-| UI-05 | TBD | Pending |
-| UI-06 | TBD | Pending |
-| UI-07 | TBD | Pending |
-| UI-08 | TBD | Pending |
-| TEST-01 | TBD | Pending |
-| TEST-02 | TBD | Pending |
-| TEST-03 | TBD | Pending |
-| TEST-04 | TBD | Pending |
-| TEST-05 | TBD | Pending |
-| TEST-06 | TBD | Pending |
-| TEST-07 | TBD | Pending |
-| TEST-08 | TBD | Pending |
-| TEST-09 | TBD | Pending |
-| TEST-10 | TBD | Pending |
-| TEST-11 | TBD | Pending |
-| TEST-12 | TBD | Pending |
-| SPM-01 | TBD | Pending |
-| SPM-02 | TBD | Pending |
-| SPM-03 | TBD | Pending |
-| SPM-04 | TBD | Pending |
-| SPM-05 | TBD | Pending |
-| SPM-06 | TBD | Pending |
-| DOC-01 | TBD | Pending |
+| OBS-01 | Phase 1 | Pending |
+| OBS-02 | Phase 1 | Pending |
+| OBS-03 | Phase 1 | Pending |
+| OBS-04 | Phase 1 | Pending |
+| OBS-05 | Phase 1 | Pending |
+| OBS-06 | Phase 1 | Pending |
+| OBS-07 | Phase 1 | Pending |
+| OBS-08 | Phase 1 | Pending |
+| OBS-09 | Phase 1 | Pending |
+| OBS-10 | Phase 1 | Pending |
+| OBS-11 | Phase 1 | Pending |
+| OBS-12 | Phase 1 | Pending |
+| OBS-13 | Phase 1 | Pending |
+| OBS-14 | Phase 1 | Pending |
+| OBS-15 | Phase 1 | Pending |
+| OBS-16 | Phase 1 | Pending |
+| OBS-17 | Phase 1 | Pending |
+| OBS-18 | Phase 1 | Pending |
+| OBS-19 | Phase 1 | Pending |
+| OBS-20 | Phase 1 | Pending |
+| OBS-21 | Phase 1 | Pending |
+| OBS-22 | Phase 1 | Pending |
+| OBS-23 | Phase 1 | Pending |
+| OBS-24 | Phase 1 | Pending |
+| OBS-25 | Phase 1 | Pending |
+| OBS-26 | Phase 1 | Pending |
+| OBS-27 | Phase 1 | Pending |
+| OBS-28 | Phase 1 | Pending |
+| OBS-29 | Phase 1 | Pending |
+| OBS-30 | Phase 1 | Pending |
+| SPM-01 | Phase 1 | Pending |
+| SPM-02 | Phase 1 | Pending |
+| SPM-03 | Phase 1 | Pending |
+| SPM-04 | Phase 1 | Pending |
+| SPM-05 | Phase 1 | Pending |
+| SPM-06 | Phase 1 | Pending |
+| CP-01 | Phase 2 | Pending |
+| CP-02 | Phase 2 | Pending |
+| CP-03 | Phase 2 | Pending |
+| CP-04 | Phase 2 | Pending |
+| CP-05 | Phase 2 | Pending |
+| CP-06 | Phase 2 | Pending |
+| CP-07 | Phase 2 | Pending |
+| CP-08 | Phase 2 | Pending |
+| IC-01 | Phase 2 | Pending |
+| IC-02 | Phase 2 | Pending |
+| IC-03 | Phase 2 | Pending |
+| IC-04 | Phase 2 | Pending |
+| IC-05 | Phase 2 | Pending |
+| IC-06 | Phase 2 | Pending |
+| CD-01 | Phase 2 | Pending |
+| CD-02 | Phase 2 | Pending |
+| CD-03 | Phase 2 | Pending |
+| CD-04 | Phase 2 | Pending |
+| CD-05 | Phase 2 | Pending |
+| IR-01 | Phase 2 | Pending |
+| IR-02 | Phase 2 | Pending |
+| IR-03 | Phase 2 | Pending |
+| IR-04 | Phase 2 | Pending |
+| TCA-01 | Phase 3 | Pending |
+| TCA-02 | Phase 3 | Pending |
+| TCA-03 | Phase 3 | Pending |
+| TCA-04 | Phase 3 | Pending |
+| TCA-05 | Phase 3 | Pending |
+| TCA-06 | Phase 3 | Pending |
+| TCA-07 | Phase 3 | Pending |
+| TCA-08 | Phase 3 | Pending |
+| TCA-09 | Phase 3 | Pending |
+| TCA-10 | Phase 3 | Pending |
+| TCA-11 | Phase 3 | Pending |
+| TCA-12 | Phase 3 | Pending |
+| TCA-13 | Phase 3 | Pending |
+| TCA-14 | Phase 3 | Pending |
+| TCA-15 | Phase 3 | Pending |
+| TCA-16 | Phase 3 | Pending |
+| DEP-01 | Phase 3 | Pending |
+| DEP-02 | Phase 3 | Pending |
+| DEP-03 | Phase 3 | Pending |
+| DEP-04 | Phase 3 | Pending |
+| DEP-05 | Phase 3 | Pending |
+| DEP-06 | Phase 3 | Pending |
+| DEP-07 | Phase 3 | Pending |
+| DEP-08 | Phase 3 | Pending |
+| DEP-09 | Phase 3 | Pending |
+| DEP-10 | Phase 3 | Pending |
+| DEP-11 | Phase 3 | Pending |
+| DEP-12 | Phase 3 | Pending |
+| TCA-17 | Phase 4 | Pending |
+| TCA-18 | Phase 4 | Pending |
+| TCA-19 | Phase 4 | Pending |
+| TCA-20 | Phase 4 | Pending |
+| TCA-21 | Phase 4 | Pending |
+| TCA-22 | Phase 4 | Pending |
+| TCA-23 | Phase 4 | Pending |
+| TCA-24 | Phase 4 | Pending |
+| TCA-25 | Phase 4 | Pending |
+| TCA-29 | Phase 4 | Pending |
+| TCA-30 | Phase 4 | Pending |
+| TCA-31 | Phase 4 | Pending |
+| SHR-01 | Phase 4 | Pending |
+| SHR-02 | Phase 4 | Pending |
+| SHR-03 | Phase 4 | Pending |
+| SHR-04 | Phase 4 | Pending |
+| SHR-05 | Phase 4 | Pending |
+| SHR-06 | Phase 4 | Pending |
+| SHR-07 | Phase 4 | Pending |
+| SHR-08 | Phase 4 | Pending |
+| SHR-09 | Phase 4 | Pending |
+| SHR-10 | Phase 4 | Pending |
+| SHR-11 | Phase 4 | Pending |
+| SHR-12 | Phase 4 | Pending |
+| SHR-13 | Phase 4 | Pending |
+| SHR-14 | Phase 4 | Pending |
+| NAV-01 | Phase 5 | Pending |
+| NAV-02 | Phase 5 | Pending |
+| NAV-03 | Phase 5 | Pending |
+| NAV-04 | Phase 5 | Pending |
+| NAV-05 | Phase 5 | Pending |
+| NAV-06 | Phase 5 | Pending |
+| NAV-07 | Phase 5 | Pending |
+| NAV-08 | Phase 5 | Pending |
+| NAV-09 | Phase 5 | Pending |
+| NAV-10 | Phase 5 | Pending |
+| NAV-11 | Phase 5 | Pending |
+| NAV-12 | Phase 5 | Pending |
+| NAV-13 | Phase 5 | Pending |
+| NAV-14 | Phase 5 | Pending |
+| NAV-15 | Phase 5 | Pending |
+| NAV-16 | Phase 5 | Pending |
+| TCA-26 | Phase 5 | Pending |
+| TCA-27 | Phase 5 | Pending |
+| TCA-28 | Phase 5 | Pending |
+| TCA-32 | Phase 5 | Pending |
+| TCA-33 | Phase 5 | Pending |
+| TCA-34 | Phase 5 | Pending |
+| TCA-35 | Phase 5 | Pending |
+| UI-01 | Phase 5 | Pending |
+| UI-02 | Phase 5 | Pending |
+| UI-03 | Phase 5 | Pending |
+| UI-04 | Phase 5 | Pending |
+| UI-05 | Phase 5 | Pending |
+| UI-06 | Phase 5 | Pending |
+| UI-07 | Phase 5 | Pending |
+| UI-08 | Phase 5 | Pending |
+| SQL-01 | Phase 6 | Pending |
+| SQL-02 | Phase 6 | Pending |
+| SQL-03 | Phase 6 | Pending |
+| SQL-04 | Phase 6 | Pending |
+| SQL-05 | Phase 6 | Pending |
+| SQL-06 | Phase 6 | Pending |
+| SQL-07 | Phase 6 | Pending |
+| SQL-08 | Phase 6 | Pending |
+| SQL-09 | Phase 6 | Pending |
+| SQL-10 | Phase 6 | Pending |
+| SQL-11 | Phase 6 | Pending |
+| SQL-12 | Phase 6 | Pending |
+| SQL-13 | Phase 6 | Pending |
+| SQL-14 | Phase 6 | Pending |
+| SQL-15 | Phase 6 | Pending |
+| SD-01 | Phase 6 | Pending |
+| SD-02 | Phase 6 | Pending |
+| SD-03 | Phase 6 | Pending |
+| SD-04 | Phase 6 | Pending |
+| SD-05 | Phase 6 | Pending |
+| SD-06 | Phase 6 | Pending |
+| SD-07 | Phase 6 | Pending |
+| SD-08 | Phase 6 | Pending |
+| SD-09 | Phase 6 | Pending |
+| SD-10 | Phase 6 | Pending |
+| SD-11 | Phase 6 | Pending |
+| SD-12 | Phase 6 | Pending |
+| TEST-01 | Phase 7 | Pending |
+| TEST-02 | Phase 7 | Pending |
+| TEST-03 | Phase 7 | Pending |
+| TEST-04 | Phase 7 | Pending |
+| TEST-05 | Phase 7 | Pending |
+| TEST-06 | Phase 7 | Pending |
+| TEST-07 | Phase 7 | Pending |
+| TEST-08 | Phase 7 | Pending |
+| TEST-09 | Phase 7 | Pending |
+| TEST-10 | Phase 7 | Pending |
+| TEST-11 | Phase 7 | Pending |
+| TEST-12 | Phase 7 | Pending |
+| DOC-01 | Phase 7 | Pending |
 
 **Coverage:**
-- v1 requirements: 176 total
+- v1 requirements: 184 total
 - Sections: OBS (30), TCA (35), DEP (12), SHR (14), NAV (16), CP (8), IC (6), SQL (15), SD (12), CD (5), IR (4), UI (8), TEST (12), SPM (6), DOC (1)
-- Mapped to phases: 0
-- Unmapped: 176 (awaiting roadmap)
+- Mapped to phases: 184
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-21*
-*Last updated: 2026-02-21 after granular pfw skill audit (176 atomic requirements across 15 sections)*
+*Last updated: 2026-02-21 -- traceability updated with 7-phase roadmap (184 requirements mapped)*
