@@ -51,8 +51,8 @@ Plans:
 
 Plans:
 - [x] 02-01-PLAN.md -- Fork housekeeping: branch rename (dev/swift-crossplatform), 3 new forks (swift-case-paths, swift-identified-collections, xctest-dynamic-overlay), Package.swift wiring for all 17 forks, per-library test targets (CP-01, CP-05, IC-01, IC-05) ✓ 2026-02-21
-- [ ] 02-02-PLAN.md -- IssueReporting three-layer Android fix (isTesting, dlsym, fallbacks) + IdentifiedCollections validation (IR-01 through IR-04, IC-01 through IC-06)
-- [ ] 02-03-PLAN.md -- CasePaths validation + EnumMetadata ABI smoke test + CustomDump conformance guards and tests (CP-01 through CP-08, CD-01 through CD-05)
+- [x] 02-02-PLAN.md -- IssueReporting three-layer Android fix (isTesting, dlsym, fallbacks) + IdentifiedCollections validation (IR-01 through IR-04, IC-01 through IC-06) ✓ 2026-02-21
+- [x] 02-03-PLAN.md -- CasePaths validation + EnumMetadata ABI smoke test + CustomDump conformance guards and tests (CP-01 through CP-08, CD-01 through CD-05) ✓ 2026-02-21
 
 ### Phase 3: TCA Core
 **Goal**: TCA Store, reducers, effects, and dependency injection work correctly on Android
@@ -142,7 +142,7 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Observation Bridge | 2/2 | Executed | - |
-| 2. Foundation Libraries | 0/3 | Not started | - |
+| 2. Foundation Libraries | 3/3 | Executed | 2026-02-21 |
 | 3. TCA Core | 0/2 | Not started | - |
 | 4. TCA State & Bindings | 0/2 | Not started | - |
 | 5. Navigation & Presentation | 0/2 | Not started | - |
