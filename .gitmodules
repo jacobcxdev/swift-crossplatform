@@ -1,54 +1,68 @@
 [submodule "forks/swift-perception"]
 	path = forks/swift-perception
 	url = https://github.com/jacobcxdev/swift-perception.git
-	branch = flote/service-app
+	branch = dev/swift-crossplatform
 [submodule "forks/swift-clocks"]
 	path = forks/swift-clocks
 	url = https://github.com/jacobcxdev/swift-clocks.git
-	branch = flote/service-app
+	branch = dev/swift-crossplatform
 [submodule "forks/combine-schedulers"]
 	path = forks/combine-schedulers
 	url = https://github.com/jacobcxdev/combine-schedulers.git
-	branch = flote/service-app
+	branch = dev/swift-crossplatform
 [submodule "forks/swift-custom-dump"]
 	path = forks/swift-custom-dump
 	url = https://github.com/jacobcxdev/swift-custom-dump.git
-	branch = flote/service-app
+	branch = dev/swift-crossplatform
 [submodule "forks/swift-snapshot-testing"]
 	path = forks/swift-snapshot-testing
 	url = https://github.com/jacobcxdev/swift-snapshot-testing.git
-	branch = flote/service-app
+	branch = dev/swift-crossplatform
 [submodule "forks/swift-structured-queries"]
 	path = forks/swift-structured-queries
 	url = https://github.com/jacobcxdev/swift-structured-queries.git
-	branch = flote/service-app
+	branch = dev/swift-crossplatform
 [submodule "forks/GRDB.swift"]
 	path = forks/GRDB.swift
 	url = https://github.com/jacobcxdev/GRDB.swift.git
-	branch = flote/service-app
+	branch = dev/swift-crossplatform
 [submodule "forks/swift-dependencies"]
 	path = forks/swift-dependencies
 	url = https://github.com/jacobcxdev/swift-dependencies.git
-	branch = flote/service-app
+	branch = dev/swift-crossplatform
 [submodule "forks/sqlite-data"]
 	path = forks/sqlite-data
 	url = https://github.com/jacobcxdev/sqlite-data.git
-	branch = flote/service-app
+	branch = dev/swift-crossplatform
 [submodule "forks/swift-navigation"]
 	path = forks/swift-navigation
 	url = https://github.com/jacobcxdev/swift-navigation.git
-	branch = flote/service-app
+	branch = dev/swift-crossplatform
 [submodule "forks/swift-sharing"]
 	path = forks/swift-sharing
 	url = https://github.com/jacobcxdev/swift-sharing.git
-	branch = flote/service-app
+	branch = dev/swift-crossplatform
 [submodule "forks/swift-composable-architecture"]
 	path = forks/swift-composable-architecture
 	url = https://github.com/jacobcxdev/swift-composable-architecture.git
-	branch = flote/service-app
+	branch = dev/swift-crossplatform
 [submodule "forks/skip-android-bridge"]
 	path = forks/skip-android-bridge
 	url = https://github.com/jacobcxdev/skip-android-bridge.git
+	branch = dev/swift-crossplatform
 [submodule "forks/skip-ui"]
 	path = forks/skip-ui
 	url = https://github.com/jacobcxdev/skip-ui.git
+	branch = dev/swift-crossplatform
+[submodule "forks/swift-case-paths"]
+	path = forks/swift-case-paths
+	url = https://github.com/jacobcxdev/swift-case-paths.git
+	branch = dev/swift-crossplatform
+[submodule "forks/swift-identified-collections"]
+	path = forks/swift-identified-collections
+	url = https://github.com/jacobcxdev/swift-identified-collections.git
+	branch = dev/swift-crossplatform
+[submodule "forks/xctest-dynamic-overlay"]
+	path = forks/xctest-dynamic-overlay
+	url = https://github.com/jacobcxdev/swift-issue-reporting.git
+	branch = dev/swift-crossplatform
