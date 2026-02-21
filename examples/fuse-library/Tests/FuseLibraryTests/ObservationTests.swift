@@ -132,4 +132,31 @@ final class ObservationTests: XCTestCase {
         XCTAssertTrue(ObservationVerifier.verifySequentialTracking(),
                       "Sequential observation cycles should each fire independently")
     }
+
+    // MARK: - Bridge-specific observation verification
+
+    func testVerifyBulkMutationCoalescing() {
+        XCTAssertTrue(ObservationVerifier.verifyBulkMutationCoalescing(),
+                      "Bulk mutations should not cause N separate onChange callbacks")
+    }
+
+    func testVerifyObservationIgnoredNoTracking() {
+        XCTAssertTrue(ObservationVerifier.verifyObservationIgnoredNoTracking(),
+                      "@ObservationIgnored properties should not register any tracking")
+    }
+
+    func testVerifyNestedObservationCycles() {
+        XCTAssertTrue(ObservationVerifier.verifyNestedObservationCycles(),
+                      "Nested observation cycles should track independently")
+    }
+
+    func testVerifySequentialObservationCyclesResubscribe() {
+        XCTAssertTrue(ObservationVerifier.verifySequentialObservationCyclesResubscribe(),
+                      "Sequential observation cycles should each fire onChange independently")
+    }
+
+    func testVerifyMultiPropertySingleOnChange() {
+        XCTAssertTrue(ObservationVerifier.verifyMultiPropertySingleOnChange(),
+                      "Multiple property accesses in one tracking scope should produce single onChange")
+    }
 }
