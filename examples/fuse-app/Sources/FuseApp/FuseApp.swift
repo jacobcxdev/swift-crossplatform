@@ -1,6 +1,7 @@
 // Licensed under the GNU General Public License v3.0 or later
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import ComposableArchitecture
 import Foundation
 import SkipFuse
 import SwiftUI
@@ -10,13 +11,18 @@ let logger: Logger = Logger(subsystem: "dev.jacobcx.fuseApp", category: "FuseApp
 
 /// The shared top-level view for the app, loaded from the platform-specific App delegates below.
 ///
-/// The default implementation merely loads the `ContentView` for the app and logs a message.
+/// The default implementation merely loads the `AppView` for the app and logs a message.
 /* SKIP @bridge */public struct FuseAppRootView : View {
+    let store = Store(initialState: AppFeature.State()) {
+        AppFeature()
+            ._printChanges()
+    }
+
     /* SKIP @bridge */public init() {
     }
 
     public var body: some View {
-        ContentView()
+        AppView(store: store)
             .task {
                 logger.info("Skip app logs are viewable in the Xcode console for iOS; Android logs can be viewed in Studio or using adb logcat")
             }
