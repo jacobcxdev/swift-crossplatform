@@ -111,5 +111,11 @@ let package = Package(
         .testTarget(name: "TestStoreEdgeCaseTests", dependencies: [
             .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
         ]),
+        .testTarget(name: "ObservationBridgeTests", dependencies: [
+            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        ]),
+        .testTarget(name: "StressTests", dependencies: [
+            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        ]),
     ]
 )
