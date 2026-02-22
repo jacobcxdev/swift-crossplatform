@@ -104,5 +104,12 @@ let package = Package(
             .product(name: "SQLiteData", package: "sqlite-data"),
             .product(name: "DependenciesTestSupport", package: "swift-dependencies"),
         ]),
+        .testTarget(name: "TestStoreTests", dependencies: [
+            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+            .product(name: "DependenciesTestSupport", package: "swift-dependencies"),
+        ]),
+        .testTarget(name: "TestStoreEdgeCaseTests", dependencies: [
+            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        ]),
     ]
 )
