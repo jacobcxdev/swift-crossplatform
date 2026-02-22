@@ -64,11 +64,11 @@ Plans:
   3. `Effect.run`, `.merge`, `.concatenate`, `.cancellable`, and `.cancel` execute async work and route actions on Android
   4. `@Dependency(\.keyPath)` resolves live values in production context and test values in test context on Android
   5. Child reducer scopes inherit parent dependency overrides on Android
-**Plans**: TBD
+**Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
+- [ ] 03-01-PLAN.md — Store/Reducer/Effect validation + Package.swift test infrastructure with DependenciesTestObserver (TCA-01..TCA-16)
+- [ ] 03-02-PLAN.md — Dependency injection validation: @Dependency, withDependencies, built-in deps, @DependencyClient, NavigationID (DEP-01..DEP-12)
 
 ### Phase 4: TCA State & Bindings
 **Goal**: ObservableState macro, two-way bindings, and shared state persistence drive correct view updates on Android
