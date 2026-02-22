@@ -28,10 +28,11 @@ let package = Package(
         .package(path: "../../forks/skip-android-bridge"),
         // Deferred forks (not yet needed — add back when targets use them):
         // .package(path: "../../forks/skip-ui"),              // Phase 4+ (view-level tests)
-        // .package(path: "../../forks/swift-snapshot-testing"), // Phase 6 (database)
-        // .package(path: "../../forks/swift-structured-queries"), // Phase 6 (database)
-        // .package(path: "../../forks/GRDB.swift"),            // Phase 6 (database)
-        // .package(path: "../../forks/sqlite-data"),           // Phase 6 (database)
+        // Database forks (Phase 6)
+        .package(path: "../../forks/swift-snapshot-testing"),
+        .package(path: "../../forks/swift-structured-queries"),
+        .package(path: "../../forks/GRDB.swift"),
+        .package(path: "../../forks/sqlite-data"),
     ],
     targets: [
         .target(name: "FuseLibrary", dependencies: [
@@ -95,6 +96,9 @@ let package = Package(
         ]),
         .testTarget(name: "UIPatternTests", dependencies: [
             .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        ]),
+        .testTarget(name: "StructuredQueriesTests", dependencies: [
+            .product(name: "SQLiteData", package: "sqlite-data"),
         ]),
     ]
 )
