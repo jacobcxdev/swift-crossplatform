@@ -262,7 +262,7 @@ Package configuration and cross-compilation on Android.
 
 ### DOC: Documentation
 
-- [ ] **DOC-01**: FORKS.md documents every fork: original upstream version, commits ahead, key changes, rationale, and upstream PR candidates
+- [x] **DOC-01**: FORKS.md documents every fork: original upstream version, commits ahead, key changes, rationale, and upstream PR candidates
 
 ## v2 Requirements
 
@@ -489,7 +489,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TEST-10 | Phase 7 | Complete |
 | TEST-11 | Phase 7 | Complete |
 | TEST-12 | Phase 7 | Pending |
-| DOC-01 | Phase 7 | Pending |
+| DOC-01 | Phase 7 | Complete |
 
 **Coverage:**
 - v1 requirements: 184 total
