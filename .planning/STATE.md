@@ -5,33 +5,34 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 3: TCA Core (complete)
+**Current focus:** Phase 4: TCA State & Bindings (complete)
 
 ## Current Position
 
-Phase: 3 of 7 (TCA Core) -- COMPLETE
-Plan: 2 of 2 in current phase (all complete)
-Status: Phase 3 complete. Both plans executed: Store/Reducer/Effect (20 tests) + Dependencies (19 tests)
-Last activity: 2026-02-22 -- Plan 03-02 executed: 19 tests, 2 tasks, 0 failures
+Phase: 4 of 7 (TCA State & Bindings) -- COMPLETE
+Plan: 3 of 3 in current phase (all complete)
+Status: Phase 4 complete. All 3 waves executed: ObservableState/Bindings (17 tests) + SharedPersistence (17 tests) + SharedBinding/Observation (16 tests). FileStorageKey enabled on Android.
+Last activity: 2026-02-22 -- All 3 plans executed: 50 new tests, 0 failures. macOS 34 tests + Skip 21/21 pass.
 
-Progress: [██████░░░░] 60%
+Progress: [███████░░░] 70%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
+- Total plans completed: 8
 - Average duration: ~10min
-- Total execution time: 0.9 hours
+- Total execution time: ~1.4 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 3 - TCA Core | 2 | 14min | 7min |
+| 4 - TCA State & Bindings | 3 | 15min | 5min |
 
 **Recent Trend:**
-- Last 5 plans: -
-- Trend: -
+- Last 5 plans: 03-01, 03-02, 04-01, 04-02, 04-03
+- Trend: stable, fast execution
 
 *Updated after each plan completion*
 
@@ -61,6 +62,11 @@ Recent decisions affecting current work:
 - Effect dependency tests require explicit withDependencies clock override (test context defaults to unimplemented)
 - [Phase 03]: dismiss/openSettings not in swift-dependencies -- 16 built-in keys validated (not 19)
 - [Phase 03]: @DependencyClient and @CasePathable macros require file-scope types (not private/local)
+- [Phase 04]: FileStorageKey.swift enabled on Android with os(Android) guard, DispatchSource.FileSystemEvent polyfill, and no-op file system monitoring
+- [Phase 04]: @ObservableState _$id identity testing requires CoW snapshot comparison (not through Store.withState)
+- [Phase 04]: @Reducer enum DestinationFeature needs parent wrapper with .ifLet for enum case switching
+- [Phase 04]: Shared mutations use $value.withLock { $0 = newValue } (direct setter unavailable)
+- [Phase 04]: Binding($shared) requires @MainActor context (defined in SharedBinding.swift)
 
 ### Pending Todos
 
@@ -80,5 +86,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Completed 03-02-PLAN.md (Dependencies validation) -- Phase 3 complete
-Resume file: /gsd:execute-phase 04 (Phase 4: Observable State next)
+Stopped at: Completed Phase 4 (TCA State & Bindings) -- all 3 plans executed, 50 new tests
+Resume file: /gsd:execute-phase 05 (Phase 5: Navigation & Presentation next)

@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 1: Observation Bridge** - Native Swift Observation works correctly on Android with record-replay pattern preventing infinite recomposition
 - [ ] **Phase 2: Foundation Libraries** - CasePaths, IdentifiedCollections, CustomDump, and IssueReporting work on Android
 - [x] **Phase 3: TCA Core** - Store, reducers, effects, and dependency injection work on Android (completed 2026-02-22)
-- [ ] **Phase 4: TCA State & Bindings** - ObservableState macro, bindings, and shared state persistence work on Android
+- [x] **Phase 4: TCA State & Bindings** - ObservableState macro, bindings, and shared state persistence work on Android (completed 2026-02-22)
 - [ ] **Phase 5: Navigation & Presentation** - TCA navigation patterns and SwiftUI presentation lifecycle work on Android
 - [ ] **Phase 6: Database & Queries** - StructuredQueries and GRDB/SQLiteData work on Android with observation-driven view updates
 - [ ] **Phase 7: Integration Testing & Documentation** - End-to-end TCA app runs on both platforms; forks documented
@@ -68,7 +68,7 @@ Plans:
 
 Plans:
 - [x] 03-01-PLAN.md — Store/Reducer/Effect validation + Package.swift test infrastructure with DependenciesTestSupport (TCA-01..TCA-16) ✓ 2026-02-22
-- [ ] 03-02-PLAN.md — Dependency injection validation: @Dependency, withDependencies, built-in deps, @DependencyClient, NavigationID (DEP-01..DEP-12)
+- [x] 03-02-PLAN.md — Dependency injection validation: @Dependency, withDependencies, built-in deps, @DependencyClient, NavigationID (DEP-01..DEP-12) ✓ 2026-02-22
 
 ### Phase 4: TCA State & Bindings
 **Goal**: ObservableState macro, two-way bindings, and shared state persistence drive correct view updates on Android
@@ -83,9 +83,9 @@ Plans:
 **Plans**: 3 plans in 3 waves
 
 Plans:
-- [ ] 04-01-PLAN.md (wave 1) — @ObservableState macro, binding projection chain, store scoping lifecycle (ForEach, optional, enum), onChange, _printChanges, @ViewAction (TCA-17..TCA-25, TCA-29..TCA-31)
-- [ ] 04-02-PLAN.md (wave 2) — FileStorage Android enablement + @Shared persistence backend validation: appStorage, fileStorage, inMemory, custom SharedKey (SHR-01..SHR-04, SHR-14)
-- [ ] 04-03-PLAN.md (wave 3) — @Shared binding projections, Observations async sequence, publisher emission, double-notification prevention, cross-feature synchronization (SHR-05..SHR-13)
+- [x] 04-01-PLAN.md (wave 1) — @ObservableState macro, binding projection chain, store scoping lifecycle (ForEach, optional, enum), onChange, _printChanges, @ViewAction (TCA-17..TCA-25, TCA-29..TCA-31) ✓ 2026-02-22
+- [x] 04-02-PLAN.md (wave 2) — FileStorage Android enablement + @Shared persistence backend validation: appStorage, fileStorage, inMemory, custom SharedKey (SHR-01..SHR-04, SHR-14) ✓ 2026-02-22
+- [x] 04-03-PLAN.md (wave 3) — @Shared binding projections, Observations async sequence, publisher emission, double-notification prevention, cross-feature synchronization (SHR-05..SHR-13) ✓ 2026-02-22
 
 ### Phase 5: Navigation & Presentation
 **Goal**: TCA navigation patterns (stack, sheet, alert, confirmation dialog) and SwiftUI presentation lifecycle work on Android

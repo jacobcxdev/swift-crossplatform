@@ -69,5 +69,20 @@ let package = Package(
             .product(name: "DependenciesTestSupport", package: "swift-dependencies"),
             .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
         ]),
+        .testTarget(name: "ObservableStateTests", dependencies: [
+            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        ]),
+        .testTarget(name: "BindingTests", dependencies: [
+            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        ]),
+        .testTarget(name: "SharedPersistenceTests", dependencies: [
+            .product(name: "Sharing", package: "swift-sharing"),
+        ]),
+        .testTarget(name: "SharedBindingTests", dependencies: [
+            .product(name: "Sharing", package: "swift-sharing"),
+        ]),
+        .testTarget(name: "SharedObservationTests", dependencies: [
+            .product(name: "Sharing", package: "swift-sharing"),
+        ]),
     ]
 )
