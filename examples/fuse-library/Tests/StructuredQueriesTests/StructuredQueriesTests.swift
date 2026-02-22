@@ -1,8 +1,456 @@
-// Placeholder — will be replaced by full tests in Task 2
 import XCTest
+import SQLiteData
+import StructuredQueries
+
+// MARK: - @Table models (must be file-scope for macro expansion)
+
+@Table
+struct Item: Identifiable, Equatable, Sendable {
+    @Column(primaryKey: true)
+    var id: Int
+    var name: String
+    var value: Int
+    var isActive: Bool
+    var categoryId: Int?
+}
+
+@Table
+struct Category: Identifiable, Equatable, Sendable {
+    @Column(primaryKey: true)
+    var id: Int
+    var name: String
+}
+
+// MARK: - @Selection for grouped aggregation (SQL-03/SQL-04)
+
+@Selection
+struct ItemSummary: Equatable {
+    var isActive: Bool
+    @Column("itemCount")
+    var itemCount: Int
+}
+
+// MARK: - Test Suite
 
 final class StructuredQueriesTests: XCTestCase {
-    func testPlaceholder() {
-        XCTAssertTrue(true)
+
+    // MARK: - Helpers
+
+    private func makeDatabase() throws -> DatabaseQueue {
+        let dbQueue = try DatabaseQueue()
+        try dbQueue.write { db in
+            try db.execute(sql: """
+                CREATE TABLE "categories" (
+                    "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    "name" TEXT NOT NULL DEFAULT ''
+                )
+                """)
+            try db.execute(sql: """
+                CREATE TABLE "items" (
+                    "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    "name" TEXT NOT NULL DEFAULT '',
+                    "value" INTEGER NOT NULL DEFAULT 0,
+                    "isActive" BOOLEAN NOT NULL DEFAULT 1,
+                    "categoryId" INTEGER REFERENCES "categories"("id")
+                )
+                """)
+        }
+        return dbQueue
+    }
+
+    private func seedCategories(_ db: Database) throws {
+        try Category.insert {
+            ($0.name)
+        } values: {
+            "Tools"
+            "Gadgets"
+        }.execute(db)
+    }
+
+    private func seedItems(_ db: Database) throws {
+        try Item.insert {
+            ($0.name, $0.value, $0.isActive, $0.categoryId)
+        } values: {
+            ("alpha", 5, true, Int?.some(1))
+            ("beta", 15, true, Int?.some(1))
+            ("gamma", 25, false, Int?.some(2))
+            ("delta", 10, true, Int?.some(2))
+            ("epsilon", 30, false, Int?.none)
+        }.execute(db)
+    }
+
+    private func seedAll(_ db: Database) throws {
+        try seedCategories(db)
+        try seedItems(db)
+    }
+
+    // MARK: - SQL-01: @Table macro generates metadata
+
+    func testTableMacro() {
+        // @Table generates tableName and column accessors
+        XCTAssertEqual(Item.tableName, "items")
+        XCTAssertEqual(Category.tableName, "categories")
+
+        // Verify the table can produce a valid SELECT query
+        let query = Item.all.query
+        XCTAssertFalse(query.isEmpty, "@Table should generate a valid query")
+    }
+
+    // MARK: - SQL-02: @Column(primaryKey:) -- auto-increment
+
+    func testColumnPrimaryKey() throws {
+        let dbQueue = try makeDatabase()
+        try dbQueue.write { db in
+            // Insert without explicit id -- auto-increment should assign ids
+            try Item.insert {
+                Item.Draft(name: "first", value: 1, isActive: true)
+            }.execute(db)
+            try Item.insert {
+                Item.Draft(name: "second", value: 2, isActive: true)
+            }.execute(db)
+
+            let items = try Item.all.order(by: \.id).fetchAll(db)
+            XCTAssertEqual(items.count, 2)
+            XCTAssertEqual(items[0].id, 1)
+            XCTAssertEqual(items[0].name, "first")
+            XCTAssertEqual(items[1].id, 2)
+            XCTAssertEqual(items[1].name, "second")
+        }
+    }
+
+    // MARK: - SQL-03: @Column(as:) -- custom column representation
+
+    func testColumnCustomRepresentation() throws {
+        let dbQueue = try makeDatabase()
+        try dbQueue.write { db in
+            try seedAll(db)
+
+            // Use a raw SQL query that produces the columns ItemSummary expects
+            let results = try #sql(
+                """
+                SELECT "isActive", count(*) AS "itemCount"
+                FROM "items"
+                GROUP BY "isActive"
+                ORDER BY "isActive"
+                """,
+                as: ItemSummary.self
+            ).fetchAll(db)
+
+            XCTAssertEqual(results.count, 2)
+            XCTAssertEqual(results[0], ItemSummary(isActive: false, itemCount: 2))
+            XCTAssertEqual(results[1], ItemSummary(isActive: true, itemCount: 3))
+        }
+    }
+
+    // MARK: - SQL-04: @Selection multi-column grouping
+
+    func testSelectionTypeComposition() throws {
+        let dbQueue = try makeDatabase()
+        try dbQueue.write { db in
+            try seedAll(db)
+
+            let results = try #sql(
+                """
+                SELECT "isActive", count(*) AS "itemCount"
+                FROM "items"
+                GROUP BY "isActive"
+                ORDER BY "isActive"
+                """,
+                as: ItemSummary.self
+            ).fetchAll(db)
+
+            XCTAssertEqual(results.count, 2)
+            // false group: gamma, epsilon
+            XCTAssertEqual(results[0].isActive, false)
+            XCTAssertEqual(results[0].itemCount, 2)
+            // true group: alpha, beta, delta
+            XCTAssertEqual(results[1].isActive, true)
+            XCTAssertEqual(results[1].itemCount, 3)
+        }
+    }
+
+    // MARK: - SQL-05: Select specific columns
+
+    func testSelectColumns() throws {
+        let dbQueue = try makeDatabase()
+        try dbQueue.write { db in
+            try seedAll(db)
+
+            let results = try Item.select { ($0.name, $0.value) }
+                .order(by: \.id)
+                .fetchAll(db)
+
+            XCTAssertEqual(results.count, 5)
+            XCTAssertEqual(results[0].0, "alpha")
+            XCTAssertEqual(results[0].1, 5)
+            XCTAssertEqual(results[2].0, "gamma")
+            XCTAssertEqual(results[2].1, 25)
+        }
+    }
+
+    // MARK: - SQL-06: Where predicates
+
+    func testWherePredicates() throws {
+        let dbQueue = try makeDatabase()
+        try dbQueue.write { db in
+            try seedAll(db)
+
+            let results = try Item.where { $0.value > 10 && $0.isActive }
+                .order(by: \.id)
+                .fetchAll(db)
+
+            XCTAssertEqual(results.count, 1)
+            XCTAssertEqual(results[0].name, "beta")
+            XCTAssertEqual(results[0].value, 15)
+        }
+    }
+
+    // MARK: - SQL-07: Find by ID
+
+    func testFindById() throws {
+        let dbQueue = try makeDatabase()
+        try dbQueue.write { db in
+            try seedAll(db)
+
+            let results = try Item.find(1).fetchAll(db)
+            XCTAssertEqual(results.count, 1)
+            XCTAssertEqual(results[0].id, 1)
+            XCTAssertEqual(results[0].name, "alpha")
+        }
+    }
+
+    // MARK: - SQL-08: Where IN operator
+
+    func testWhereInOperator() throws {
+        let dbQueue = try makeDatabase()
+        try dbQueue.write { db in
+            try seedAll(db)
+
+            let results = try Item.where { $0.name.in(["alpha", "gamma"]) }
+                .order(by: \.name)
+                .fetchAll(db)
+
+            XCTAssertEqual(results.count, 2)
+            XCTAssertEqual(results[0].name, "alpha")
+            XCTAssertEqual(results[1].name, "gamma")
+        }
+    }
+
+    // MARK: - SQL-09: Join operations
+
+    func testJoinOperations() throws {
+        let dbQueue = try makeDatabase()
+        try dbQueue.write { db in
+            try seedAll(db)
+
+            // Inner join -- only items with matching categories
+            let innerResults = try Item
+                .order { $0.id.asc() }
+                .join(Category.all) { $0.categoryId.eq($1.id) }
+                .select { ($0.name, $1.name) }
+                .fetchAll(db)
+
+            XCTAssertEqual(innerResults.count, 4) // epsilon has no category
+            XCTAssertEqual(innerResults[0].0, "alpha")
+            XCTAssertEqual(innerResults[0].1, "Tools")
+            XCTAssertEqual(innerResults[2].0, "gamma")
+            XCTAssertEqual(innerResults[2].1, "Gadgets")
+
+            // Left join -- all items, categories nullable
+            let leftResults = try Item
+                .order { $0.id.asc() }
+                .leftJoin(Category.all) { $0.categoryId.eq($1.id) }
+                .select { ($0.name, $1.name) }
+                .fetchAll(db)
+
+            XCTAssertEqual(leftResults.count, 5)
+            XCTAssertEqual(leftResults[4].0, "epsilon")
+            XCTAssertNil(leftResults[4].1) // no category
+        }
+    }
+
+    // MARK: - SQL-10: Order by (asc, desc, collation)
+
+    func testOrderBy() throws {
+        let dbQueue = try makeDatabase()
+        try dbQueue.write { db in
+            try seedAll(db)
+
+            // Ascending order by name
+            let ascResults = try Item.select(\.name)
+                .order { $0.name.asc() }
+                .fetchAll(db)
+            XCTAssertEqual(ascResults, ["alpha", "beta", "delta", "epsilon", "gamma"])
+
+            // Descending order by name
+            let descResults = try Item.select(\.name)
+                .order { $0.name.desc() }
+                .fetchAll(db)
+            XCTAssertEqual(descResults, ["gamma", "epsilon", "delta", "beta", "alpha"])
+        }
+
+        // Case-insensitive collation ordering
+        let dbQueue2 = try makeDatabase()
+        try dbQueue2.write { db in
+            try Item.insert {
+                ($0.name, $0.value, $0.isActive)
+            } values: {
+                ("Banana", 1, true)
+                ("apple", 2, true)
+                ("Cherry", 3, true)
+            }.execute(db)
+
+            let collateResults = try Item.select(\.name)
+                .order { $0.name.collate(.nocase).asc() }
+                .fetchAll(db)
+            XCTAssertEqual(collateResults, ["apple", "Banana", "Cherry"])
+        }
+    }
+
+    // MARK: - SQL-11: Group by with aggregations
+
+    func testGroupByAggregation() throws {
+        let dbQueue = try makeDatabase()
+        try dbQueue.write { db in
+            try seedAll(db)
+
+            // Group by isActive, count per group
+            let countResults = try Item
+                .select { ($0.isActive, $0.id.count()) }
+                .group(by: \.isActive)
+                .order { $0.isActive.asc() }
+                .fetchAll(db)
+
+            XCTAssertEqual(countResults.count, 2)
+            XCTAssertEqual(countResults[0].0, false) // inactive
+            XCTAssertEqual(countResults[0].1, 2)     // gamma, epsilon
+            XCTAssertEqual(countResults[1].0, true)  // active
+            XCTAssertEqual(countResults[1].1, 3)     // alpha, beta, delta
+
+            // Sum of values per group
+            let sumResults = try Item
+                .select { ($0.isActive, $0.value.sum()) }
+                .group(by: \.isActive)
+                .order { $0.isActive.asc() }
+                .fetchAll(db)
+
+            XCTAssertEqual(sumResults[0].1, 55)  // gamma(25) + epsilon(30)
+            XCTAssertEqual(sumResults[1].1, 30)  // alpha(5) + beta(15) + delta(10)
+
+            // Min and max
+            let minResult = try Item.select { $0.value.min() }.fetchAll(db)
+            XCTAssertEqual(minResult.first, 5)
+
+            let maxResult = try Item.select { $0.value.max() }.fetchAll(db)
+            XCTAssertEqual(maxResult.first, 30)
+        }
+    }
+
+    // MARK: - SQL-12: Limit and offset
+
+    func testLimitOffset() throws {
+        let dbQueue = try makeDatabase()
+        try dbQueue.write { db in
+            try seedAll(db)
+
+            let results = try Item.select(\.name)
+                .order(by: \.id)
+                .limit(2, offset: 1)
+                .fetchAll(db)
+
+            XCTAssertEqual(results.count, 2)
+            XCTAssertEqual(results[0], "beta")   // id=2
+            XCTAssertEqual(results[1], "gamma")  // id=3
+        }
+    }
+
+    // MARK: - SQL-13: Insert and upsert
+
+    func testInsertAndUpsert() throws {
+        let dbQueue = try makeDatabase()
+        try dbQueue.write { db in
+            try seedCategories(db)
+
+            // Insert a new row
+            try Item.insert {
+                Item.Draft(name: "newItem", value: 42, isActive: true)
+            }.execute(db)
+
+            let items = try Item.all.fetchAll(db)
+            XCTAssertEqual(items.count, 1)
+            XCTAssertEqual(items[0].name, "newItem")
+            XCTAssertEqual(items[0].value, 42)
+
+            // Upsert -- insert new row (no conflict)
+            try Item.upsert {
+                Item.Draft(name: "upserted", value: 99, isActive: false)
+            }.execute(db)
+
+            let allItems = try Item.all.order(by: \.id).fetchAll(db)
+            XCTAssertEqual(allItems.count, 2)
+            XCTAssertEqual(allItems[1].name, "upserted")
+
+            // Upsert -- conflict on existing id updates the row
+            let existingId = allItems[0].id
+            try Item.upsert {
+                Item.Draft(id: existingId, name: "updated", value: 100, isActive: false)
+            }.execute(db)
+
+            let updated = try Item.find(existingId).fetchAll(db)
+            XCTAssertEqual(updated.first?.name, "updated")
+            XCTAssertEqual(updated.first?.value, 100)
+        }
+    }
+
+    // MARK: - SQL-14: Update and delete
+
+    func testUpdateAndDelete() throws {
+        let dbQueue = try makeDatabase()
+        try dbQueue.write { db in
+            try seedAll(db)
+
+            // Update: set value = 999 for items where value > 20
+            try Item.where { $0.value > 20 }
+                .update { $0.value = 999 }
+                .execute(db)
+
+            let highValue = try Item.where { $0.value == 999 }
+                .order(by: \.id)
+                .fetchAll(db)
+            XCTAssertEqual(highValue.count, 2) // gamma(25), epsilon(30) -> both 999
+            XCTAssertEqual(highValue[0].name, "gamma")
+            XCTAssertEqual(highValue[1].name, "epsilon")
+
+            // Delete: remove item with id=1
+            try Item.find(1).delete().execute(db)
+
+            let remaining = try Item.all.fetchAll(db)
+            XCTAssertEqual(remaining.count, 4) // was 5, removed 1
+            XCTAssertFalse(remaining.contains(where: { $0.id == 1 }))
+        }
+    }
+
+    // MARK: - SQL-15: #sql macro for safe interpolation
+
+    func testSqlMacro() throws {
+        let dbQueue = try makeDatabase()
+        try dbQueue.write { db in
+            try seedAll(db)
+
+            let results = try #sql(
+                """
+                SELECT \(Item.columns)
+                FROM \(Item.self)
+                WHERE \(Item.value) > \(bind: 10)
+                ORDER BY \(Item.value)
+                """,
+                as: Item.self
+            ).fetchAll(db)
+
+            XCTAssertEqual(results.count, 3) // beta(15), gamma(25), epsilon(30)
+            XCTAssertEqual(results[0].name, "beta")
+            XCTAssertEqual(results[1].name, "gamma")
+            XCTAssertEqual(results[2].name, "epsilon")
+        }
     }
 }
