@@ -143,14 +143,14 @@ Navigation patterns and presentation lifecycle on Android.
 
 Enum routing and pattern matching on Android.
 
-- [ ] **CP-01**: `@CasePathable` macro generates `AllCasePaths` and `CaseKeyPath` accessors on Android
-- [ ] **CP-02**: `.is(\.caseName)` returns correct `Bool` for case checking on Android
-- [ ] **CP-03**: `.modify(\.caseName) { }` mutates associated value in-place on Android
-- [ ] **CP-04**: `@dynamicMemberLookup` dot-syntax returns `Optional<AssociatedValue>` on Android
-- [ ] **CP-05**: `allCasePaths` static variable returns collection of all case key paths on Android
-- [ ] **CP-06**: `root[case: caseKeyPath]` subscript extracts/embeds associated value on Android
+- [x] **CP-01**: `@CasePathable` macro generates `AllCasePaths` and `CaseKeyPath` accessors on Android
+- [x] **CP-02**: `.is(\.caseName)` returns correct `Bool` for case checking on Android
+- [x] **CP-03**: `.modify(\.caseName) { }` mutates associated value in-place on Android
+- [x] **CP-04**: `@dynamicMemberLookup` dot-syntax returns `Optional<AssociatedValue>` on Android
+- [x] **CP-05**: `allCasePaths` static variable returns collection of all case key paths on Android
+- [x] **CP-06**: `root[case: caseKeyPath]` subscript extracts/embeds associated value on Android
 - [ ] **CP-07**: `@Reducer enum` pattern -- enum reducers synthesize `body` and `scope` on Android
-- [ ] **CP-08**: `AnyCasePath` with custom embed/extract closures works on Android
+- [x] **CP-08**: `AnyCasePath` with custom embed/extract closures works on Android
 
 ### IC: Identified Collections
 
@@ -204,11 +204,11 @@ Database lifecycle, query execution, and observation on Android.
 
 Value dumping, diffing, and assertion utilities on Android.
 
-- [ ] **CD-01**: `customDump(_:)` outputs structured value representation on Android
-- [ ] **CD-02**: `String(customDumping:)` creates string from value dump on Android
-- [ ] **CD-03**: `diff(_:_:)` computes string diff between two values on Android
-- [ ] **CD-04**: `expectNoDifference(_:_:)` asserts equality with diff output on failure on Android
-- [ ] **CD-05**: `expectDifference(_:_:operation:changes:)` asserts value changes after operation on Android
+- [x] **CD-01**: `customDump(_:)` outputs structured value representation on Android
+- [x] **CD-02**: `String(customDumping:)` creates string from value dump on Android
+- [x] **CD-03**: `diff(_:_:)` computes string diff between two values on Android
+- [x] **CD-04**: `expectNoDifference(_:_:)` asserts equality with diff output on failure on Android
+- [x] **CD-05**: `expectDifference(_:_:operation:changes:)` asserts value changes after operation on Android
 
 ### IR: Issue Reporting
 
