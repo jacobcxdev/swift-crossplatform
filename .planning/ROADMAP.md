@@ -113,11 +113,11 @@ Plans:
   2. `DatabaseMigrator` runs migrations and `database.read/write` execute transactions on Android
   3. `@FetchAll` and `@FetchOne` observation macros trigger view updates when underlying database rows change on Android
   4. `@Dependency(\.defaultDatabase)` injects database connection into views and models on Android
-**Plans**: TBD
+**Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] 06-01: TBD
-- [ ] 06-02: TBD
+- [ ] 06-01-PLAN.md — Package.swift database fork wiring + StructuredQueries validation tests (SQL-01..SQL-15)
+- [ ] 06-02-PLAN.md — SQLiteData lifecycle, GRDB transactions, observation macros, dependency injection (SD-01..SD-12)
 
 ### Phase 7: Integration Testing & Documentation
 **Goal**: A complete TCA app runs on both iOS and Android; all forks are documented with change rationale and upstream PR candidates
