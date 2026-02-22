@@ -100,5 +100,9 @@ let package = Package(
         .testTarget(name: "StructuredQueriesTests", dependencies: [
             .product(name: "SQLiteData", package: "sqlite-data"),
         ]),
+        .testTarget(name: "SQLiteDataTests", dependencies: [
+            .product(name: "SQLiteData", package: "sqlite-data"),
+            .product(name: "DependenciesTestSupport", package: "swift-dependencies"),
+        ]),
     ]
 )
