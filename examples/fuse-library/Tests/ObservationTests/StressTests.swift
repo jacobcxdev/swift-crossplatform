@@ -1,3 +1,4 @@
+#if !SKIP
 #if canImport(Darwin)
 import Darwin
 #endif
@@ -164,3 +165,4 @@ struct StressTests {
         print("Observation coalescing: \(iterations) cycles in \(elapsed)")
     }
 }
+#endif

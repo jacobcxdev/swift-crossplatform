@@ -38,84 +38,39 @@ let package = Package(
         .target(name: "FuseLibrary", dependencies: [
             .product(name: "SkipFuse", package: "skip-fuse")
         ], resources: [.process("Resources")], plugins: [.plugin(name: "skipstone", package: "skip")]),
-        .testTarget(name: "FuseLibraryTests", dependencies: [
+        // Observation tests (Phase 1 bridge + tracking + Phase 7 bridge/stress)
+        .testTarget(name: "ObservationTests", dependencies: [
             "FuseLibrary",
-            .product(name: "SkipTest", package: "skip")
+            .product(name: "SkipTest", package: "skip"),
+            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
         ], resources: [.process("Resources")], plugins: [.plugin(name: "skipstone", package: "skip")]),
-        .testTarget(name: "ObservationTrackingTests", dependencies: [
-            "FuseLibrary",
-        ]),
-        .testTarget(name: "CasePathsTests", dependencies: [
+        // Foundation library tests (Phase 2)
+        .testTarget(name: "FoundationTests", dependencies: [
             .product(name: "CasePaths", package: "swift-case-paths"),
-        ]),
-        .testTarget(name: "IdentifiedCollectionsTests", dependencies: [
             .product(name: "IdentifiedCollections", package: "swift-identified-collections"),
-        ]),
-        .testTarget(name: "CustomDumpTests", dependencies: [
             .product(name: "CustomDump", package: "swift-custom-dump"),
-        ]),
-        .testTarget(name: "IssueReportingTests", dependencies: [
             .product(name: "IssueReporting", package: "xctest-dynamic-overlay"),
             .product(name: "IssueReportingTestSupport", package: "xctest-dynamic-overlay"),
         ]),
-        .testTarget(name: "StoreReducerTests", dependencies: [
+        // TCA core tests (Phase 3 + 4 state/bindings + Phase 7 TestStore)
+        .testTarget(name: "TCATests", dependencies: [
             .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-        ]),
-        .testTarget(name: "EffectTests", dependencies: [
-            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-        ]),
-        .testTarget(name: "DependencyTests", dependencies: [
             .product(name: "Dependencies", package: "swift-dependencies"),
             .product(name: "DependenciesMacros", package: "swift-dependencies"),
             .product(name: "DependenciesTestSupport", package: "swift-dependencies"),
-            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
         ]),
-        .testTarget(name: "ObservableStateTests", dependencies: [
-            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-        ]),
-        .testTarget(name: "BindingTests", dependencies: [
-            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-        ]),
-        .testTarget(name: "SharedPersistenceTests", dependencies: [
+        // Sharing tests (Phase 4)
+        .testTarget(name: "SharingTests", dependencies: [
             .product(name: "Sharing", package: "swift-sharing"),
         ]),
-        .testTarget(name: "SharedBindingTests", dependencies: [
-            .product(name: "Sharing", package: "swift-sharing"),
-        ]),
-        .testTarget(name: "SharedObservationTests", dependencies: [
-            .product(name: "Sharing", package: "swift-sharing"),
-        ]),
+        // Navigation tests (Phase 5)
         .testTarget(name: "NavigationTests", dependencies: [
             .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
         ]),
-        .testTarget(name: "NavigationStackTests", dependencies: [
-            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-        ]),
-        .testTarget(name: "PresentationTests", dependencies: [
-            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-        ]),
-        .testTarget(name: "UIPatternTests", dependencies: [
-            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-        ]),
-        .testTarget(name: "StructuredQueriesTests", dependencies: [
-            .product(name: "SQLiteData", package: "sqlite-data"),
-        ]),
-        .testTarget(name: "SQLiteDataTests", dependencies: [
+        // Database tests (Phase 6)
+        .testTarget(name: "DatabaseTests", dependencies: [
             .product(name: "SQLiteData", package: "sqlite-data"),
             .product(name: "DependenciesTestSupport", package: "swift-dependencies"),
-        ]),
-        .testTarget(name: "TestStoreTests", dependencies: [
-            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-            .product(name: "DependenciesTestSupport", package: "swift-dependencies"),
-        ]),
-        .testTarget(name: "TestStoreEdgeCaseTests", dependencies: [
-            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-        ]),
-        .testTarget(name: "ObservationBridgeTests", dependencies: [
-            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-        ]),
-        .testTarget(name: "StressTests", dependencies: [
-            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
         ]),
     ]
 )

@@ -7,8 +7,8 @@ import StructuredQueries
 
 // MARK: - @Table model (must be file-scope for macro expansion)
 
-@Table
-struct Item: Identifiable, Equatable, Sendable {
+@Table("items")
+struct DataItem: Identifiable, Equatable, Sendable {
     @Column(primaryKey: true)
     var id: Int
     var name: String
@@ -44,7 +44,7 @@ final class SQLiteDataTests: XCTestCase {
     private func makeSeededDatabase() throws -> DatabaseQueue {
         let dbQueue = try makeDatabase()
         try dbQueue.write { db in
-            try Item.insert {
+            try DataItem.insert {
                 ($0.name, $0.value, $0.isActive)
             } values: {
                 ("alpha", 5, true)
@@ -108,12 +108,12 @@ final class SQLiteDataTests: XCTestCase {
 
         // Verify table exists by inserting and reading
         try dbQueue.write { db in
-            try Item.insert {
-                Item.Draft(name: "migrated", value: 42, isActive: true)
+            try DataItem.insert {
+                DataItem.Draft(name: "migrated", value: 42, isActive: true)
             }.execute(db)
         }
         let items = try dbQueue.read { db in
-            try Item.all.fetchAll(db)
+            try DataItem.all.fetchAll(db)
         }
         XCTAssertEqual(items.count, 1)
         XCTAssertEqual(items[0].name, "migrated")
@@ -125,7 +125,7 @@ final class SQLiteDataTests: XCTestCase {
         let dbQueue = try makeSeededDatabase()
 
         let items = try dbQueue.read { db in
-            try Item.all.order(by: \.id).fetchAll(db)
+            try DataItem.all.order(by: \.id).fetchAll(db)
         }
         XCTAssertEqual(items.count, 3)
         XCTAssertEqual(items[0].name, "alpha")
@@ -139,14 +139,14 @@ final class SQLiteDataTests: XCTestCase {
         let dbQueue = try makeDatabase()
 
         try dbQueue.write { db in
-            try Item.insert {
-                Item.Draft(name: "written", value: 99, isActive: true)
+            try DataItem.insert {
+                DataItem.Draft(name: "written", value: 99, isActive: true)
             }.execute(db)
         }
 
         // Verify data persists in subsequent read
         let items = try dbQueue.read { db in
-            try Item.all.fetchAll(db)
+            try DataItem.all.fetchAll(db)
         }
         XCTAssertEqual(items.count, 1)
         XCTAssertEqual(items[0].name, "written")
@@ -159,7 +159,7 @@ final class SQLiteDataTests: XCTestCase {
         let dbQueue = try makeSeededDatabase()
 
         let items = try await dbQueue.read { db in
-            try Item.all.order(by: \.id).fetchAll(db)
+            try DataItem.all.order(by: \.id).fetchAll(db)
         }
         XCTAssertEqual(items.count, 3)
         XCTAssertEqual(items[0].name, "alpha")
@@ -171,13 +171,13 @@ final class SQLiteDataTests: XCTestCase {
         let dbQueue = try makeDatabase()
 
         try await dbQueue.write { db in
-            try Item.insert {
-                Item.Draft(name: "async-written", value: 77, isActive: false)
+            try DataItem.insert {
+                DataItem.Draft(name: "async-written", value: 77, isActive: false)
             }.execute(db)
         }
 
         let items = try await dbQueue.read { db in
-            try Item.all.fetchAll(db)
+            try DataItem.all.fetchAll(db)
         }
         XCTAssertEqual(items.count, 1)
         XCTAssertEqual(items[0].name, "async-written")
@@ -190,13 +190,13 @@ final class SQLiteDataTests: XCTestCase {
         let dbQueue = try makeSeededDatabase()
 
         let allItems = try dbQueue.read { db in
-            try Item.all.fetchAll(db)
+            try DataItem.all.fetchAll(db)
         }
         XCTAssertEqual(allItems.count, 3)
 
         // Filtered fetchAll
         let activeItems = try dbQueue.read { db in
-            try Item.where { $0.isActive }.fetchAll(db)
+            try DataItem.where { $0.isActive }.fetchAll(db)
         }
         XCTAssertEqual(activeItems.count, 2)
         XCTAssertTrue(activeItems.allSatisfy { $0.isActive })
@@ -209,14 +209,14 @@ final class SQLiteDataTests: XCTestCase {
 
         // fetchOne returns first match
         let first = try dbQueue.read { db in
-            try Item.find(1).fetchOne(db)
+            try DataItem.find(1).fetchOne(db)
         }
         XCTAssertNotNil(first)
         XCTAssertEqual(first?.name, "alpha")
 
         // fetchOne returns nil for no match
         let missing = try dbQueue.read { db in
-            try Item.where { $0.name == "nonexistent" }.limit(1).fetchOne(db)
+            try DataItem.where { $0.name == "nonexistent" }.limit(1).fetchOne(db)
         }
         XCTAssertNil(missing)
     }
@@ -227,17 +227,17 @@ final class SQLiteDataTests: XCTestCase {
         let dbQueue = try makeSeededDatabase()
 
         let totalCount = try dbQueue.read { db in
-            try Item.all.fetchCount(db)
+            try DataItem.all.fetchCount(db)
         }
         XCTAssertEqual(totalCount, 3)
 
         let activeCount = try dbQueue.read { db in
-            try Item.where { $0.isActive }.fetchCount(db)
+            try DataItem.where { $0.isActive }.fetchCount(db)
         }
         XCTAssertEqual(activeCount, 2)
 
         let inactiveCount = try dbQueue.read { db in
-            try Item.where { !$0.isActive }.fetchCount(db)
+            try DataItem.where { !$0.isActive }.fetchCount(db)
         }
         XCTAssertEqual(inactiveCount, 1)
     }
@@ -249,11 +249,11 @@ final class SQLiteDataTests: XCTestCase {
         let dbQueue = try makeDatabase()
 
         let observation = ValueObservation.tracking { db in
-            try Item.all.order(by: \.id).fetchAll(db)
+            try DataItem.all.order(by: \.id).fetchAll(db)
         }
 
         let expectation = XCTestExpectation(description: "observation triggers on insert")
-        var observedValues: [[Item]] = []
+        var observedValues: [[DataItem]] = []
 
         let cancellable = observation.start(in: dbQueue, onError: { _ in }, onChange: { items in
             observedValues.append(items)
@@ -267,8 +267,8 @@ final class SQLiteDataTests: XCTestCase {
 
         // Mutate database — should trigger onChange
         try await dbQueue.write { db in
-            try Item.insert {
-                Item.Draft(name: "observed", value: 42, isActive: true)
+            try DataItem.insert {
+                DataItem.Draft(name: "observed", value: 42, isActive: true)
             }.execute(db)
         }
 
@@ -288,11 +288,11 @@ final class SQLiteDataTests: XCTestCase {
         let dbQueue = try makeDatabase()
 
         let observation = ValueObservation.tracking { db in
-            try Item.all.limit(1).fetchOne(db)
+            try DataItem.all.limit(1).fetchOne(db)
         }
 
         let expectation = XCTestExpectation(description: "observation triggers for single row")
-        var observedValues: [Item?] = []
+        var observedValues: [DataItem?] = []
 
         let cancellable = observation.start(in: dbQueue, onError: { _ in }, onChange: { item in
             observedValues.append(item)
@@ -305,8 +305,8 @@ final class SQLiteDataTests: XCTestCase {
 
         // Insert a row — should trigger onChange
         try await dbQueue.write { db in
-            try Item.insert {
-                Item.Draft(name: "single", value: 10, isActive: true)
+            try DataItem.insert {
+                DataItem.Draft(name: "single", value: 10, isActive: true)
             }.execute(db)
         }
 
@@ -325,14 +325,14 @@ final class SQLiteDataTests: XCTestCase {
         let dbQueue = try makeDatabase()
 
         // Composite observation: fetch count + filtered items in single tracking block
-        let observation = ValueObservation.tracking { db -> (Int, [Item]) in
-            let count = try Item.all.fetchCount(db)
-            let activeItems = try Item.where { $0.isActive }.order(by: \.id).fetchAll(db)
+        let observation = ValueObservation.tracking { db -> (Int, [DataItem]) in
+            let count = try DataItem.all.fetchCount(db)
+            let activeItems = try DataItem.where { $0.isActive }.order(by: \.id).fetchAll(db)
             return (count, activeItems)
         }
 
         let expectation = XCTestExpectation(description: "composite observation triggers")
-        var observedValues: [(Int, [Item])] = []
+        var observedValues: [(Int, [DataItem])] = []
 
         let cancellable = observation.start(in: dbQueue, onError: { _ in }, onChange: { value in
             observedValues.append(value)
@@ -345,7 +345,7 @@ final class SQLiteDataTests: XCTestCase {
 
         // Insert mixed active/inactive rows
         try await dbQueue.write { db in
-            try Item.insert {
+            try DataItem.insert {
                 ($0.name, $0.value, $0.isActive)
             } values: {
                 ("active1", 1, true)
@@ -379,19 +379,19 @@ final class SQLiteDataTests: XCTestCase {
 
             // Write through dependency-injected database
             try database.write { db in
-                try Item.insert {
-                    Item.Draft(name: "injected", value: 55, isActive: true)
+                try DataItem.insert {
+                    DataItem.Draft(name: "injected", value: 55, isActive: true)
                 }.execute(db)
             }
 
             // Read through dependency-injected database
             let count = try database.read { db in
-                try Item.all.fetchCount(db)
+                try DataItem.all.fetchCount(db)
             }
             XCTAssertEqual(count, 1)
 
             let items = try database.read { db in
-                try Item.all.fetchAll(db)
+                try DataItem.all.fetchAll(db)
             }
             XCTAssertEqual(items.first?.name, "injected")
         }

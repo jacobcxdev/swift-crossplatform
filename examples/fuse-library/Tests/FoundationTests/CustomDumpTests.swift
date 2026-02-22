@@ -1,7 +1,7 @@
 import CustomDump
 import Testing
 
-struct User: Equatable, Sendable {
+struct DumpUser: Equatable, Sendable {
     var id: Int
     var name: String
     var email: String?
@@ -14,10 +14,10 @@ enum Status: Equatable {
 
 // CD-01: customDump produces structured value representation
 @Test func customDumpStructOutput() {
-    let user = User(id: 1, name: "Blob", email: "blob@example.com")
+    let user = DumpUser(id: 1, name: "Blob", email: "blob@example.com")
     var output = ""
     customDump(user, to: &output)
-    #expect(output.contains("User("))
+    #expect(output.contains("DumpUser("))
     #expect(output.contains("id: 1"))
     #expect(output.contains("name: \"Blob\""))
     #expect(output.contains("blob@example.com"))
@@ -49,17 +49,17 @@ enum Status: Equatable {
 
 // CD-02: String(customDumping:) creates string from value dump
 @Test func stringCustomDumping() {
-    let user = User(id: 1, name: "Blob", email: nil)
+    let user = DumpUser(id: 1, name: "Blob", email: nil)
     let output = String(customDumping: user)
-    #expect(output.contains("User("))
+    #expect(output.contains("DumpUser("))
     #expect(output.contains("id: 1"))
     #expect(output.contains("name: \"Blob\""))
 }
 
 // CD-03: diff computes string diff between two values
 @Test func diffDetectsChanges() {
-    let user1 = User(id: 1, name: "Blob", email: nil)
-    let user2 = User(id: 1, name: "Blob Jr.", email: "jr@example.com")
+    let user1 = DumpUser(id: 1, name: "Blob", email: nil)
+    let user2 = DumpUser(id: 1, name: "Blob Jr.", email: "jr@example.com")
     let result = diff(user1, user2)
     #expect(result != nil)
     #expect(result!.contains("name"))
@@ -67,8 +67,8 @@ enum Status: Equatable {
 }
 
 @Test func diffReturnsNilForEqualValues() {
-    let user1 = User(id: 1, name: "Blob", email: nil)
-    let user2 = User(id: 1, name: "Blob", email: nil)
+    let user1 = DumpUser(id: 1, name: "Blob", email: nil)
+    let user2 = DumpUser(id: 1, name: "Blob", email: nil)
     let result = diff(user1, user2)
     #expect(result == nil)
 }
@@ -83,14 +83,14 @@ enum Status: Equatable {
 // CD-04: expectNoDifference asserts equality with diff output on failure
 // Depends on reportIssue() working correctly (fixed in Plan 02-02)
 @Test func expectNoDifferencePassesForEqualValues() {
-    let user = User(id: 1, name: "Blob", email: nil)
+    let user = DumpUser(id: 1, name: "Blob", email: nil)
     expectNoDifference(user, user)
     // Should pass without issue
 }
 
 @Test func expectNoDifferenceFailsForDifferentValues() {
-    let user1 = User(id: 1, name: "Blob", email: nil)
-    let user2 = User(id: 1, name: "Blob Jr.", email: nil)
+    let user1 = DumpUser(id: 1, name: "Blob", email: nil)
+    let user2 = DumpUser(id: 1, name: "Blob Jr.", email: nil)
     withKnownIssue {
         expectNoDifference(user1, user2)
     }
@@ -98,7 +98,7 @@ enum Status: Equatable {
 
 // CD-05: expectDifference asserts value changes after operation
 @Test func expectDifferenceDetectsChanges() {
-    var user = User(id: 1, name: "Blob", email: nil)
+    var user = DumpUser(id: 1, name: "Blob", email: nil)
     expectDifference(user) {
         user.name = "Blob Jr."
     } changes: {

@@ -30,10 +30,10 @@ struct ChainFeature {
     }
 }
 
-private enum CancelInFlightID: Hashable { case fetch }
+private enum EdgeCaseCancelInFlightID: Hashable { case fetch }
 
 @Reducer
-struct CancelInFlightFeature {
+struct EdgeCaseCancelInFlightFeature {
     struct State: Equatable {
         var result: String = ""
         var fetchCount = 0
@@ -52,7 +52,7 @@ struct CancelInFlightFeature {
                 return .run { send in
                     await send(.response("result-\(count)"))
                 }
-                .cancellable(id: CancelInFlightID.fetch, cancelInFlight: true)
+                .cancellable(id: EdgeCaseCancelInFlightID.fetch, cancelInFlight: true)
             case let .response(value):
                 state.result = value
                 return .none
@@ -136,8 +136,8 @@ final class TestStoreEdgeCaseTests: XCTestCase {
 
     @MainActor
     func testCancelInFlightRapidResend() async {
-        let store = TestStore(initialState: CancelInFlightFeature.State()) {
-            CancelInFlightFeature()
+        let store = TestStore(initialState: EdgeCaseCancelInFlightFeature.State()) {
+            EdgeCaseCancelInFlightFeature()
         }
         store.exhaustivity = .off
         store.timeout = 5_000_000_000

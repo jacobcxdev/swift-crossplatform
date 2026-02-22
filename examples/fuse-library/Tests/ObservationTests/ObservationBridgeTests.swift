@@ -1,3 +1,4 @@
+#if !SKIP
 import Observation
 import ComposableArchitecture
 import Testing
@@ -284,3 +285,4 @@ struct ObservationBridgeTests {
     //    Per C5: silent no-op only in Lite mode. Requires intentionally breaking
     //    bridge class loading — not suitable for automated test."
 }
+#endif
