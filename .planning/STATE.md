@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 7: Integration Testing & Documentation (next)
+**Current focus:** Phase 7: Integration Testing & Documentation (executing)
 
 ## Current Position
 
-Phase: 7 of 7 (Integration Testing & Documentation) -- NOT STARTED
-Plan: 0 of TBD in current phase (planning pending)
-Status: Phase 6 complete. 28 database tests (15 StructuredQueries + 13 SQLiteData) covering SQL-01..SQL-15 and SD-01..SD-12. Triple-verified (Claude + Codex gaps auto-fixed, Gemini PASS). Phase 7 is the final phase.
-Last activity: 2026-02-22 -- Phase 6 executed and verified.
+Phase: 7 of 7 (Integration Testing & Documentation) -- IN PROGRESS
+Plan: 1 of 4 in current phase (07-01 complete)
+Status: Plan 07-01 complete. 18 TestStore tests (14 core + 4 edge case) covering TEST-01..TEST-09. TestStore API validated: init, send, receive, exhaustivity, finish, skipReceivedActions, dependency overrides, effectDidSubscribe fallback for 5 effect types.
+Last activity: 2026-02-22 -- Plan 07-01 executed.
 
-Progress: [█████████░] 90%
+Progress: [█████████░] 93%
 
 ## Performance Metrics
 

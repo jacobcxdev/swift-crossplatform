@@ -129,13 +129,13 @@ Plans:
   3. Stress tests confirm stability under >1000 TCA state mutations/second on Android
   4. A fuse-app example demonstrates full TCA app (store, reducer, effects, navigation, persistence) running on both iOS and Android
   5. FORKS.md documents every fork with upstream version, commits ahead, key changes, rationale, and upstream PR candidates
-**Plans**: 4 plans in 3 waves
+**Plans**: 4 plans in 4 waves
 
 Plans:
-- [ ] 07-01-PLAN.md — TestStore API validation: init, send, receive, exhaustivity, finish, skipReceivedActions, dependencies, edge cases (TEST-01..TEST-09)
-- [ ] 07-02-PLAN.md — Observation bridge semantics tests + stress tests: Store throughput and observation coalescing (TEST-10, TEST-11)
-- [ ] 07-03-PLAN.md — Fuse-app showcase: 6 TCA features with integration tests (TEST-12)
-- [ ] 07-04-PLAN.md — Fork documentation: FORKS.md with dependency graph, PR drafts, cleanup (DOC-01)
+- [ ] 07-01-PLAN.md (wave 1) — TestStore API validation: init, send, receive, exhaustivity, finish, skipReceivedActions, dependencies, effectDidSubscribe edge cases (TEST-01..TEST-09)
+- [ ] 07-02-PLAN.md (wave 2) — Observation bridge semantics + stress tests + Android emulator validation + deferred Phase 1 tests (TEST-10, TEST-11)
+- [ ] 07-03-PLAN.md (wave 3) — Fuse-app showcase: 6 TCA features, integration tests, README, Android build verification (TEST-12)
+- [ ] 07-04-PLAN.md (wave 4) — Fork documentation: FORKS.md + test reorganisation into 6 feature-aligned targets (DOC-01)
 
 ## Progress
 
@@ -151,4 +151,4 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 | 4. TCA State & Bindings | 3/3 | Complete | 2026-02-22 |
 | 5. Navigation & Presentation | 3/3 | Complete | 2026-02-22 |
 | 6. Database & Queries | 2/2 | Complete | 2026-02-22 |
-| 7. Integration Testing & Documentation | 0/4 | Not started | - |
+| 7. Integration Testing & Documentation | 0/4 | Planned | - |
