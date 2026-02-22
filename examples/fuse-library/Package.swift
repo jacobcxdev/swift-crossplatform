@@ -56,5 +56,17 @@ let package = Package(
             .product(name: "IssueReporting", package: "xctest-dynamic-overlay"),
             .product(name: "IssueReportingTestSupport", package: "xctest-dynamic-overlay"),
         ]),
+        .testTarget(name: "StoreReducerTests", dependencies: [
+            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        ]),
+        .testTarget(name: "EffectTests", dependencies: [
+            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        ]),
+        .testTarget(name: "DependencyTests", dependencies: [
+            .product(name: "Dependencies", package: "swift-dependencies"),
+            .product(name: "DependenciesMacros", package: "swift-dependencies"),
+            .product(name: "DependenciesTestSupport", package: "swift-dependencies"),
+            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        ]),
     ]
 )
