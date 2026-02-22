@@ -42,6 +42,7 @@ Progress: [██████░░░░] 60%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- Skip sandbox only resolves deps used by targets — unused local path deps must be commented out or removed
 - Fuse mode only (no Lite) for TCA apps -- counter-based observation incompatible
 - Fix at bridge level (skip-android-bridge/skip-ui), not app level
 - Use native `withObservationTracking` (not swift-perception) -- `libswiftObservation.so` ships with Android SDK
@@ -65,9 +66,10 @@ Recent decisions affecting current work:
 
 - **Perception bypass on Android (Phase 3+):** `PerceptionRegistrar` delegates to native `ObservationRegistrar`, bypassing bridge `recordAccess` hooks. Raw `@Perceptible` views (without TCA) won't trigger Compose updates. Safe for TCA (uses bridge registrar directly). Verify no non-TCA code relies on Perception for view driving. (Source: Gemini verifier)
 - **Android runtime verification (Phase 7):** 5 human tests deferred — single recomposition, nested independence, ViewModifier observation, fatal error on bridge failure, full 14-fork compilation. All require running emulator. (Source: all 3 verifiers)
-- **Android runtime test execution (Phase 7):** Phase 3 plans use macOS proxy testing + Android build verification. Full Android runtime test execution (`skip test`) deferred due to Kotlin compilation issues in Skip toolchain. Must be validated when toolchain stabilizes. (Source: Codex verifier, Phase 3 plan check)
+- **~~Android runtime test execution (Phase 7):~~** RESOLVED — `skip test` now passes 21/21 (Swift + Kotlin) after removing unused fork deps that broke Skip's sandbox. All future phases should run `skip test` as part of validation.
 - **MainSerialExecutor Android fallback validation (Phase 7):** Context suggested porting MainSerialExecutor; research determined existing `effectDidSubscribe` AsyncStream fallback is the intended Android path. Validate fallback under all effect types during Phase 7 TestStore testing. (Source: Codex verifier, Phase 3 plan check)
 - **DEP-05 previewValue on Android (clarification):** DEP-05 requirement says "previewValue is used in preview context on Android" but previews don't exist on Android. Phase 3 test validates preview context is never active. If Android ever gains preview support, revisit. (Source: Codex verifier, Phase 3 plan check)
+- **dismiss/openSettings dependency validation (Phase 5):** These TCA dependencies wrap SwiftUI `DismissAction`/`OpenSettingsAction`. Available on Android via Skip's SwiftUI bridge but require active view hierarchy to test meaningfully. Validate during Phase 5 navigation/presentation testing. (Source: Codex verifier gap #2, Phase 3 reconciliation)
 
 ### Blockers/Concerns
 
