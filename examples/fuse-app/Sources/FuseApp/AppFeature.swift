@@ -9,11 +9,10 @@ struct AppFeature {
     struct State: Equatable {
         var selectedTab = Tab.counter
         var counter = CounterFeature.State()
-        // Remaining features added in Task 1b
-        // var todos = TodosFeature.State()
-        // var contacts = ContactsFeature.State()
-        // var database = DatabaseFeature.State()
-        // var settings = SettingsFeature.State()
+        var todos = TodosFeature.State()
+        var contacts = ContactsFeature.State()
+        var database = DatabaseFeature.State()
+        var settings = SettingsFeature.State()
 
         enum Tab: String, Equatable {
             case counter, todos, contacts, database, settings
@@ -22,11 +21,10 @@ struct AppFeature {
 
     enum Action {
         case counter(CounterFeature.Action)
-        // Remaining features added in Task 1b
-        // case todos(TodosFeature.Action)
-        // case contacts(ContactsFeature.Action)
-        // case database(DatabaseFeature.Action)
-        // case settings(SettingsFeature.Action)
+        case todos(TodosFeature.Action)
+        case contacts(ContactsFeature.Action)
+        case database(DatabaseFeature.Action)
+        case settings(SettingsFeature.Action)
         case tabSelected(State.Tab)
     }
 
@@ -34,12 +32,24 @@ struct AppFeature {
         Scope(state: \.counter, action: \.counter) {
             CounterFeature()
         }
+        Scope(state: \.todos, action: \.todos) {
+            TodosFeature()
+        }
+        Scope(state: \.contacts, action: \.contacts) {
+            ContactsFeature()
+        }
+        Scope(state: \.database, action: \.database) {
+            DatabaseFeature()
+        }
+        Scope(state: \.settings, action: \.settings) {
+            SettingsFeature()
+        }
         Reduce { state, action in
             switch action {
             case let .tabSelected(tab):
                 state.selectedTab = tab
                 return .none
-            case .counter:
+            case .counter, .todos, .contacts, .database, .settings:
                 return .none
             }
         }
@@ -59,27 +69,24 @@ struct AppView: View {
             .tabItem { Label("Counter", systemImage: "number") }
             .tag(AppFeature.State.Tab.counter)
 
-            // Remaining tabs added in Task 1b
             NavigationStack {
-                Text("Todos - Coming Soon")
+                TodosView(store: store.scope(state: \.todos, action: \.todos))
             }
             .tabItem { Label("Todos", systemImage: "checklist") }
             .tag(AppFeature.State.Tab.todos)
 
-            NavigationStack {
-                Text("Contacts - Coming Soon")
-            }
-            .tabItem { Label("Contacts", systemImage: "person.2") }
-            .tag(AppFeature.State.Tab.contacts)
+            ContactsView(store: store.scope(state: \.contacts, action: \.contacts))
+                .tabItem { Label("Contacts", systemImage: "person.2") }
+                .tag(AppFeature.State.Tab.contacts)
 
             NavigationStack {
-                Text("Database - Coming Soon")
+                DatabaseView(store: store.scope(state: \.database, action: \.database))
             }
             .tabItem { Label("Database", systemImage: "cylinder") }
             .tag(AppFeature.State.Tab.database)
 
             NavigationStack {
-                Text("Settings - Coming Soon")
+                SettingsView(store: store.scope(state: \.settings, action: \.settings))
             }
             .tabItem { Label("Settings", systemImage: "gearshape") }
             .tag(AppFeature.State.Tab.settings)

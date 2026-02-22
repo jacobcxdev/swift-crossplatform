@@ -43,6 +43,7 @@ let package = Package(
             .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             // Database
             .product(name: "SQLiteData", package: "sqlite-data"),
+            .product(name: "GRDB", package: "GRDB.swift"),
         ], resources: [.process("Resources")], plugins: [.plugin(name: "skipstone", package: "skip")]),
         .testTarget(name: "FuseAppTests", dependencies: [
             "FuseApp",
