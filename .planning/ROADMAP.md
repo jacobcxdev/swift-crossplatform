@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: TCA Core** - Store, reducers, effects, and dependency injection work on Android (completed 2026-02-22)
 - [x] **Phase 4: TCA State & Bindings** - ObservableState macro, bindings, and shared state persistence work on Android (completed 2026-02-22)
 - [x] **Phase 5: Navigation & Presentation** - TCA navigation patterns and SwiftUI presentation lifecycle work on Android (completed 2026-02-22)
-- [ ] **Phase 6: Database & Queries** - StructuredQueries and GRDB/SQLiteData work on Android with observation-driven view updates
+- [x] **Phase 6: Database & Queries** - StructuredQueries and GRDB/SQLiteData work on Android with observation-driven view updates (completed 2026-02-22)
 - [ ] **Phase 7: Integration Testing & Documentation** - End-to-end TCA app runs on both platforms; forks documented
 
 ## Phase Details
@@ -117,7 +117,7 @@ Plans:
 
 Plans:
 - [x] 06-01-PLAN.md — Package.swift database fork wiring + StructuredQueries validation tests (SQL-01..SQL-15) ✓ 2026-02-22
-- [ ] 06-02-PLAN.md — SQLiteData lifecycle, GRDB transactions, observation macros, dependency injection (SD-01..SD-12)
+- [x] 06-02-PLAN.md — SQLiteData lifecycle, GRDB transactions, observation macros, dependency injection (SD-01..SD-12) ✓ 2026-02-22
 
 ### Phase 7: Integration Testing & Documentation
 **Goal**: A complete TCA app runs on both iOS and Android; all forks are documented with change rationale and upstream PR candidates
@@ -148,5 +148,5 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 | 3. TCA Core | 2/2 | Complete    | 2026-02-22 |
 | 4. TCA State & Bindings | 3/3 | Complete | 2026-02-22 |
 | 5. Navigation & Presentation | 3/3 | Complete | 2026-02-22 |
-| 6. Database & Queries | 1/2 | In progress | - |
+| 6. Database & Queries | 2/2 | Complete | 2026-02-22 |
 | 7. Integration Testing & Documentation | 0/2 | Not started | - |
