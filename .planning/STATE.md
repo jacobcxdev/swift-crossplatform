@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 2: Foundation Libraries (in progress)
+**Current focus:** Phase 3: TCA Core (planned, ready to execute)
 
 ## Current Position
 
-Phase: 2 of 7 (Foundation Libraries)
-Plan: 3 of 3 in current phase (all complete)
-Status: Executed -- All 3 plans complete, pending phase verification
-Last activity: 2026-02-21 -- Plan 02-03 executed: CasePaths + CustomDump validation, 21 new tests, EnumMetadata ABI confirmed
+Phase: 3 of 7 (TCA Core) -- PLANNED
+Plan: 0 of 2 in current phase
+Status: Plans verified (triple verification), ready for execution
+Last activity: 2026-02-22 -- Phase 3 planned: 2 plans in 2 waves, triple-verified
 
 Progress: [██████████] 100%
 
@@ -60,6 +60,9 @@ Recent decisions affecting current work:
 
 - **Perception bypass on Android (Phase 3+):** `PerceptionRegistrar` delegates to native `ObservationRegistrar`, bypassing bridge `recordAccess` hooks. Raw `@Perceptible` views (without TCA) won't trigger Compose updates. Safe for TCA (uses bridge registrar directly). Verify no non-TCA code relies on Perception for view driving. (Source: Gemini verifier)
 - **Android runtime verification (Phase 7):** 5 human tests deferred — single recomposition, nested independence, ViewModifier observation, fatal error on bridge failure, full 14-fork compilation. All require running emulator. (Source: all 3 verifiers)
+- **Android runtime test execution (Phase 7):** Phase 3 plans use macOS proxy testing + Android build verification. Full Android runtime test execution (`skip test`) deferred due to Kotlin compilation issues in Skip toolchain. Must be validated when toolchain stabilizes. (Source: Codex verifier, Phase 3 plan check)
+- **MainSerialExecutor Android fallback validation (Phase 7):** Context suggested porting MainSerialExecutor; research determined existing `effectDidSubscribe` AsyncStream fallback is the intended Android path. Validate fallback under all effect types during Phase 7 TestStore testing. (Source: Codex verifier, Phase 3 plan check)
+- **DEP-05 previewValue on Android (clarification):** DEP-05 requirement says "previewValue is used in preview context on Android" but previews don't exist on Android. Phase 3 test validates preview context is never active. If Android ever gains preview support, revisit. (Source: Codex verifier, Phase 3 plan check)
 
 ### Blockers/Concerns
 
@@ -69,6 +72,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-02-21
-Stopped at: Phase 2, all plans executed, pending phase verification
-Resume file: /gsd:execute-phase 2
+Last session: 2026-02-22
+Stopped at: Phase 2 complete, ready for Phase 3 (TCA Core)
+Resume file: /gsd:plan-phase 3
