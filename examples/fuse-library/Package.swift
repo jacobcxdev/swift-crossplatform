@@ -87,5 +87,14 @@ let package = Package(
         .testTarget(name: "NavigationTests", dependencies: [
             .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
         ]),
+        .testTarget(name: "NavigationStackTests", dependencies: [
+            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        ]),
+        .testTarget(name: "PresentationTests", dependencies: [
+            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        ]),
+        .testTarget(name: "UIPatternTests", dependencies: [
+            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        ]),
     ]
 )
