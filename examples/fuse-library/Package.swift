@@ -17,20 +17,21 @@ let package = Package(
         .package(path: "../../forks/swift-case-paths"),
         .package(path: "../../forks/swift-identified-collections"),
         .package(path: "../../forks/swift-custom-dump"),
-        // Remaining forks (wired for transitive resolution)
+        // Remaining forks (wired for transitive resolution — Skip sandbox compatible via useLocalPackage)
         .package(path: "../../forks/swift-perception"),
         .package(path: "../../forks/swift-clocks"),
         .package(path: "../../forks/combine-schedulers"),
-        .package(path: "../../forks/swift-snapshot-testing"),
-        .package(path: "../../forks/swift-structured-queries"),
-        .package(path: "../../forks/GRDB.swift"),
         .package(path: "../../forks/swift-dependencies"),
-        .package(path: "../../forks/sqlite-data"),
         .package(path: "../../forks/swift-navigation"),
         .package(path: "../../forks/swift-sharing"),
         .package(path: "../../forks/swift-composable-architecture"),
         .package(path: "../../forks/skip-android-bridge"),
-        .package(path: "../../forks/skip-ui"),
+        // Deferred forks (not yet needed — add back when targets use them):
+        // .package(path: "../../forks/skip-ui"),              // Phase 4+ (view-level tests)
+        // .package(path: "../../forks/swift-snapshot-testing"), // Phase 6 (database)
+        // .package(path: "../../forks/swift-structured-queries"), // Phase 6 (database)
+        // .package(path: "../../forks/GRDB.swift"),            // Phase 6 (database)
+        // .package(path: "../../forks/sqlite-data"),           // Phase 6 (database)
     ],
     targets: [
         .target(name: "FuseLibrary", dependencies: [
