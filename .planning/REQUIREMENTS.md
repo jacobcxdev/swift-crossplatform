@@ -86,18 +86,18 @@ Store, reducers, effects, and composition patterns on Android.
 
 Dependency injection and resolution on Android.
 
-- [ ] **DEP-01**: `@Dependency(\.keyPath)` resolves a dependency from `DependencyValues` inside a reducer on Android
-- [ ] **DEP-02**: `@Dependency(Type.self)` resolves a dependency by type conformance on Android
-- [ ] **DEP-03**: `DependencyKey` protocol -- `liveValue` is used in production context on Android
-- [ ] **DEP-04**: `DependencyKey.testValue` is used in test context on Android
-- [ ] **DEP-05**: `DependencyKey.previewValue` is used in preview context on Android
-- [ ] **DEP-06**: `DependencyValues` extension with computed property registers a custom dependency on Android
-- [ ] **DEP-07**: `@DependencyClient` macro generates a client struct with `unimplemented` defaults on Android
-- [ ] **DEP-08**: `Reducer.dependency(_:_:)` modifier overrides a dependency for a scoped reducer on Android
-- [ ] **DEP-09**: `withDependencies { } operation: { }` scopes dependency overrides to a closure on Android
-- [ ] **DEP-10**: `prepareDependencies` closure overrides dependencies before any `@Dependency` access on Android
-- [ ] **DEP-11**: Child reducer scopes inherit parent dependency context on Android
-- [ ] **DEP-12**: `@Dependency` in effect closures resolves the correct (potentially overridden) value on Android
+- [x] **DEP-01**: `@Dependency(\.keyPath)` resolves a dependency from `DependencyValues` inside a reducer on Android
+- [x] **DEP-02**: `@Dependency(Type.self)` resolves a dependency by type conformance on Android
+- [x] **DEP-03**: `DependencyKey` protocol -- `liveValue` is used in production context on Android
+- [x] **DEP-04**: `DependencyKey.testValue` is used in test context on Android
+- [x] **DEP-05**: `DependencyKey.previewValue` is used in preview context on Android
+- [x] **DEP-06**: `DependencyValues` extension with computed property registers a custom dependency on Android
+- [x] **DEP-07**: `@DependencyClient` macro generates a client struct with `unimplemented` defaults on Android
+- [x] **DEP-08**: `Reducer.dependency(_:_:)` modifier overrides a dependency for a scoped reducer on Android
+- [x] **DEP-09**: `withDependencies { } operation: { }` scopes dependency overrides to a closure on Android
+- [x] **DEP-10**: `prepareDependencies` closure overrides dependencies before any `@Dependency` access on Android
+- [x] **DEP-11**: Child reducer scopes inherit parent dependency context on Android
+- [x] **DEP-12**: `@Dependency` in effect closures resolves the correct (potentially overridden) value on Android
 
 ### SHR: Shared State
 
@@ -381,18 +381,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TCA-14 | Phase 3 | Complete |
 | TCA-15 | Phase 3 | Complete |
 | TCA-16 | Phase 3 | Complete |
-| DEP-01 | Phase 3 | Pending |
-| DEP-02 | Phase 3 | Pending |
-| DEP-03 | Phase 3 | Pending |
-| DEP-04 | Phase 3 | Pending |
-| DEP-05 | Phase 3 | Pending |
-| DEP-06 | Phase 3 | Pending |
-| DEP-07 | Phase 3 | Pending |
-| DEP-08 | Phase 3 | Pending |
-| DEP-09 | Phase 3 | Pending |
-| DEP-10 | Phase 3 | Pending |
-| DEP-11 | Phase 3 | Pending |
-| DEP-12 | Phase 3 | Pending |
+| DEP-01 | Phase 3 | Complete |
+| DEP-02 | Phase 3 | Complete |
+| DEP-03 | Phase 3 | Complete |
+| DEP-04 | Phase 3 | Complete |
+| DEP-05 | Phase 3 | Complete |
+| DEP-06 | Phase 3 | Complete |
+| DEP-07 | Phase 3 | Complete |
+| DEP-08 | Phase 3 | Complete |
+| DEP-09 | Phase 3 | Complete |
+| DEP-10 | Phase 3 | Complete |
+| DEP-11 | Phase 3 | Complete |
+| DEP-12 | Phase 3 | Complete |
 | TCA-17 | Phase 4 | Pending |
 | TCA-18 | Phase 4 | Pending |
 | TCA-19 | Phase 4 | Pending |

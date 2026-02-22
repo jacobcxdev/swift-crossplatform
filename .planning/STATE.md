@@ -5,29 +5,29 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 3: TCA Core (executing)
+**Current focus:** Phase 3: TCA Core (complete)
 
 ## Current Position
 
-Phase: 3 of 7 (TCA Core) -- EXECUTING
-Plan: 1 of 2 in current phase
-Status: Plan 03-01 complete (Store/Reducer/Effect validation), Plan 03-02 next (Dependencies)
-Last activity: 2026-02-22 -- Plan 03-01 executed: 20 tests, 3 tasks, 0 failures
+Phase: 3 of 7 (TCA Core) -- COMPLETE
+Plan: 2 of 2 in current phase (all complete)
+Status: Phase 3 complete. Both plans executed: Store/Reducer/Effect (20 tests) + Dependencies (19 tests)
+Last activity: 2026-02-22 -- Plan 03-02 executed: 19 tests, 2 tasks, 0 failures
 
-Progress: [█████░░░░░] 50%
+Progress: [██████░░░░] 60%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: ~12min
-- Total execution time: 0.8 hours
+- Total plans completed: 5
+- Average duration: ~10min
+- Total execution time: 0.9 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 3 - TCA Core | 1 | 8min | 8min |
+| 3 - TCA Core | 2 | 14min | 7min |
 
 **Recent Trend:**
 - Last 5 plans: -
@@ -58,6 +58,8 @@ Recent decisions affecting current work:
 - DependenciesTestObserver replaced with DependenciesTestSupport (observer product is macOS-excluded)
 - ifLet/ifCaseLet tests validate happy path only (TCA reports errors for nil-state child actions by design)
 - Effect dependency tests require explicit withDependencies clock override (test context defaults to unimplemented)
+- [Phase 03]: dismiss/openSettings not in swift-dependencies -- 16 built-in keys validated (not 19)
+- [Phase 03]: @DependencyClient and @CasePathable macros require file-scope types (not private/local)
 
 ### Pending Todos
 
@@ -76,5 +78,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Completed 03-01-PLAN.md (Store/Reducer/Effect validation)
-Resume file: /gsd:execute-phase 03 (Plan 03-02 next)
+Stopped at: Completed 03-02-PLAN.md (Dependencies validation) -- Phase 3 complete
+Resume file: /gsd:execute-phase 04 (Phase 4: Observable State next)
