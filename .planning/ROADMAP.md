@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 2: Foundation Libraries** - CasePaths, IdentifiedCollections, CustomDump, and IssueReporting work on Android
 - [x] **Phase 3: TCA Core** - Store, reducers, effects, and dependency injection work on Android (completed 2026-02-22)
 - [x] **Phase 4: TCA State & Bindings** - ObservableState macro, bindings, and shared state persistence work on Android (completed 2026-02-22)
-- [ ] **Phase 5: Navigation & Presentation** - TCA navigation patterns and SwiftUI presentation lifecycle work on Android
+- [x] **Phase 5: Navigation & Presentation** - TCA navigation patterns and SwiftUI presentation lifecycle work on Android (completed 2026-02-22)
 - [ ] **Phase 6: Database & Queries** - StructuredQueries and GRDB/SQLiteData work on Android with observation-driven view updates
 - [ ] **Phase 7: Integration Testing & Documentation** - End-to-end TCA app runs on both platforms; forks documented
 
@@ -97,12 +97,12 @@ Plans:
   3. `AlertState` and `ConfirmationDialogState` render with correct titles, messages, buttons, and destructive roles on Android
   4. `@Presents` / `PresentationAction.dismiss` lifecycle correctly nils optional child state and closes presentation on Android
   5. `.task` modifier executes async work on view appearance without blocking recomposition on Android
-**Plans**: 3 plans in 2 waves
+**Plans**: 3 plans in 3 waves
 
 Plans:
-- [ ] 05-01-PLAN.md — Guard removals (EphemeralState, Popover, NavigationStack+Observation) + data-layer navigation tests: StackState, StackAction, PresentationReducer, @Presents, dismiss dep, alert/dialog state, CaseKeyPath binding (TCA-26..TCA-28, TCA-32..TCA-35, NAV-09..NAV-15)
-- [ ] 05-02-PLAN.md — NavigationStack Android adapter (type-erasure bridge) + presentation tests: sheet, fullScreenCover, popover, stack push/pop, dismiss lifecycle (NAV-01..NAV-08, NAV-14, NAV-16)
-- [ ] 05-03-PLAN.md — SwiftUI pattern validation tests: .task, @State, Binding extensions, Form, nested Observable + full suite validation (UI-01..UI-08)
+- [x] 05-01-PLAN.md (wave 1) — Guard removals (EphemeralState, Popover, NavigationStack+Observation) + data-layer navigation tests (TCA-26..TCA-28, TCA-32..TCA-35, NAV-09..NAV-15) ✓ 2026-02-22
+- [x] 05-02-PLAN.md (wave 2) — NavigationStack Android adapter + presentation tests: sheet, fullScreenCover, popover, stack push/pop (NAV-01..NAV-08, NAV-16) ✓ 2026-02-22
+- [x] 05-03-PLAN.md (wave 3) — SwiftUI pattern validation tests + full suite validation (UI-01..UI-08) ✓ 2026-02-22
 
 ### Phase 6: Database & Queries
 **Goal**: StructuredQueries type-safe query building and GRDB database lifecycle work on Android with observation-driven view updates
@@ -145,8 +145,8 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 |-------|----------------|--------|-----------|
 | 1. Observation Bridge | 2/2 | Executed | - |
 | 2. Foundation Libraries | 3/3 | Executed | 2026-02-21 |
-| 3. TCA Core | 1/2 | Complete    | 2026-02-22 |
-| 4. TCA State & Bindings | 0/3 | Planned | - |
-| 5. Navigation & Presentation | 0/2 | Not started | - |
+| 3. TCA Core | 2/2 | Complete    | 2026-02-22 |
+| 4. TCA State & Bindings | 3/3 | Complete | 2026-02-22 |
+| 5. Navigation & Presentation | 3/3 | Complete | 2026-02-22 |
 | 6. Database & Queries | 0/2 | Not started | - |
 | 7. Integration Testing & Documentation | 0/2 | Not started | - |

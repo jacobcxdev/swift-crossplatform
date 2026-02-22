@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 4: TCA State & Bindings (complete)
+**Current focus:** Phase 5: Navigation & Presentation (complete)
 
 ## Current Position
 
-Phase: 4 of 7 (TCA State & Bindings) -- COMPLETE
+Phase: 5 of 7 (Navigation & Presentation) -- COMPLETE
 Plan: 3 of 3 in current phase (all complete)
-Status: Phase 4 complete. All 3 waves executed: ObservableState/Bindings (17 tests) + SharedPersistence (17 tests) + SharedBinding/Observation (16 tests). FileStorageKey enabled on Android.
-Last activity: 2026-02-22 -- All 3 plans executed: 50 new tests, 0 failures. macOS 34 tests + Skip 21/21 pass.
+Status: Phase 5 complete. 3 waves executed: Guard removals + NavigationTests (18) + NavigationStackTests (7) + PresentationTests (9) + UIPatternTests (12). 80 total tests, 0 failures.
+Last activity: 2026-02-22 -- All 3 plans executed: 28 new tests (Waves 2-3), triple-verified (Claude PASS, Gemini PASS, Codex FAIL on Phase 7 scope).
 
-Progress: [███████░░░] 70%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
@@ -29,9 +29,10 @@ Progress: [███████░░░] 70%
 |-------|-------|-------|----------|
 | 3 - TCA Core | 2 | 14min | 7min |
 | 4 - TCA State & Bindings | 3 | 15min | 5min |
+| 5 - Navigation & Presentation | 3 | 20min | 7min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01, 03-02, 04-01, 04-02, 04-03
+- Last 5 plans: 04-02, 04-03, 05-01, 05-02, 05-03
 - Trend: stable, fast execution
 
 *Updated after each plan completion*
@@ -75,16 +76,17 @@ Recent decisions affecting current work:
 - **~~Android runtime test execution (Phase 7):~~** RESOLVED — `skip test` now passes 21/21 (Swift + Kotlin) after removing unused fork deps that broke Skip's sandbox. All future phases should run `skip test` as part of validation.
 - **MainSerialExecutor Android fallback validation (Phase 7):** Context suggested porting MainSerialExecutor; research determined existing `effectDidSubscribe` AsyncStream fallback is the intended Android path. Validate fallback under all effect types during Phase 7 TestStore testing. (Source: Codex verifier, Phase 3 plan check)
 - **DEP-05 previewValue on Android (clarification):** DEP-05 requirement says "previewValue is used in preview context on Android" but previews don't exist on Android. Phase 3 test validates preview context is never active. If Android ever gains preview support, revisit. (Source: Codex verifier, Phase 3 plan check)
-- **dismiss/openSettings dependency validation (Phase 5):** These TCA dependencies wrap SwiftUI `DismissAction`/`OpenSettingsAction`. Available on Android via Skip's SwiftUI bridge but require active view hierarchy to test meaningfully. Validate during Phase 5 navigation/presentation testing. (Source: Codex verifier gap #2, Phase 3 reconciliation)
+- **dismiss/openSettings dependency validation (Phase 7):** dismiss dependency validated at data layer in Phase 5 (DismissEffect + LockIsolated pattern). openSettings deferred to Phase 7 — requires active view hierarchy. (Source: Codex verifier gap #2, Phase 3 reconciliation)
+- **Android UI rendering validation (Phase 7):** Phase 5 Codex verifier flagged that NavigationStack, sheet, alert, dialog, .task tests validate data layer only, not Android Compose rendering. All UI rendering assertions deferred to Phase 7 integration testing with emulator. (Source: Codex verifier, Phase 5)
 
 ### Blockers/Concerns
 
-- Navigation on Android: `NavigationStack.init(path:root:destination:)` is fully guarded out on Android -- need to determine skip-ui Compose equivalent (affects Phase 5)
+- ~~Navigation on Android: `NavigationStack.init(path:root:destination:)` is fully guarded out on Android~~ RESOLVED — Guards minimised in Phase 5 Wave 1. Modern extensions unguarded, only deprecated Perception.Bindable stays guarded.
 - `jniContext` thread attachment: verify `AttachCurrentThread()` handling for non-main threads (affects TCA effects in Phase 3)
 - `swiftThreadingFatal` stub required until Swift 6.3 ships upstream fix (PR #77890)
 
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Completed Phase 4 (TCA State & Bindings) -- all 3 plans executed, 50 new tests
-Resume file: /gsd:execute-phase 05 (Phase 5: Navigation & Presentation next)
+Stopped at: Completed Phase 5 (Navigation & Presentation) -- all 3 plans executed, 80 total tests
+Resume file: /gsd:execute-phase 06 (Phase 6: Database & Queries next)
