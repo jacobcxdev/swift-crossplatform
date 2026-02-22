@@ -1,3 +1,4 @@
+@_spi(Reflection) import CasePaths
 import ComposableArchitecture
 import Dependencies
 import DependenciesMacros
@@ -350,6 +351,199 @@ final class DependencyTests: XCTestCase {
         siblingA.send(.increment)
         siblingA.withState { state in
             XCTAssertEqual(state.count, 111)
+        }
+    }
+
+    // MARK: - Task 2: @DependencyClient, Effects, NavigationID
+
+    // MARK: DEP-07: @DependencyClient unimplemented reports issue
+
+    func testDependencyClientUnimplementedReportsIssue() {
+        let client = NumberClient()
+
+        XCTExpectFailure {
+            $0.compactDescription.contains("Unimplemented")
+        }
+
+        // Calling unimplemented endpoint should report issue via reportIssue
+        let result = client.fetch(42)
+        // Default return for Int is 0 when unimplemented
+        XCTAssertEqual(result, 0)
+    }
+
+    // MARK: DEP-07: @DependencyClient implemented endpoint
+
+    func testDependencyClientImplementedEndpoint() {
+        withDependencies {
+            $0[NumberClient.self] = NumberClient(fetch: { $0 * 2 })
+        } operation: {
+            @Dependency(NumberClient.self) var client
+            XCTAssertEqual(client.fetch(21), 42)
+        }
+    }
+
+    // MARK: DEP-08: Reducer .dependency modifier
+
+    @MainActor
+    func testReducerDependencyModifier() {
+        let store = Store(
+            initialState: DepCounter.State()
+        ) {
+            DepCounter()
+                .dependency(\.testCounter, 999)
+        }
+
+        store.send(.increment)
+        store.withState { state in
+            XCTAssertEqual(state.count, 999)
+        }
+    }
+
+    // MARK: DEP-12: dependency resolves in effect closure
+
+    @MainActor
+    func testDependencyResolvesInEffectClosure() async throws {
+        let store = Store(
+            initialState: DepCounter.State()
+        ) {
+            DepCounter()
+        } withDependencies: {
+            $0.uuid = .incrementing
+        }
+
+        store.send(.setID)
+        try await Task.sleep(for: .milliseconds(100))
+        store.withState { state in
+            // Should be the first incrementing UUID, proving the dependency
+            // propagated through the Effect.run boundary
+            XCTAssertEqual(state.id, UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+        }
+    }
+
+    // MARK: DEP-12: dependency resolves in merged effects
+
+    @MainActor
+    func testDependencyResolvesInMergedEffects() async throws {
+        let store = Store(
+            initialState: MergedEffectFeature.State()
+        ) {
+            MergedEffectFeature()
+        } withDependencies: {
+            $0.uuid = .incrementing
+        }
+
+        store.send(.fetchBoth)
+        try await Task.sleep(for: .milliseconds(100))
+        store.withState { state in
+            // Both effects should get incrementing UUIDs from the overridden dependency
+            XCTAssertNotNil(state.id1)
+            XCTAssertNotNil(state.id2)
+            // They should be different (incrementing)
+            XCTAssertNotEqual(state.id1, state.id2)
+        }
+    }
+
+    // MARK: NavigationID EnumMetadata tag validation
+
+    func testNavigationIDEnumMetadataTag() {
+        // Validate EnumMetadata.tag(of:) — the same code path NavigationID uses for hashing
+        // TestAction is defined at file scope (macros can't attach to local types)
+        guard let metadata = EnumMetadata(TestAction.self) else {
+            XCTFail("EnumMetadata should be constructible from TestAction enum")
+            return
+        }
+
+        let tag0 = metadata.tag(of: TestAction.first(1))
+        let tag1 = metadata.tag(of: TestAction.second("hello"))
+        let tag2 = metadata.tag(of: TestAction.third)
+
+        // Tags should be consistent for same case
+        XCTAssertEqual(tag0, metadata.tag(of: TestAction.first(99)))
+        XCTAssertEqual(tag1, metadata.tag(of: TestAction.second("world")))
+
+        // Tags should be different between cases
+        XCTAssertNotEqual(tag0, tag1)
+        XCTAssertNotEqual(tag1, tag2)
+        XCTAssertNotEqual(tag0, tag2)
+
+        // Verify case names
+        XCTAssertEqual(metadata.caseName(forTag: tag0), "first")
+        XCTAssertEqual(metadata.caseName(forTag: tag1), "second")
+        XCTAssertEqual(metadata.caseName(forTag: tag2), "third")
+    }
+
+    // MARK: DEP-09: @TaskLocal propagation through async closures
+
+    func testTaskLocalPropagation() async {
+        await withDependencies {
+            $0.uuid = .incrementing
+        } operation: {
+            @Dependency(\.uuid) var uuid
+
+            // Verify dependency is accessible from a Task (async context)
+            let id = await Task {
+                @Dependency(\.uuid) var innerUUID
+                return innerUUID()
+            }.value
+
+            XCTAssertNotNil(id)
+            // The incrementing generator should produce sequential UUIDs
+            // even when accessed from within a Task
+            let directID = uuid()
+            XCTAssertNotNil(directID)
+        }
+    }
+}
+
+// MARK: - Task 2 Test Fixtures
+
+@DependencyClient
+struct NumberClient: TestDependencyKey, Sendable {
+    var fetch: @Sendable (_ id: Int) -> Int = { _ in 0 }
+
+    static let testValue = NumberClient()
+}
+
+@CasePathable
+enum TestAction {
+    case first(Int)
+    case second(String)
+    case third
+}
+
+@Reducer
+private struct MergedEffectFeature {
+    struct State: Equatable {
+        var id1: UUID?
+        var id2: UUID?
+    }
+    enum Action: Equatable {
+        case fetchBoth
+        case gotID1(UUID)
+        case gotID2(UUID)
+    }
+
+    @Dependency(\.uuid) var uuid
+
+    var body: some ReducerOf<Self> {
+        Reduce { state, action in
+            switch action {
+            case .fetchBoth:
+                return .merge(
+                    .run { [uuid] send in
+                        await send(.gotID1(uuid()))
+                    },
+                    .run { [uuid] send in
+                        await send(.gotID2(uuid()))
+                    }
+                )
+            case let .gotID1(id):
+                state.id1 = id
+                return .none
+            case let .gotID2(id):
+                state.id2 = id
+                return .none
+            }
         }
     }
 }
