@@ -97,11 +97,12 @@ Plans:
   3. `AlertState` and `ConfirmationDialogState` render with correct titles, messages, buttons, and destructive roles on Android
   4. `@Presents` / `PresentationAction.dismiss` lifecycle correctly nils optional child state and closes presentation on Android
   5. `.task` modifier executes async work on view appearance without blocking recomposition on Android
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 05-01: TBD
-- [ ] 05-02: TBD
+- [ ] 05-01-PLAN.md — Guard removals (EphemeralState, Popover, NavigationStack+Observation) + data-layer navigation tests: StackState, StackAction, PresentationReducer, @Presents, dismiss dep, alert/dialog state, CaseKeyPath binding (TCA-26..TCA-28, TCA-32..TCA-35, NAV-09..NAV-15)
+- [ ] 05-02-PLAN.md — NavigationStack Android adapter (type-erasure bridge) + presentation tests: sheet, fullScreenCover, popover, stack push/pop, dismiss lifecycle (NAV-01..NAV-08, NAV-14, NAV-16)
+- [ ] 05-03-PLAN.md — SwiftUI pattern validation tests: .task, @State, Binding extensions, Form, nested Observable + full suite validation (UI-01..UI-08)
 
 ### Phase 6: Database & Queries
 **Goal**: StructuredQueries type-safe query building and GRDB database lifecycle work on Android with observation-driven view updates
