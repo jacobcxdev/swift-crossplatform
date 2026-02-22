@@ -1,7 +1,7 @@
 EXAMPLE ?= fuse-library
 EXAMPLE_DIR := examples/$(EXAMPLE)
 
-.PHONY: build test android-build android-test skip-test skip-verify status push-all pull-all diff-all branch-all
+.PHONY: build test android-build android-test skip-test skip-verify clean status push-all pull-all diff-all branch-all
 
 # Build & Test (run against an example project, default: fuse-library)
 build:
@@ -17,11 +17,18 @@ test-filter:
 android-build:
 	cd $(EXAMPLE_DIR) && skip android build
 
+android-test:
+	cd $(EXAMPLE_DIR) && skip android test
+
 skip-test:
 	cd $(EXAMPLE_DIR) && skip test
 
 skip-verify:
 	cd $(EXAMPLE_DIR) && skip verify --fix
+
+clean:
+	cd $(EXAMPLE_DIR) && swift package clean
+	@echo "Cleaned $(EXAMPLE_DIR)"
 
 # Submodule management
 status:
