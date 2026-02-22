@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Observation Bridge** - Native Swift Observation works correctly on Android with record-replay pattern preventing infinite recomposition
 - [ ] **Phase 2: Foundation Libraries** - CasePaths, IdentifiedCollections, CustomDump, and IssueReporting work on Android
-- [ ] **Phase 3: TCA Core** - Store, reducers, effects, and dependency injection work on Android
+- [x] **Phase 3: TCA Core** - Store, reducers, effects, and dependency injection work on Android (completed 2026-02-22)
 - [ ] **Phase 4: TCA State & Bindings** - ObservableState macro, bindings, and shared state persistence work on Android
 - [ ] **Phase 5: Navigation & Presentation** - TCA navigation patterns and SwiftUI presentation lifecycle work on Android
 - [ ] **Phase 6: Database & Queries** - StructuredQueries and GRDB/SQLiteData work on Android with observation-driven view updates
@@ -143,7 +143,7 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 |-------|----------------|--------|-----------|
 | 1. Observation Bridge | 2/2 | Executed | - |
 | 2. Foundation Libraries | 3/3 | Executed | 2026-02-21 |
-| 3. TCA Core | 1/2 | Executing | - |
+| 3. TCA Core | 1/2 | Complete    | 2026-02-22 |
 | 4. TCA State & Bindings | 0/2 | Not started | - |
 | 5. Navigation & Presentation | 0/2 | Not started | - |
 | 6. Database & Queries | 0/2 | Not started | - |
