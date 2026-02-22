@@ -80,11 +80,12 @@ Plans:
   3. `@Shared(.appStorage)`, `@Shared(.fileStorage)`, and `@Shared(.inMemory)` persist and restore state across feature boundaries on Android
   4. `Observations { }` async sequence emits on every `@Shared` mutation on Android
   5. Multiple `@Shared` declarations with the same backing store synchronize updates on Android
-**Plans**: TBD
+**Plans**: 3 plans in 3 waves
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
+- [ ] 04-01-PLAN.md (wave 1) — @ObservableState macro, binding projection chain, store scoping lifecycle (ForEach, optional, enum), onChange, _printChanges, @ViewAction (TCA-17..TCA-25, TCA-29..TCA-31)
+- [ ] 04-02-PLAN.md (wave 2) — FileStorage Android enablement + @Shared persistence backend validation: appStorage, fileStorage, inMemory, custom SharedKey (SHR-01..SHR-04, SHR-14)
+- [ ] 04-03-PLAN.md (wave 3) — @Shared binding projections, Observations async sequence, publisher emission, double-notification prevention, cross-feature synchronization (SHR-05..SHR-13)
 
 ### Phase 5: Navigation & Presentation
 **Goal**: TCA navigation patterns (stack, sheet, alert, confirmation dialog) and SwiftUI presentation lifecycle work on Android
@@ -144,7 +145,7 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 | 1. Observation Bridge | 2/2 | Executed | - |
 | 2. Foundation Libraries | 3/3 | Executed | 2026-02-21 |
 | 3. TCA Core | 1/2 | Complete    | 2026-02-22 |
-| 4. TCA State & Bindings | 0/2 | Not started | - |
+| 4. TCA State & Bindings | 0/3 | Planned | - |
 | 5. Navigation & Presentation | 0/2 | Not started | - |
 | 6. Database & Queries | 0/2 | Not started | - |
 | 7. Integration Testing & Documentation | 0/2 | Not started | - |
