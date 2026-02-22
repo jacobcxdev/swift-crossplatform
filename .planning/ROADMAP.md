@@ -116,7 +116,7 @@ Plans:
 **Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] 06-01-PLAN.md — Package.swift database fork wiring + StructuredQueries validation tests (SQL-01..SQL-15)
+- [x] 06-01-PLAN.md — Package.swift database fork wiring + StructuredQueries validation tests (SQL-01..SQL-15) ✓ 2026-02-22
 - [ ] 06-02-PLAN.md — SQLiteData lifecycle, GRDB transactions, observation macros, dependency injection (SD-01..SD-12)
 
 ### Phase 7: Integration Testing & Documentation
@@ -148,5 +148,5 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 | 3. TCA Core | 2/2 | Complete    | 2026-02-22 |
 | 4. TCA State & Bindings | 3/3 | Complete | 2026-02-22 |
 | 5. Navigation & Presentation | 3/3 | Complete | 2026-02-22 |
-| 6. Database & Queries | 0/2 | Not started | - |
+| 6. Database & Queries | 1/2 | In progress | - |
 | 7. Integration Testing & Documentation | 0/2 | Not started | - |

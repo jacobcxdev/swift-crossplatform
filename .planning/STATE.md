@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 5: Navigation & Presentation (complete)
+**Current focus:** Phase 6: Database & Queries (planned)
 
 ## Current Position
 
-Phase: 5 of 7 (Navigation & Presentation) -- COMPLETE
-Plan: 3 of 3 in current phase (all complete)
-Status: Phase 5 complete. 3 waves executed: Guard removals + NavigationTests (18) + NavigationStackTests (7) + PresentationTests (9) + UIPatternTests (12). 80 total tests, 0 failures.
-Last activity: 2026-02-22 -- All 3 plans executed: 28 new tests (Waves 2-3), triple-verified (Claude PASS, Gemini PASS, Codex FAIL on Phase 7 scope).
+Phase: 6 of 7 (Database & Queries) -- IN PROGRESS
+Plan: 1 of 2 in current phase (Plan 06-01 complete, Plan 06-02 pending)
+Status: Plan 06-01 complete. 4 database forks wired, 15 StructuredQueries tests pass (SQL-01..SQL-15). 95 total tests (80 existing + 15 new). Plan 06-02 next: SQLiteData lifecycle/observation (SD-01..SD-12).
+Last activity: 2026-02-22 -- Plan 06-01 executed successfully.
 
 Progress: [████████░░] 80%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
+- Total plans completed: 9
 - Average duration: ~10min
-- Total execution time: ~1.4 hours
+- Total execution time: ~1.5 hours
 
 **By Phase:**
 
@@ -30,9 +30,10 @@ Progress: [████████░░] 80%
 | 3 - TCA Core | 2 | 14min | 7min |
 | 4 - TCA State & Bindings | 3 | 15min | 5min |
 | 5 - Navigation & Presentation | 3 | 20min | 7min |
+| 6 - Database & Queries | 1 | 8min | 8min |
 
 **Recent Trend:**
-- Last 5 plans: 04-02, 04-03, 05-01, 05-02, 05-03
+- Last 5 plans: 04-03, 05-01, 05-02, 05-03, 06-01
 - Trend: stable, fast execution
 
 *Updated after each plan completion*
@@ -68,6 +69,8 @@ Recent decisions affecting current work:
 - [Phase 04]: @Reducer enum DestinationFeature needs parent wrapper with .ifLet for enum case switching
 - [Phase 04]: Shared mutations use $value.withLock { $0 = newValue } (direct setter unavailable)
 - [Phase 04]: Binding($shared) requires @MainActor context (defined in SharedBinding.swift)
+- [Phase 06]: Use GRDB DatabaseQueue + Statement.fetchAll/execute bridge (not _StructuredQueriesSQLite.Database) -- matches SQLiteData's re-exported API
+- [Phase 06]: Import SQLiteData (which re-exports StructuredQueriesSQLite + GRDB via @_exported) not internal modules directly
 
 ### Pending Todos
 
@@ -78,6 +81,8 @@ Recent decisions affecting current work:
 - **DEP-05 previewValue on Android (clarification):** DEP-05 requirement says "previewValue is used in preview context on Android" but previews don't exist on Android. Phase 3 test validates preview context is never active. If Android ever gains preview support, revisit. (Source: Codex verifier, Phase 3 plan check)
 - **dismiss/openSettings dependency validation (Phase 7):** dismiss dependency validated at data layer in Phase 5 (DismissEffect + LockIsolated pattern). openSettings deferred to Phase 7 — requires active view hierarchy. (Source: Codex verifier gap #2, Phase 3 reconciliation)
 - **Android UI rendering validation (Phase 7):** Phase 5 Codex verifier flagged that NavigationStack, sheet, alert, dialog, .task tests validate data layer only, not Android Compose rendering. All UI rendering assertions deferred to Phase 7 integration testing with emulator. (Source: Codex verifier, Phase 5)
+- **Database observation wrapper-level testing (Phase 7):** Phase 6 Codex verifier flagged SD-09/SD-10/SD-11 tests use ValueObservation.start() directly, not @FetchAll/@FetchOne DynamicProperty wrappers. DynamicProperty.update() requires SwiftUI runtime (guarded out on Android). Wrapper-level integration testing deferred to Phase 7 with emulator. (Source: Codex verifier, Phase 6)
+- **Database Android build verification (Phase 7):** Phase 6 Codex verifier flagged missing `skip test` / `make android-build` in plan verification. macOS-only testing is consistent with Phases 3-5. Android build validation deferred to Phase 7. (Source: Codex verifier, Phase 6)
 
 ### Blockers/Concerns
 
@@ -88,5 +93,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Completed Phase 5 (Navigation & Presentation) -- all 3 plans executed, 80 total tests
-Resume file: /gsd:execute-phase 06 (Phase 6: Database & Queries next)
+Stopped at: Completed 06-01-PLAN.md (StructuredQueries validation) -- 15 tests, 95 total
+Resume file: /gsd:execute-phase 06 (Plan 06-02: SQLiteData lifecycle next)

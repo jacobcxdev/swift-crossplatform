@@ -167,21 +167,21 @@ Enum routing and pattern matching on Android.
 
 Type-safe query building via StructuredQueries on Android.
 
-- [ ] **SQL-01**: `@Table` macro generates correct table metadata on Android
-- [ ] **SQL-02**: `@Column(primaryKey:)` custom primary key designation works on Android
-- [ ] **SQL-03**: `@Column(as:)` custom column representations work on Android
-- [ ] **SQL-04**: `@Selection` type composition for multi-column grouping works on Android
-- [ ] **SQL-05**: `Table.select { }` tuple/closure column selection works on Android
-- [ ] **SQL-06**: `Table.where { }` equality, comparison, and boolean predicates work on Android
-- [ ] **SQL-07**: `Table.find(id)` primary key lookup works on Android
-- [ ] **SQL-08**: `Table.where { $0.column.in(values) }` IN/NOT IN operators work on Android
-- [ ] **SQL-09**: `Table.join()` / `leftJoin()` / `rightJoin()` / `fullJoin()` work on Android
-- [ ] **SQL-10**: `Table.order { }` ascending/descending/collation ordering works on Android
-- [ ] **SQL-11**: `Table.group { }` with `count()`/`avg()`/`sum()`/`min()`/`max()` aggregations work on Android
-- [ ] **SQL-12**: `Table.limit(n, offset:)` pagination works on Android
-- [ ] **SQL-13**: `Table.insert { }` / `Table.upsert { }` with draft and conflict resolution work on Android
-- [ ] **SQL-14**: `Table.where(...).update { }` / `Table.find(id).delete()` mutation/deletion work on Android
-- [ ] **SQL-15**: `#sql()` safe SQL macro with column interpolation works on Android
+- [x] **SQL-01**: `@Table` macro generates correct table metadata on Android
+- [x] **SQL-02**: `@Column(primaryKey:)` custom primary key designation works on Android
+- [x] **SQL-03**: `@Column(as:)` custom column representations work on Android
+- [x] **SQL-04**: `@Selection` type composition for multi-column grouping works on Android
+- [x] **SQL-05**: `Table.select { }` tuple/closure column selection works on Android
+- [x] **SQL-06**: `Table.where { }` equality, comparison, and boolean predicates work on Android
+- [x] **SQL-07**: `Table.find(id)` primary key lookup works on Android
+- [x] **SQL-08**: `Table.where { $0.column.in(values) }` IN/NOT IN operators work on Android
+- [x] **SQL-09**: `Table.join()` / `leftJoin()` / `rightJoin()` / `fullJoin()` work on Android
+- [x] **SQL-10**: `Table.order { }` ascending/descending/collation ordering works on Android
+- [x] **SQL-11**: `Table.group { }` with `count()`/`avg()`/`sum()`/`min()`/`max()` aggregations work on Android
+- [x] **SQL-12**: `Table.limit(n, offset:)` pagination works on Android
+- [x] **SQL-13**: `Table.insert { }` / `Table.upsert { }` with draft and conflict resolution work on Android
+- [x] **SQL-14**: `Table.where(...).update { }` / `Table.find(id).delete()` mutation/deletion work on Android
+- [x] **SQL-15**: `#sql()` safe SQL macro with column interpolation works on Android
 
 ### SD: SQLiteData & GRDB
 
@@ -450,21 +450,21 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-06 | Phase 5 | Pending |
 | UI-07 | Phase 5 | Pending |
 | UI-08 | Phase 5 | Pending |
-| SQL-01 | Phase 6 | Pending |
-| SQL-02 | Phase 6 | Pending |
-| SQL-03 | Phase 6 | Pending |
-| SQL-04 | Phase 6 | Pending |
-| SQL-05 | Phase 6 | Pending |
-| SQL-06 | Phase 6 | Pending |
-| SQL-07 | Phase 6 | Pending |
-| SQL-08 | Phase 6 | Pending |
-| SQL-09 | Phase 6 | Pending |
-| SQL-10 | Phase 6 | Pending |
-| SQL-11 | Phase 6 | Pending |
-| SQL-12 | Phase 6 | Pending |
-| SQL-13 | Phase 6 | Pending |
-| SQL-14 | Phase 6 | Pending |
-| SQL-15 | Phase 6 | Pending |
+| SQL-01 | Phase 6 | Complete |
+| SQL-02 | Phase 6 | Complete |
+| SQL-03 | Phase 6 | Complete |
+| SQL-04 | Phase 6 | Complete |
+| SQL-05 | Phase 6 | Complete |
+| SQL-06 | Phase 6 | Complete |
+| SQL-07 | Phase 6 | Complete |
+| SQL-08 | Phase 6 | Complete |
+| SQL-09 | Phase 6 | Complete |
+| SQL-10 | Phase 6 | Complete |
+| SQL-11 | Phase 6 | Complete |
+| SQL-12 | Phase 6 | Complete |
+| SQL-13 | Phase 6 | Complete |
+| SQL-14 | Phase 6 | Complete |
+| SQL-15 | Phase 6 | Complete |
 | SD-01 | Phase 6 | Pending |
 | SD-02 | Phase 6 | Pending |
 | SD-03 | Phase 6 | Pending |
