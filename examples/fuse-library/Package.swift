@@ -84,5 +84,8 @@ let package = Package(
         .testTarget(name: "SharedObservationTests", dependencies: [
             .product(name: "Sharing", package: "swift-sharing"),
         ]),
+        .testTarget(name: "NavigationTests", dependencies: [
+            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        ]),
     ]
 )
