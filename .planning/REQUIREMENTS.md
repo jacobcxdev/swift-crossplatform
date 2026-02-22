@@ -46,22 +46,22 @@ Bridge-level observation semantics and Swift Observation correctness on Android.
 
 Store, reducers, effects, and composition patterns on Android.
 
-- [ ] **TCA-01**: `Store.init(initialState:reducer:)` initializes with correct initial state on Android
-- [ ] **TCA-02**: `Store.init(initialState:reducer:withDependencies:)` -- `prepareDependencies` closure overrides dependencies at construction on Android
-- [ ] **TCA-03**: `store.send(.action)` dispatches an action from a view and returns a `StoreTask` on Android
-- [ ] **TCA-04**: `store.scope(state:action:)` derives a child store from a parent store on Android
-- [ ] **TCA-05**: `Scope(state:action:)` reducer runs child reducer against parent state/action on Android
-- [ ] **TCA-06**: `.ifLet(_:action:destination:)` runs child reducer when optional state is non-nil on Android
-- [ ] **TCA-07**: `.forEach(_:action:destination:)` runs element reducer for each collection element on Android
-- [ ] **TCA-08**: `.ifCaseLet(_:action:)` runs child reducer when enum state matches a specific case on Android
-- [ ] **TCA-09**: `CombineReducers { }` builder syntax composes multiple reducers in sequence on Android
-- [ ] **TCA-10**: `Effect.none` returns immediately without side effects on Android
-- [ ] **TCA-11**: `Effect.run { send in }` executes async work and sends actions back into the store on Android
-- [ ] **TCA-12**: `Effect.merge(...)` runs multiple effects concurrently on Android
-- [ ] **TCA-13**: `Effect.concatenate(...)` runs effects sequentially in order on Android
-- [ ] **TCA-14**: `Effect.cancellable(id:cancelInFlight:)` marks an effect as cancellable on Android
-- [ ] **TCA-15**: `Effect.cancel(id:)` cancels in-flight effects by ID on Android
-- [ ] **TCA-16**: `Effect.send(_:)` synchronously dispatches an action as an effect on Android
+- [x] **TCA-01**: `Store.init(initialState:reducer:)` initializes with correct initial state on Android
+- [x] **TCA-02**: `Store.init(initialState:reducer:withDependencies:)` -- `prepareDependencies` closure overrides dependencies at construction on Android
+- [x] **TCA-03**: `store.send(.action)` dispatches an action from a view and returns a `StoreTask` on Android
+- [x] **TCA-04**: `store.scope(state:action:)` derives a child store from a parent store on Android
+- [x] **TCA-05**: `Scope(state:action:)` reducer runs child reducer against parent state/action on Android
+- [x] **TCA-06**: `.ifLet(_:action:destination:)` runs child reducer when optional state is non-nil on Android
+- [x] **TCA-07**: `.forEach(_:action:destination:)` runs element reducer for each collection element on Android
+- [x] **TCA-08**: `.ifCaseLet(_:action:)` runs child reducer when enum state matches a specific case on Android
+- [x] **TCA-09**: `CombineReducers { }` builder syntax composes multiple reducers in sequence on Android
+- [x] **TCA-10**: `Effect.none` returns immediately without side effects on Android
+- [x] **TCA-11**: `Effect.run { send in }` executes async work and sends actions back into the store on Android
+- [x] **TCA-12**: `Effect.merge(...)` runs multiple effects concurrently on Android
+- [x] **TCA-13**: `Effect.concatenate(...)` runs effects sequentially in order on Android
+- [x] **TCA-14**: `Effect.cancellable(id:cancelInFlight:)` marks an effect as cancellable on Android
+- [x] **TCA-15**: `Effect.cancel(id:)` cancels in-flight effects by ID on Android
+- [x] **TCA-16**: `Effect.send(_:)` synchronously dispatches an action as an effect on Android
 - [ ] **TCA-17**: `@ObservableState` macro synthesizes `_$id`, `_$observationRegistrar`, `_$willModify` on Android
 - [ ] **TCA-18**: `@ObservationStateIgnored` suppresses observation tracking for annotated state properties on Android
 - [ ] **TCA-19**: `BindableAction` protocol + `case binding(BindingAction<State>)` compiles and routes correctly on Android
@@ -365,22 +365,22 @@ Which phases cover which requirements. Updated during roadmap creation.
 | IR-02 | Phase 2 | Complete |
 | IR-03 | Phase 2 | Complete |
 | IR-04 | Phase 2 | Complete |
-| TCA-01 | Phase 3 | Pending |
-| TCA-02 | Phase 3 | Pending |
-| TCA-03 | Phase 3 | Pending |
-| TCA-04 | Phase 3 | Pending |
-| TCA-05 | Phase 3 | Pending |
-| TCA-06 | Phase 3 | Pending |
-| TCA-07 | Phase 3 | Pending |
-| TCA-08 | Phase 3 | Pending |
-| TCA-09 | Phase 3 | Pending |
-| TCA-10 | Phase 3 | Pending |
-| TCA-11 | Phase 3 | Pending |
-| TCA-12 | Phase 3 | Pending |
-| TCA-13 | Phase 3 | Pending |
-| TCA-14 | Phase 3 | Pending |
-| TCA-15 | Phase 3 | Pending |
-| TCA-16 | Phase 3 | Pending |
+| TCA-01 | Phase 3 | Complete |
+| TCA-02 | Phase 3 | Complete |
+| TCA-03 | Phase 3 | Complete |
+| TCA-04 | Phase 3 | Complete |
+| TCA-05 | Phase 3 | Complete |
+| TCA-06 | Phase 3 | Complete |
+| TCA-07 | Phase 3 | Complete |
+| TCA-08 | Phase 3 | Complete |
+| TCA-09 | Phase 3 | Complete |
+| TCA-10 | Phase 3 | Complete |
+| TCA-11 | Phase 3 | Complete |
+| TCA-12 | Phase 3 | Complete |
+| TCA-13 | Phase 3 | Complete |
+| TCA-14 | Phase 3 | Complete |
+| TCA-15 | Phase 3 | Complete |
+| TCA-16 | Phase 3 | Complete |
 | DEP-01 | Phase 3 | Pending |
 | DEP-02 | Phase 3 | Pending |
 | DEP-03 | Phase 3 | Pending |

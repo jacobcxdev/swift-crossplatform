@@ -5,29 +5,29 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 3: TCA Core (planned, ready to execute)
+**Current focus:** Phase 3: TCA Core (executing)
 
 ## Current Position
 
-Phase: 3 of 7 (TCA Core) -- PLANNED
-Plan: 0 of 2 in current phase
-Status: Plans verified (triple verification), ready for execution
-Last activity: 2026-02-22 -- Phase 3 planned: 2 plans in 2 waves, triple-verified
+Phase: 3 of 7 (TCA Core) -- EXECUTING
+Plan: 1 of 2 in current phase
+Status: Plan 03-01 complete (Store/Reducer/Effect validation), Plan 03-02 next (Dependencies)
+Last activity: 2026-02-22 -- Plan 03-01 executed: 20 tests, 3 tasks, 0 failures
 
-Progress: [██████████] 100%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: ~14min
-- Total execution time: 0.7 hours
+- Total plans completed: 4
+- Average duration: ~12min
+- Total execution time: 0.8 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 3 - TCA Core | 1 | 8min | 8min |
 
 **Recent Trend:**
 - Last 5 plans: -
@@ -55,6 +55,9 @@ Recent decisions affecting current work:
 - Android isTesting detection via process args + dlsym + env vars (not Darwin-specific checks)
 - dlopen/dlsym uses os(Android) alongside os(Linux) for ELF dynamic linking
 - IdentifiedCollections confirmed zero-change on Android (pure Swift data structures)
+- DependenciesTestObserver replaced with DependenciesTestSupport (observer product is macOS-excluded)
+- ifLet/ifCaseLet tests validate happy path only (TCA reports errors for nil-state child actions by design)
+- Effect dependency tests require explicit withDependencies clock override (test context defaults to unimplemented)
 
 ### Pending Todos
 
@@ -73,5 +76,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Phase 2 complete, ready for Phase 3 (TCA Core)
-Resume file: /gsd:plan-phase 3
+Stopped at: Completed 03-01-PLAN.md (Store/Reducer/Effect validation)
+Resume file: /gsd:execute-phase 03 (Plan 03-02 next)

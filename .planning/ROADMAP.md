@@ -67,7 +67,7 @@ Plans:
 **Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] 03-01-PLAN.md — Store/Reducer/Effect validation + Package.swift test infrastructure with DependenciesTestObserver (TCA-01..TCA-16)
+- [x] 03-01-PLAN.md — Store/Reducer/Effect validation + Package.swift test infrastructure with DependenciesTestSupport (TCA-01..TCA-16) ✓ 2026-02-22
 - [ ] 03-02-PLAN.md — Dependency injection validation: @Dependency, withDependencies, built-in deps, @DependencyClient, NavigationID (DEP-01..DEP-12)
 
 ### Phase 4: TCA State & Bindings
@@ -143,7 +143,7 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 |-------|----------------|--------|-----------|
 | 1. Observation Bridge | 2/2 | Executed | - |
 | 2. Foundation Libraries | 3/3 | Executed | 2026-02-21 |
-| 3. TCA Core | 0/2 | Not started | - |
+| 3. TCA Core | 1/2 | Executing | - |
 | 4. TCA State & Bindings | 0/2 | Not started | - |
 | 5. Navigation & Presentation | 0/2 | Not started | - |
 | 6. Database & Queries | 0/2 | Not started | - |
