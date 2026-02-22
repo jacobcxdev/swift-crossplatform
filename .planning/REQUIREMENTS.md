@@ -187,18 +187,18 @@ Type-safe query building via StructuredQueries on Android.
 
 Database lifecycle, query execution, and observation on Android.
 
-- [ ] **SD-01**: `SQLiteData.defaultDatabase()` initializes database connection on Android
-- [ ] **SD-02**: `DatabaseMigrator` executes registered migrations on Android
-- [ ] **SD-03**: `database.read { db in }` executes synchronous read-only transaction on Android
-- [ ] **SD-04**: `database.write { db in }` executes synchronous write transaction on Android
-- [ ] **SD-05**: `await database.read { }` / `await database.write { }` async transactions work on Android
-- [ ] **SD-06**: `Table.fetchAll(db)` returns array of matching rows on Android
-- [ ] **SD-07**: `Table.fetchOne(db)` returns optional single row on Android
-- [ ] **SD-08**: `Table.fetchCount(db)` returns integer count on Android
-- [ ] **SD-09**: `@FetchAll` observation macro triggers view updates when database changes on Android
-- [ ] **SD-10**: `@FetchOne` observation macro triggers view updates for single-row queries on Android
-- [ ] **SD-11**: `@Fetch` with `FetchKeyRequest` executes composite multi-query observations on Android
-- [ ] **SD-12**: `@Dependency(\.defaultDatabase)` injects database into views and models on Android
+- [x] **SD-01**: `SQLiteData.defaultDatabase()` initializes database connection on Android
+- [x] **SD-02**: `DatabaseMigrator` executes registered migrations on Android
+- [x] **SD-03**: `database.read { db in }` executes synchronous read-only transaction on Android
+- [x] **SD-04**: `database.write { db in }` executes synchronous write transaction on Android
+- [x] **SD-05**: `await database.read { }` / `await database.write { }` async transactions work on Android
+- [x] **SD-06**: `Table.fetchAll(db)` returns array of matching rows on Android
+- [x] **SD-07**: `Table.fetchOne(db)` returns optional single row on Android
+- [x] **SD-08**: `Table.fetchCount(db)` returns integer count on Android
+- [x] **SD-09**: `@FetchAll` observation macro triggers view updates when database changes on Android
+- [x] **SD-10**: `@FetchOne` observation macro triggers view updates for single-row queries on Android
+- [x] **SD-11**: `@Fetch` with `FetchKeyRequest` executes composite multi-query observations on Android
+- [x] **SD-12**: `@Dependency(\.defaultDatabase)` injects database into views and models on Android
 
 ### CD: Custom Dump
 

@@ -266,6 +266,27 @@ final class StructuredQueriesTests: XCTestCase {
             XCTAssertEqual(leftResults.count, 5)
             XCTAssertEqual(leftResults[4].0, "epsilon")
             XCTAssertNil(leftResults[4].1) // no category
+
+            // Right join -- all categories, items nullable
+            let rightResults = try Item
+                .rightJoin(Category.all) { $0.categoryId.eq($1.id) }
+                .select { ($0.name, $1.name) }
+                .fetchAll(db)
+
+            // Both categories have items, so right join returns all category rows
+            XCTAssertGreaterThanOrEqual(rightResults.count, 2)
+            // Verify at least one category name appears
+            XCTAssertTrue(rightResults.contains(where: { $0.1 == "Tools" }))
+            XCTAssertTrue(rightResults.contains(where: { $0.1 == "Gadgets" }))
+
+            // Full join -- all rows from both sides
+            let fullResults = try Item
+                .fullJoin(Category.all) { $0.categoryId.eq($1.id) }
+                .select { ($0.name, $1.name) }
+                .fetchAll(db)
+
+            // Full join includes epsilon (no category) + all category-matched items
+            XCTAssertGreaterThanOrEqual(fullResults.count, 5)
         }
     }
 
@@ -336,6 +357,16 @@ final class StructuredQueriesTests: XCTestCase {
 
             XCTAssertEqual(sumResults[0].1, 55)  // gamma(25) + epsilon(30)
             XCTAssertEqual(sumResults[1].1, 30)  // alpha(5) + beta(15) + delta(10)
+
+            // Avg of values per group
+            let avgResults = try Item
+                .select { ($0.isActive, $0.value.avg()) }
+                .group(by: \.isActive)
+                .order { $0.isActive.asc() }
+                .fetchAll(db)
+
+            XCTAssertEqual(avgResults[0].1, 27.5) // (25+30)/2
+            XCTAssertEqual(avgResults[1].1, 10.0) // (5+15+10)/3
 
             // Min and max
             let minResult = try Item.select { $0.value.min() }.fetchAll(db)
