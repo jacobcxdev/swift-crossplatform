@@ -132,8 +132,8 @@ Plans:
 **Plans**: 4 plans in 4 waves
 
 Plans:
-- [ ] 07-01-PLAN.md (wave 1) — TestStore API validation: init, send, receive, exhaustivity, finish, skipReceivedActions, dependencies, effectDidSubscribe edge cases (TEST-01..TEST-09)
-- [ ] 07-02-PLAN.md (wave 2) — Observation bridge semantics + stress tests + Android emulator validation + deferred Phase 1 tests (TEST-10, TEST-11)
+- [x] 07-01-PLAN.md (wave 1) — TestStore API validation: init, send, receive, exhaustivity, finish, skipReceivedActions, dependencies, effectDidSubscribe edge cases (TEST-01..TEST-09) ✓ 2026-02-22
+- [x] 07-02-PLAN.md (wave 2) — Observation bridge semantics + stress tests + Android emulator validation + deferred Phase 1 tests (TEST-10, TEST-11) ✓ 2026-02-22
 - [ ] 07-03-PLAN.md (wave 3) — Fuse-app showcase: 6 TCA features, integration tests, README, Android build verification (TEST-12)
 - [ ] 07-04-PLAN.md (wave 4) — Fork documentation: FORKS.md + test reorganisation into 6 feature-aligned targets (DOC-01)
 
@@ -151,4 +151,4 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 | 4. TCA State & Bindings | 3/3 | Complete | 2026-02-22 |
 | 5. Navigation & Presentation | 3/3 | Complete | 2026-02-22 |
 | 6. Database & Queries | 2/2 | Complete | 2026-02-22 |
-| 7. Integration Testing & Documentation | 0/4 | Planned | - |
+| 7. Integration Testing & Documentation | 2/4 | In Progress | - |

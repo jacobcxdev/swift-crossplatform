@@ -245,8 +245,8 @@ Test infrastructure and project deliverables.
 - [ ] **TEST-07**: `await store.skipReceivedActions()` discards unconsumed received actions on Android
 - [ ] **TEST-08**: Deterministic async effect execution (alternative to `useMainSerialExecutor`) works on Android
 - [ ] **TEST-09**: `.dependencies { }` test trait overrides dependencies for a test on Android
-- [ ] **TEST-10**: Integration tests verify observation bridge prevents infinite recomposition on Android emulator
-- [ ] **TEST-11**: Stress tests confirm stability under >1000 TCA state mutations/second on Android
+- [x] **TEST-10**: Integration tests verify observation bridge prevents infinite recomposition on Android emulator
+- [x] **TEST-11**: Stress tests confirm stability under >1000 TCA state mutations/second on Android
 - [ ] **TEST-12**: A fuse-app example demonstrates full TCA app (store, reducer, effects, navigation, persistence) on both iOS and Android
 
 ### SPM: Build & Compilation
@@ -486,8 +486,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TEST-07 | Phase 7 | Pending |
 | TEST-08 | Phase 7 | Pending |
 | TEST-09 | Phase 7 | Pending |
-| TEST-10 | Phase 7 | Pending |
-| TEST-11 | Phase 7 | Pending |
+| TEST-10 | Phase 7 | Complete |
+| TEST-11 | Phase 7 | Complete |
 | TEST-12 | Phase 7 | Pending |
 | DOC-01 | Phase 7 | Pending |
 

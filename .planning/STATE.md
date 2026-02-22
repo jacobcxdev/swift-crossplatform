@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 7 of 7 (Integration Testing & Documentation) -- IN PROGRESS
-Plan: 1 of 4 in current phase (07-01 complete)
-Status: Plan 07-01 complete. 18 TestStore tests (14 core + 4 edge case) covering TEST-01..TEST-09. TestStore API validated: init, send, receive, exhaustivity, finish, skipReceivedActions, dependency overrides, effectDidSubscribe fallback for 5 effect types.
-Last activity: 2026-02-22 -- Plan 07-01 executed.
+Plan: 2 of 4 in current phase (07-01, 07-02 complete)
+Status: Plan 07-02 complete. 11 new tests (9 observation bridge + 2 stress). Bridge semantics validated: coalescing, nesting, thread isolation, @ObservationIgnored, ObservableState registrar. Store throughput 229K mut/sec, 0MB memory growth. Android build passes, android test blocked by pre-existing fork issue.
+Last activity: 2026-02-22 -- Plan 07-02 executed.
 
-Progress: [█████████░] 93%
+Progress: [█████████░] 95%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
+- Total plans completed: 12
 - Average duration: ~9min
-- Total execution time: ~1.6 hours
+- Total execution time: ~1.8 hours
 
 **By Phase:**
 
@@ -31,9 +31,10 @@ Progress: [█████████░] 93%
 | 4 - TCA State & Bindings | 3 | 15min | 5min |
 | 5 - Navigation & Presentation | 3 | 20min | 7min |
 | 6 - Database & Queries | 2 | 13min | 6.5min |
+| 7 - Integration Testing | 2 | 18min | 9min |
 
 **Recent Trend:**
-- Last 5 plans: 05-01, 05-02, 05-03, 06-01, 06-02
+- Last 5 plans: 05-03, 06-01, 06-02, 07-01, 07-02
 - Trend: stable, fast execution
 
 *Updated after each plan completion*
@@ -71,6 +72,9 @@ Recent decisions affecting current work:
 - [Phase 04]: Binding($shared) requires @MainActor context (defined in SharedBinding.swift)
 - [Phase 06]: Use GRDB DatabaseQueue + Statement.fetchAll/execute bridge (not _StructuredQueriesSQLite.Database) -- matches SQLiteData's re-exported API
 - [Phase 06]: Import SQLiteData (which re-exports StructuredQueriesSQLite + GRDB via @_exported) not internal modules directly
+- [Phase 07]: AtomicCounter (LockIsolated wrapper) for withObservationTracking onChange closures -- Swift 6 Sendable requirement
+- [Phase 07]: Android emulator test blocked by pre-existing dlopen/dlsym missing imports in xctest-dynamic-overlay fork -- deferred to fork maintenance
+- [Phase 07]: D8-c ViewModifier and D8-d bridge failure documented as manual verification steps (cannot automate)
 
 ### Pending Todos
 
@@ -83,6 +87,7 @@ Recent decisions affecting current work:
 - **Android UI rendering validation (Phase 7):** Phase 5 Codex verifier flagged that NavigationStack, sheet, alert, dialog, .task tests validate data layer only, not Android Compose rendering. All UI rendering assertions deferred to Phase 7 integration testing with emulator. (Source: Codex verifier, Phase 5)
 - **Database observation wrapper-level testing (Phase 7):** Phase 6 Codex verifier flagged SD-09/SD-10/SD-11 tests use ValueObservation.start() directly, not @FetchAll/@FetchOne DynamicProperty wrappers. DynamicProperty.update() requires SwiftUI runtime (guarded out on Android). Wrapper-level integration testing deferred to Phase 7 with emulator. (Source: Codex verifier, Phase 6)
 - **Database Android build verification (Phase 7):** Phase 6 Codex verifier flagged missing `skip test` / `make android-build` in plan verification. macOS-only testing is consistent with Phases 3-5. Android build validation deferred to Phase 7. (Source: Codex verifier, Phase 6)
+- **xctest-dynamic-overlay Android test build (Phase 7):** Fork needs `#if os(Android) import Android #endif` for `dlopen`/`dlsym` in `SwiftTesting.swift:643` and `IsTesting.swift:39`. Blocks `skip android test` for all test targets. Non-test Android build works fine. (Source: 07-02 Task 3)
 
 ### Blockers/Concerns
 
@@ -93,5 +98,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Completed Phase 6 (Database & Queries) -- all 2 plans executed, 28 database tests, 108 total
-Resume file: /gsd:plan-phase 07 (Phase 7: Integration Testing & Documentation next)
+Stopped at: Completed 07-02-PLAN.md -- 11 bridge/stress tests, 229K mut/sec throughput, Makefile fixed
+Resume file: /gsd:execute-phase 07 (Plan 07-03 next)
