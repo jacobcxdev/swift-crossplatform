@@ -61,7 +61,7 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
     static var notificationsEnabled: Self { Self[.appStorage("notificationsEnabled"), default: true] }
 }
 
-extension SharedKey where Self == FileStorageKey<[Todo]>.Default {
+extension SharedKey where Self == FileStorageKey<IdentifiedArrayOf<Todo>>.Default {
     static var savedTodos: Self {
         Self[.fileStorage(URL.applicationSupportDirectory.appending(component: "todos.json")), default: []]
     }
@@ -79,13 +79,13 @@ struct NumberFactClient: Sendable {
 }
 
 extension NumberFactClient: DependencyKey {
-    static let liveValue = Self(
-        fetch: { number in "The number \(number) is interesting!" }
-    )
-    static let testValue = Self()
-    static let previewValue = Self(
-        fetch: { number in "Preview fact for \(number)" }
-    )
+    static var liveValue: Self {
+        Self(fetch: { number in "The number \(number) is interesting!" })
+    }
+    static var testValue: Self { Self() }
+    static var previewValue: Self {
+        Self(fetch: { number in "Preview fact for \(number)" })
+    }
 }
 
 extension DependencyValues {

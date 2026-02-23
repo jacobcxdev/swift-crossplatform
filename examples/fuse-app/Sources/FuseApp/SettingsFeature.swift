@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import Foundation
+import IdentifiedCollections
 import Sharing
 import SwiftUI
 
@@ -12,7 +13,7 @@ struct SettingsFeature {
         @Shared(.userName) var userName: String
         @Shared(.appearance) var appearance: String
         @Shared(.notificationsEnabled) var notificationsEnabled: Bool
-        @Shared(.savedTodos) var savedTodos: [Todo] = []
+        @Shared(.savedTodos) var savedTodos: IdentifiedArrayOf<Todo> = []
         @Shared(.sessionActionCount) var sessionActionCount: Int
         @ObservationStateIgnored var debugInfo: String = ""
     }

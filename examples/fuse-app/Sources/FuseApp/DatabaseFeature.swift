@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import Dependencies
 import GRDB
+import IdentifiedCollections
 import IssueReporting
 import SQLiteData
 import StructuredQueries
@@ -46,7 +47,7 @@ extension DependencyValues {
 struct DatabaseFeature {
     @ObservableState
     struct State: Equatable {
-        var notes: [Note] = []
+        var notes: IdentifiedArrayOf<Note> = []
         var selectedCategory: String = "all"
         var noteCount: Int = 0
         var isLoading = false
@@ -58,7 +59,7 @@ struct DatabaseFeature {
         case addNoteTapped
         case deleteNote(Int64)
         case categoryFilterChanged(String)
-        case notesLoaded([Note])
+        case notesLoaded(IdentifiedArrayOf<Note>)
         case noteCountLoaded(Int)
         case noteAdded(Note)
         case noteDeleted(Int64)
@@ -75,7 +76,7 @@ struct DatabaseFeature {
                 return .run { send in
                     do {
                         let notes = try await database.read { db in
-                            try Note.all.order { $0.createdAt.desc() }.fetchAll(db)
+                            IdentifiedArrayOf<Note>(uniqueElements: try Note.all.order { $0.createdAt.desc() }.fetchAll(db))
                         }
                         let count = try await database.read { db in
                             try Note.all.fetchCount(db)
@@ -141,7 +142,7 @@ struct DatabaseFeature {
                 return .none
 
             case let .noteDeleted(id):
-                state.notes.removeAll { $0.id == id }
+                state.notes.remove(id: id)
                 state.noteCount -= 1
                 return .none
             }
@@ -218,7 +219,7 @@ struct DatabaseView: View {
         .task { store.send(.onAppear) }
     }
 
-    private var filteredNotes: [Note] {
+    private var filteredNotes: IdentifiedArrayOf<Note> {
         if store.selectedCategory == "all" {
             return store.notes
         }
