@@ -215,3 +215,66 @@ struct DatabaseView: View {
         return store.notes.filter { $0.category == store.selectedCategory }
     }
 }
+
+// MARK: - DatabaseObservingView (@FetchAll/@FetchOne pattern)
+
+/// Demonstrates PFW canonical @FetchAll/@FetchOne reactive database observation.
+/// This view uses SQLiteData property wrappers for automatic database-driven updates
+/// instead of the polling-via-reducer pattern used in DatabaseView above.
+/// Write operations (add/delete) remain in the reducer for transactional safety.
+struct DatabaseObservingView: View {
+    let store: StoreOf<DatabaseFeature>
+
+    @FetchAll(Note.all.order { $0.createdAt.desc() })
+    var notes
+
+    @FetchOne(Note.count())
+    var noteCount = 0
+
+    var body: some View {
+        List {
+            Section("Notes (\(noteCount))") {
+                if notes.isEmpty {
+                    Text("No notes yet. Tap + to add one.")
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(notes) { note in
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(note.title)
+                                    .font(.headline)
+                                HStack {
+                                    Text(note.category)
+                                        .font(.caption)
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(.secondary.opacity(0.2))
+                                        .clipShape(Capsule())
+                                    Spacer()
+                                    Text(Date(timeIntervalSince1970: note.createdAt), style: .date)
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            Button {
+                                store.send(.deleteNote(note.id))
+                            } label: {
+                                Image(systemName: "trash")
+                                    .foregroundStyle(.red)
+                            }
+                            .buttonStyle(.borderless)
+                        }
+                    }
+                }
+            }
+        }
+        .navigationTitle("Database (Observing)")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button { store.send(.addButtonTapped) } label: {
+                    Label("Add", systemImage: "plus")
+                }
+            }
+        }
+    }
+}
