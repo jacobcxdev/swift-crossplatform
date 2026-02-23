@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 8 — PFW skill alignment (Waves 1-2 complete, 3 plans remaining).
+**Current focus:** Phase 8 — PFW skill alignment (Waves 1-3 complete, 2 plans remaining).
 
 ## Current Position
 
 Phase: 8 of 8 (PFW Skill Alignment)
-Plan: 3 of 5 in current phase (08-01, 08-02 complete)
-Status: Wave 2 structural alignment applied. @CasePathable, Path un-nesting, IdentifiedArrayOf, @Presents, dismiss pattern, PFW naming. 272+ tests (120 passing fuse-app, 91 Swift Testing fuse-library, all pre-existing failures only).
-Last activity: 2026-02-23 -- 08-02 Wave 2 complete.
+Plan: 4 of 5 in current phase (08-01, 08-02, 08-03 complete)
+Status: Wave 3 database & import cleanup applied. import SQLiteData only, defaultDatabase(), @FetchAll/@FetchOne, #sql macro, .dependencies trait TODOs. 277 tests (30 fuse-app, 156+91 fuse-library, all pre-existing failures only).
+Last activity: 2026-02-23 -- 08-03 Wave 3 complete.
 
-Progress: [████------] 40%
+Progress: [██████----] 60%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
+- Total plans completed: 16
 - Average duration: ~9min
-- Total execution time: ~2.4 hours
+- Total execution time: ~2.6 hours
 
 **By Phase:**
 
@@ -32,10 +32,10 @@ Progress: [████------] 40%
 | 5 - Navigation & Presentation | 3 | 20min | 7min |
 | 6 - Database & Queries | 2 | 13min | 6.5min |
 | 7 - Integration Testing | 4 | 29min | 7min |
-| 8 - PFW Skill Alignment | 2 | 25min | 12.5min |
+| 8 - PFW Skill Alignment | 3 | 40min | 13min |
 
 **Recent Trend:**
-- Last 5 plans: 07-03, 07-04, 08-01, 08-02
+- Last 5 plans: 07-04, 08-01, 08-02, 08-03
 - Trend: stable, fast execution
 
 *Updated after each plan completion*
@@ -85,6 +85,10 @@ Recent decisions affecting current work:
 - [Phase 08]: Parent-driven dismissal uses .send(.destination(.dismiss)) -- ensures PresentationReducer effect cancellation pipeline runs
 - [Phase 08]: SheetToggleFeature refactored with dedicated SheetContent child reducer for @Presents pattern
 - [Phase 08]: Test fixture Todo/Contact constructors keep explicit UUID() -- only model init defaults removed
+- [Phase 08]: ValueObservation added to sqlite-data fork re-exports (not previously re-exported by SQLiteData)
+- [Phase 08]: ComposableArchitecture kept in FuseAppIntegrationTests (not transitively available via FuseApp)
+- [Phase 08]: bootstrapDatabase() stays in FuseAppRootView.init() -- correct for Skip Fuse architecture (no @main App struct)
+- [Phase 08]: BOOLEAN replaced with INTEGER in STRICT table DDL (STRICT only supports 5 column types)
 
 ### Pending Todos
 
@@ -112,5 +116,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Completed 08-02-PLAN.md (Wave 2 structural alignment). Next: 08-03-PLAN.md (Wave 3 database & import cleanup).
-Resume file: .planning/phases/08-pfw-skill-alignment/08-03-PLAN.md
+Stopped at: Completed 08-03-PLAN.md (Wave 3 database & import cleanup). Next: 08-04-PLAN.md (Wave 4 test modernisation).
+Resume file: .planning/phases/08-pfw-skill-alignment/08-04-PLAN.md
