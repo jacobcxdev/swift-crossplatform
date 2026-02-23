@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 8 — PFW skill alignment (Waves 1-4 complete, 1 plan remaining).
+**Current focus:** Phase 8 complete. All 8 phases delivered.
 
 ## Current Position
 
-Phase: 8 of 8 (PFW Skill Alignment)
-Plan: 5 of 5 in current phase (08-01, 08-02, 08-03, 08-04 complete)
-Status: Wave 4 test modernisation complete. 12 XCTestCase files migrated to Swift Testing @Suite/@Test. 225 fuse-library tests + 30 fuse-app tests passing. 2 ObservationTests files kept as XCTest (Skip transpilation constraint).
-Last activity: 2026-02-23 -- 08-04 Wave 4 complete.
+Phase: 8 of 8 (PFW Skill Alignment) -- COMPLETE
+Plan: 5 of 5 in current phase (all complete)
+Status: All 191 PFW audit findings addressed. Bridge namespace renamed to BridgeObservation, os_unfair_lock replacing DispatchSemaphore, Android NavigationStack gap documented. 225 fuse-library tests + 30 fuse-app tests passing. Phase 8 and full project complete.
+Last activity: 2026-02-23 -- 08-05 Wave 5 complete. Phase 8 complete.
 
-Progress: [███████---] 70%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17
+- Total plans completed: 18
 - Average duration: ~10min
-- Total execution time: ~2.9 hours
+- Total execution time: ~3.0 hours
 
 **By Phase:**
 
@@ -32,10 +32,10 @@ Progress: [███████---] 70%
 | 5 - Navigation & Presentation | 3 | 20min | 7min |
 | 6 - Database & Queries | 2 | 13min | 6.5min |
 | 7 - Integration Testing | 4 | 29min | 7min |
-| 8 - PFW Skill Alignment | 4 | 58min | 14.5min |
+| 8 - PFW Skill Alignment | 5 | 65min | 13min |
 
 **Recent Trend:**
-- Last 5 plans: 08-01, 08-02, 08-03, 08-04
+- Last 5 plans: 08-01, 08-02, 08-03, 08-04, 08-05
 - Trend: stable, fast execution
 
 *Updated after each plan completion*
@@ -93,6 +93,9 @@ Recent decisions affecting current work:
 - [Phase 08]: @_spi(Reflection) import CasePaths kept in DependencyTests -- EnumMetadata requires SPI access
 - [Phase 08]: Combine publishers kept in SharedObservationTests -- Observations {} async sequence not available in swift-sharing
 - [Phase 08]: nonisolated(unsafe) var for onChange counters in SharedBindingTests -- LockIsolated not in SharingTests target
+- [Phase 08]: BridgeObservation namespace rename confirmed safe -- all @_cdecl JNI exports are free functions with string literal names
+- [Phase 08]: os_unfair_lock replaces DispatchSemaphore in bridge -- available on Android via Swift Android SDK compatibility layer
+- [Phase 08]: Android NavigationStack path binding silently unused -- documented with TODO in ContactsFeature.swift (M13)
 
 ### Pending Todos
 
@@ -120,5 +123,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Completed 08-04-PLAN.md (Wave 4 test modernisation). Next: 08-05-PLAN.md (Wave 5 fork cleanup + assertion sweep).
-Resume file: .planning/phases/08-pfw-skill-alignment/08-05-PLAN.md
+Stopped at: Completed 08-05-PLAN.md (Wave 5 fork cleanup + assertion sweep). Phase 8 complete. All 18 plans across 8 phases delivered.
+Resume file: N/A -- project complete

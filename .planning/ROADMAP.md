@@ -152,7 +152,7 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 | 5. Navigation & Presentation | 3/3 | Complete | 2026-02-22 |
 | 6. Database & Queries | 2/2 | Complete | 2026-02-22 |
 | 7. Integration Testing & Documentation | 4/4 | Complete    | 2026-02-23 |
-| 8. PFW Skill Alignment | 4/5 | In Progress | - |
+| 8. PFW Skill Alignment | 5/5 | Complete | 2026-02-23 |
 
 ### Phase 8: PFW Skill Alignment
 
@@ -172,4 +172,4 @@ Plans:
 - [x] 08-02-PLAN.md (wave 2) — Structural alignment: @CasePathable, Path un-nesting, CombineReducers, IdentifiedArrayOf, dismiss pattern, action naming ✓ 2026-02-23
 - [x] 08-03-PLAN.md (wave 3) — Database & import cleanup: import SQLiteData only, defaultDatabase(), @FetchAll/@FetchOne, #sql macro, .dependencies trait ✓ 2026-02-23
 - [x] 08-04-PLAN.md (wave 4) — Test modernisation: 12 XCTestCase files to Swift Testing, expectNoDifference, confirmation() replacing XCTestExpectation ✓ 2026-02-23
-- [ ] 08-05-PLAN.md (wave 5) — Fork cleanup + assertion sweep: bridge namespace rename, os_unfair_lock, final verification of all 191 findings
+- [x] 08-05-PLAN.md (wave 5) — Fork cleanup + assertion sweep: bridge namespace rename, os_unfair_lock, final verification of all 191 findings ✓ 2026-02-23
