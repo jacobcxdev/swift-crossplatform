@@ -215,11 +215,12 @@ Plans:
 - [ ] 10-01-PLAN.md — TBD
 
 ### Phase 11: Presentation Dismiss on Android
-**Goal:** Enable TCA's `@Dependency(\.dismiss)` on Android by implementing programmatic dismiss support in skip-ui fork and removing the `#if !os(Android)` gate in swift-composable-architecture fork
+**Goal:** Enable TCA's `@Dependency(\.dismiss)` on Android by removing `#if !os(Android)` guards in the swift-composable-architecture fork's `Dismiss.swift` and `PresentationReducer` — skip-ui already supports `@Environment(\.dismiss)` ([skip.dev docs](https://skip.dev/docs/modules/skip-ui/#environment-keys))
 **Depends on:** Phase 10
 **Requirements:** TCA-26, TCA-28, NAV-14 (strengthening existing Complete status from iOS-only to cross-platform)
 **Gap Closure:** Closes M2-ANDROID-DISMISS (integration)
 **Canonical pattern references:** `/pfw-composable-architecture` (PresentationAction.dismiss pattern), `/pfw-swift-navigation` (dismiss dependency)
+**Key insight:** skip-ui supports `@Environment(\.dismiss)` (confirmed in skip-ui environment keys docs). TCA's `Dismiss.swift` has `#if canImport(SwiftUI) && !os(Android)` guards (lines 90, 122) that make the dismiss dependency a no-op `EmptyReducer()` on Android. The underlying SwiftUI dismiss mechanism is available — the guards may simply need removal + verification.
 **Success Criteria** (what must be TRUE):
   1. `@Dependency(\.dismiss)` resolves a functional dismiss implementation on Android (not EmptyReducer no-op)
   2. Programmatic dismiss from TCA reducer triggers Compose presentation close (sheet dismiss / navigation pop)
