@@ -97,7 +97,7 @@ final class TodosFeatureTests: XCTestCase {
     }
 
     @MainActor func testToggleTodo() async {
-        let todo = Todo(id: UUID(), title: "Test", isComplete: false)
+        let todo = Todo(id: UUID(), title: "Test", isComplete: false, createdAt: .distantPast)
         let store = TestStore(initialState: TodosFeature.State(todos: [todo])) {
             TodosFeature()
         }
@@ -107,7 +107,7 @@ final class TodosFeatureTests: XCTestCase {
     }
 
     @MainActor func testDeleteWithAlertConfirmation() async {
-        let todo = Todo(id: UUID(), title: "Delete me")
+        let todo = Todo(id: UUID(), title: "Delete me", createdAt: .distantPast)
         let store = TestStore(initialState: TodosFeature.State(todos: [todo])) {
             TodosFeature()
         }
@@ -134,8 +134,8 @@ final class TodosFeatureTests: XCTestCase {
     }
 
     @MainActor func testFilter() async {
-        let todo1 = Todo(id: UUID(), title: "Active", isComplete: false)
-        let todo2 = Todo(id: UUID(), title: "Done", isComplete: true)
+        let todo1 = Todo(id: UUID(), title: "Active", isComplete: false, createdAt: .distantPast)
+        let todo2 = Todo(id: UUID(), title: "Done", isComplete: true, createdAt: .distantPast)
         let store = TestStore(initialState: TodosFeature.State(todos: [todo1, todo2])) {
             TodosFeature()
         }

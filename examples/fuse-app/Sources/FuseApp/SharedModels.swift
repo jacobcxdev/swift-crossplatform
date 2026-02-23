@@ -13,7 +13,7 @@ struct Todo: Equatable, Identifiable, Codable, Sendable {
     var isComplete: Bool
     var createdAt: Date
 
-    init(id: UUID = UUID(), title: String = "", isComplete: Bool = false, createdAt: Date = .now) {
+    init(id: UUID, title: String = "", isComplete: Bool = false, createdAt: Date) {
         self.id = id
         self.title = title
         self.isComplete = isComplete
@@ -28,7 +28,7 @@ struct Contact: Equatable, Identifiable, Codable, Hashable, Sendable {
     var name: String
     var email: String
 
-    init(id: UUID = UUID(), name: String = "", email: String = "") {
+    init(id: UUID, name: String = "", email: String = "") {
         self.id = id
         self.name = name
         self.email = email
