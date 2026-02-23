@@ -225,6 +225,8 @@ final class ContactsFeatureTests: XCTestCase {
         }
         await store.send(.destination(.presented(.addContact(.delegate(.saveContact(newContact)))))) {
             $0.contacts.append(newContact)
+        }
+        await store.receive(\.destination.dismiss) {
             $0.destination = nil
         }
     }
@@ -302,6 +304,8 @@ final class ContactDetailFeatureTests: XCTestCase {
         }
         await store.send(.destination(.presented(.editSheet(.delegate(.save(updated)))))) {
             $0.contact = updated
+        }
+        await store.receive(\.destination.dismiss) {
             $0.destination = nil
         }
     }
@@ -369,7 +373,7 @@ final class DatabaseFeatureTests: XCTestCase {
         let store = TestStore(initialState: DatabaseFeature.State()) {
             DatabaseFeature()
         }
-        await store.send(.toggleCategory("work")) {
+        await store.send(.categoryFilterChanged("work")) {
             $0.selectedCategory = "work"
         }
     }

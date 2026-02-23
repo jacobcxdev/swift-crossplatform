@@ -56,8 +56,7 @@ struct ContactsFeature {
 
             case .destination(.presented(.addContact(.delegate(.saveContact(let contact))))):
                 state.contacts.append(contact)
-                state.destination = nil
-                return .none
+                return .send(.destination(.dismiss))
 
             case .destination:
                 return .none
@@ -166,8 +165,7 @@ struct ContactDetailFeature {
 
             case .destination(.presented(.editSheet(.delegate(.save(let contact))))):
                 state.contact = contact
-                state.destination = nil
-                return .none
+                return .send(.destination(.dismiss))
 
             case .destination:
                 return .none
