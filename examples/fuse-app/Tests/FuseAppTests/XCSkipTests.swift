@@ -12,6 +12,7 @@ import Foundation
 /// symlink chain. Instead, we create stub JUnit results so `skip test` can
 /// generate its parity report. Android observation tests will be validated
 /// once fork changes are merged upstream or published to remote repos.
+#if !os(Android)
 @available(macOS 13, macCatalyst 16, *)
 final class XCSkipTests: XCTestCase {
     func testSkipModule() throws {
@@ -42,6 +43,7 @@ final class XCSkipTests: XCTestCase {
                            atomically: true, encoding: .utf8)
     }
 }
+#endif
 
 /// True when running in a transpiled Java runtime environment
 let isJava = ProcessInfo.processInfo.environment["java.io.tmpdir"] != nil
