@@ -26,6 +26,7 @@ A comprehensive reference application demonstrating [The Composable Architecture
 | B3 | @Shared(.appStorage) subscription notifications are no-op on Android | Same as B2 for UserDefaults-backed storage | In-app mutations work; no cross-process sync |
 | B5 | TestStore non-determinism on Android | Tests run macOS-only via FuseAppIntegrationTests target | Dedicated test target without skipstone plugin |
 | P1-7 | @Shared(.appStorage) with [String] type crashes | Array-typed appStorage unavailable | Use scalar types (String, Bool, Int, Double) |
+| P8 | Perception bypass on Android: `PerceptionRegistrar` delegates to native `ObservationRegistrar`, bypassing the bridge's `recordAccess` hooks | Raw `@Perceptible` views (without TCA) will not trigger Compose recomposition. Safe for all TCA usage (TCA uses `ObservationStateRegistrar` which routes through the bridge directly) | Only affects code using `swift-perception`'s `@Perceptible` macro directly for view driving outside TCA. Use `@Observable` or TCA's `@ObservableState` instead |
 
 ### Platform Differences
 

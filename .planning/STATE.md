@@ -102,7 +102,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- **Perception bypass on Android (Phase 3+):** `PerceptionRegistrar` delegates to native `ObservationRegistrar`, bypassing bridge `recordAccess` hooks. Raw `@Perceptible` views (without TCA) won't trigger Compose updates. Safe for TCA (uses bridge registrar directly). Verify no non-TCA code relies on Perception for view driving. (Source: Gemini verifier)
+- **~~Perception bypass on Android (Phase 3+):~~** DOCUMENTED — `PerceptionRegistrar` delegates to native `ObservationRegistrar`, bypassing bridge `recordAccess` hooks. Raw `@Perceptible` views (without TCA) won't trigger Compose updates. Safe for TCA (uses bridge registrar directly). Documented in fuse-app README.md Known Limitations (P8). (Source: Gemini verifier)
 - **Android runtime verification (Phase 7):** 5 human tests deferred — single recomposition, nested independence, ViewModifier observation, fatal error on bridge failure, full 14-fork compilation. All require running emulator. (Source: all 3 verifiers)
 - **~~Android runtime test execution (Phase 7):~~** RESOLVED — `skip test` now passes 21/21 (Swift + Kotlin) after removing unused fork deps that broke Skip's sandbox. All future phases should run `skip test` as part of validation.
 - **MainSerialExecutor Android fallback validation (Phase 7):** Context suggested porting MainSerialExecutor; research determined existing `effectDidSubscribe` AsyncStream fallback is the intended Android path. Validate fallback under all effect types during Phase 7 TestStore testing. (Source: Codex verifier, Phase 3 plan check)
