@@ -209,10 +209,11 @@ Plans:
   3. `.navigationDestination(for: StackState.Component.self)` resolves destinations correctly on Android
   4. ContactsFeature.swift `#if os(Android)` workaround removed — single code path for both platforms
   5. `skip android test` passes with NavigationStack path push/pop working on Android
-**Plans:** TBD
+**Plans:** 2 plans in 2 waves
 
 Plans:
-- [ ] 10-01-PLAN.md — TBD
+- [ ] 10-01-PLAN.md — Android NavigationStack adapter: _TCANavigationStack View struct + free function + _NavigationDestinationViewModifier enablement (NAV-01..NAV-03, TCA-32, TCA-33)
+- [ ] 10-02-PLAN.md — ContactsFeature unification + adapter binding tests + Android build verification (NAV-01..NAV-03, TCA-32, TCA-33)
 
 ### Phase 11: Presentation Dismiss on Android
 **Goal:** Enable TCA's `@Dependency(\.dismiss)` on Android by removing `#if !os(Android)` guards in the swift-composable-architecture fork's `Dismiss.swift` and `PresentationReducer` — skip-ui already supports `@Environment(\.dismiss)` ([skip.dev docs](https://skip.dev/docs/modules/skip-ui/#environment-keys))
