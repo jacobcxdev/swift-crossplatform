@@ -1,5 +1,5 @@
 import ComposableArchitecture
-import XCTest
+import Testing
 
 // MARK: - Test Reducers
 
@@ -21,7 +21,7 @@ struct EffectRunFeature {
     struct State: Equatable {
         var value: String = ""
     }
-    enum Action: Equatable {
+    enum Action {
         case fetch
         case response(String)
     }
@@ -45,7 +45,7 @@ struct BackgroundSendFeature {
     struct State: Equatable {
         var value: String = ""
     }
-    enum Action: Equatable {
+    enum Action {
         case fetch
         case response(String)
     }
@@ -72,7 +72,7 @@ struct MergeFeature {
     struct State: Equatable {
         var values: [String] = []
     }
-    enum Action: Equatable {
+    enum Action {
         case start
         case received(String)
     }
@@ -97,7 +97,7 @@ struct ConcatenateFeature {
     struct State: Equatable {
         var values: [Int] = []
     }
-    enum Action: Equatable {
+    enum Action {
         case start
         case received(Int)
     }
@@ -124,7 +124,7 @@ struct CancellableFeature {
     struct State: Equatable {
         var completed = false
     }
-    enum Action: Equatable {
+    enum Action {
         case start
         case cancelEffect
         case completed
@@ -153,7 +153,7 @@ struct CancelInFlightFeature {
     struct State: Equatable {
         var value: Int = 0
     }
-    enum Action: Equatable {
+    enum Action {
         case request(Int)
         case response(Int)
     }
@@ -179,7 +179,7 @@ struct DependencyEffectFeature {
     struct State: Equatable {
         var elapsed = false
     }
-    enum Action: Equatable {
+    enum Action {
         case start
         case done
     }
@@ -202,75 +202,70 @@ struct DependencyEffectFeature {
 
 // MARK: - Tests
 
-final class EffectTests: XCTestCase {
+@Suite(.serialized) @MainActor
+struct EffectTests {
 
     // MARK: TCA-10: Effect.none
 
-    @MainActor
-    func testEffectNone() {
+    @Test func effectNone() {
         let store = Store(initialState: EffectNoneFeature.State(count: 42)) {
             EffectNoneFeature()
         }
         store.send(.noop)
-        XCTAssertEqual(store.withState(\.count), 42)
+        #expect(store.withState(\.count) == 42)
     }
 
     // MARK: TCA-11: Effect.run
 
-    @MainActor
-    func testEffectRun() async throws {
+    @Test func effectRun() async throws {
         let store = Store(initialState: EffectRunFeature.State()) {
             EffectRunFeature()
         }
         store.send(.fetch)
         // Wait for the effect to complete
         try await Task.sleep(for: .milliseconds(100))
-        XCTAssertEqual(store.withState(\.value), "hello")
+        #expect(store.withState(\.value) == "hello")
     }
 
     // MARK: TCA-11: Effect.run from background thread
 
-    @MainActor
-    func testEffectRunFromBackgroundThread() async throws {
+    @Test func effectRunFromBackgroundThread() async throws {
         let store = Store(initialState: BackgroundSendFeature.State()) {
             BackgroundSendFeature()
         }
         store.send(.fetch)
         try await Task.sleep(for: .milliseconds(200))
-        XCTAssertEqual(store.withState(\.value), "from-background")
+        #expect(store.withState(\.value) == "from-background")
     }
 
     // MARK: TCA-12: Effect.merge
 
-    @MainActor
-    func testEffectMerge() async throws {
+    @Test func effectMerge() async throws {
         let store = Store(initialState: MergeFeature.State()) {
             MergeFeature()
         }
         store.send(.start)
         try await Task.sleep(for: .milliseconds(200))
         let values = store.withState(\.values)
-        XCTAssertEqual(values.count, 2)
-        XCTAssertTrue(values.contains("a"))
-        XCTAssertTrue(values.contains("b"))
+        #expect(values.count == 2)
+        #expect(values.contains("a"))
+        #expect(values.contains("b"))
     }
 
     // MARK: TCA-13: Effect.concatenate
 
-    @MainActor
-    func testEffectConcatenate() async throws {
+    @Test func effectConcatenate() async throws {
         let store = Store(initialState: ConcatenateFeature.State()) {
             ConcatenateFeature()
         }
         store.send(.start)
         try await Task.sleep(for: .milliseconds(200))
-        XCTAssertEqual(store.withState(\.values), [1, 2])
+        #expect(store.withState(\.values) == [1, 2])
     }
 
     // MARK: TCA-14: Effect.cancellable
 
-    @MainActor
-    func testEffectCancellable() async throws {
+    @Test func effectCancellable() async throws {
         let store = Store(initialState: CancellableFeature.State()) {
             CancellableFeature()
         }
@@ -279,13 +274,12 @@ final class EffectTests: XCTestCase {
         store.send(.cancelEffect)
         // Wait to verify the effect was cancelled (completed should remain false)
         try await Task.sleep(for: .milliseconds(200))
-        XCTAssertFalse(store.withState(\.completed))
+        #expect(store.withState(\.completed) == false)
     }
 
     // MARK: TCA-14: cancelInFlight
 
-    @MainActor
-    func testEffectCancelInFlight() async throws {
+    @Test func effectCancelInFlight() async throws {
         let store = Store(initialState: CancelInFlightFeature.State()) {
             CancelInFlightFeature()
         }
@@ -294,13 +288,12 @@ final class EffectTests: XCTestCase {
         store.send(.request(2))
         try await Task.sleep(for: .milliseconds(200))
         // Only the second request should complete
-        XCTAssertEqual(store.withState(\.value), 2)
+        #expect(store.withState(\.value) == 2)
     }
 
     // MARK: TCA-15: Effect.cancel
 
-    @MainActor
-    func testEffectCancel() async throws {
+    @Test func effectCancel() async throws {
         let store = Store(initialState: CancellableFeature.State()) {
             CancellableFeature()
         }
@@ -308,13 +301,12 @@ final class EffectTests: XCTestCase {
         // Cancel via Effect.cancel(id:)
         store.send(.cancelEffect)
         try await Task.sleep(for: .milliseconds(200))
-        XCTAssertFalse(store.withState(\.completed))
+        #expect(store.withState(\.completed) == false)
     }
 
     // MARK: TCA-11 + DEP-12: Effect.run with dependency
 
-    @MainActor
-    func testEffectRunWithDependencies() async throws {
+    @Test func effectRunWithDependencies() async throws {
         let store = Store(initialState: DependencyEffectFeature.State()) {
             DependencyEffectFeature()
         } withDependencies: {
@@ -322,6 +314,6 @@ final class EffectTests: XCTestCase {
         }
         store.send(.start)
         try await Task.sleep(for: .milliseconds(200))
-        XCTAssertTrue(store.withState(\.elapsed))
+        #expect(store.withState(\.elapsed) == true)
     }
 }

@@ -1,8 +1,9 @@
 import ComposableArchitecture
+import CustomDump
 import Dependencies
 import DependenciesTestSupport
+import Foundation
 import Testing
-import XCTest
 
 // MARK: - Test Reducers
 
@@ -287,22 +288,21 @@ struct TSCancelEffectFeature {
 
 // MARK: - Tests
 
-final class TestStoreTests: XCTestCase {
+@Suite(.serialized) @MainActor
+struct TestStoreTests {
 
     // MARK: TEST-01 — TestStore init
 
-    @MainActor
-    func testTestStoreInit() async {
+    @Test func testStoreInit() async {
         let store = TestStore(initialState: TSCounter.State(count: 5)) {
             TSCounter()
         }
-        XCTAssertEqual(store.state.count, 5)
+        #expect(store.state.count == 5)
     }
 
     // MARK: TEST-02 — send with state assertion
 
-    @MainActor
-    func testSendWithStateAssertion() async {
+    @Test func sendWithStateAssertion() async {
         let store = TestStore(initialState: TSCounter.State()) {
             TSCounter()
         }
@@ -313,8 +313,7 @@ final class TestStoreTests: XCTestCase {
 
     // MARK: TEST-03 — receive effect action
 
-    @MainActor
-    func testReceiveEffectAction() async {
+    @Test func receiveEffectAction() async {
         let store = TestStore(initialState: TSFetchFeature.State()) {
             TSFetchFeature()
         }
@@ -326,8 +325,7 @@ final class TestStoreTests: XCTestCase {
 
     // MARK: TEST-04 — exhaustivity on (default)
 
-    @MainActor
-    func testExhaustivityOnDetectsUnassertedChange() async {
+    @Test func exhaustivityOnDetectsUnassertedChange() async {
         let store = TestStore(initialState: TSExhaustivityFeature.State()) {
             TSExhaustivityFeature()
         }
@@ -344,8 +342,7 @@ final class TestStoreTests: XCTestCase {
 
     // MARK: TEST-05 — exhaustivity off
 
-    @MainActor
-    func testExhaustivityOff() async {
+    @Test func exhaustivityOff() async {
         let store = TestStore(initialState: TSExhaustivityFeature.State()) {
             TSExhaustivityFeature()
         }
@@ -357,8 +354,7 @@ final class TestStoreTests: XCTestCase {
 
     // MARK: TEST-06 — finish()
 
-    @MainActor
-    func testFinish() async {
+    @Test func finish() async {
         let store = TestStore(initialState: TSFinishFeature.State()) {
             TSFinishFeature()
         }
@@ -371,8 +367,7 @@ final class TestStoreTests: XCTestCase {
 
     // MARK: TEST-07 — skipReceivedActions()
 
-    @MainActor
-    func testSkipReceivedActions() async {
+    @Test func skipReceivedActions() async {
         let store = TestStore(initialState: TSMultiEffectFeature.State()) {
             TSMultiEffectFeature()
         }
@@ -380,13 +375,12 @@ final class TestStoreTests: XCTestCase {
         await store.send(.triggerMultiple)
         await store.skipReceivedActions()
         // Test passes without asserting each received action
-        XCTAssertEqual(store.state.values, ["a", "b"])
+        expectNoDifference(store.state.values, ["a", "b"])
     }
 
     // MARK: TEST-09 — .dependencies trait (withDependencies)
 
-    @MainActor
-    func testDependenciesOverride() async {
+    @Test func dependenciesOverride() async {
         let store = TestStore(initialState: TSUUIDFeature.State()) {
             TSUUIDFeature()
         } withDependencies: {
@@ -399,8 +393,7 @@ final class TestStoreTests: XCTestCase {
 
     // MARK: D9 — effectDidSubscribe: Effect.run settles correctly
 
-    @MainActor
-    func testEffectDidSubscribeRun() async {
+    @Test func effectDidSubscribeRun() async {
         let store = TestStore(initialState: TSRunEffectFeature.State()) {
             TSRunEffectFeature()
         }
@@ -412,8 +405,7 @@ final class TestStoreTests: XCTestCase {
 
     // MARK: D9 — effectDidSubscribe: .merge effects all complete
 
-    @MainActor
-    func testEffectDidSubscribeMerge() async {
+    @Test func effectDidSubscribeMerge() async {
         let store = TestStore(initialState: TSMergeEffectFeature.State()) {
             TSMergeEffectFeature()
         }
@@ -423,15 +415,14 @@ final class TestStoreTests: XCTestCase {
         await store.skipReceivedActions()
         // Both merged effects should have completed (order not guaranteed per R1b Guard 4)
         let values = store.state.values
-        XCTAssertEqual(values.count, 2)
-        XCTAssertTrue(values.contains("m1"))
-        XCTAssertTrue(values.contains("m2"))
+        #expect(values.count == 2)
+        #expect(values.contains("m1"))
+        #expect(values.contains("m2"))
     }
 
     // MARK: D9 — effectDidSubscribe: .concatenate effects execute in order
 
-    @MainActor
-    func testEffectDidSubscribeConcatenate() async {
+    @Test func effectDidSubscribeConcatenate() async {
         let store = TestStore(initialState: TSConcatenateEffectFeature.State()) {
             TSConcatenateEffectFeature()
         }
@@ -446,8 +437,7 @@ final class TestStoreTests: XCTestCase {
 
     // MARK: D9 — effectDidSubscribe: .cancellable effect can be awaited
 
-    @MainActor
-    func testEffectDidSubscribeCancellable() async {
+    @Test func effectDidSubscribeCancellable() async {
         let store = TestStore(initialState: TSCancellableEffectFeature.State()) {
             TSCancellableEffectFeature()
         }
@@ -459,8 +449,7 @@ final class TestStoreTests: XCTestCase {
 
     // MARK: D9 — effectDidSubscribe: .cancel terminates in-flight effect
 
-    @MainActor
-    func testEffectDidSubscribeCancel() async {
+    @Test func effectDidSubscribeCancel() async {
         let store = TestStore(initialState: TSCancelEffectFeature.State()) {
             TSCancelEffectFeature()
         }
@@ -469,6 +458,6 @@ final class TestStoreTests: XCTestCase {
             $0.cancelled = true
         }
         // After cancel, the long-running effect should NOT complete
-        XCTAssertFalse(store.state.completed)
+        #expect(store.state.completed == false)
     }
 }

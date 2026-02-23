@@ -1,5 +1,5 @@
 import ComposableArchitecture
-import XCTest
+import Testing
 
 // MARK: - Edge Case Reducers
 
@@ -114,12 +114,12 @@ struct NonExhaustiveReceiveFeature {
 
 // MARK: - Tests
 
-final class TestStoreEdgeCaseTests: XCTestCase {
+@Suite(.serialized) @MainActor
+struct TestStoreEdgeCaseTests {
 
     // MARK: TEST-08 gap 1 — chained effects settle deterministically
 
-    @MainActor
-    func testChainedEffectsSettle() async {
+    @Test func chainedEffectsSettle() async {
         let store = TestStore(initialState: ChainFeature.State()) {
             ChainFeature()
         }
@@ -134,8 +134,7 @@ final class TestStoreEdgeCaseTests: XCTestCase {
 
     // MARK: TEST-08 gap 2 — cancelInFlight rapid re-send
 
-    @MainActor
-    func testCancelInFlightRapidResend() async {
+    @Test func cancelInFlightRapidResend() async {
         let store = TestStore(initialState: EdgeCaseCancelInFlightFeature.State()) {
             EdgeCaseCancelInFlightFeature()
         }
@@ -150,13 +149,12 @@ final class TestStoreEdgeCaseTests: XCTestCase {
         }
         // Skip any pending actions and verify only last result arrived
         await store.skipReceivedActions()
-        XCTAssertEqual(store.state.result, "result-2")
+        #expect(store.state.result == "result-2")
     }
 
     // MARK: TEST-08 gap 3 — finish() with slow effect
 
-    @MainActor
-    func testFinishWithSlowEffect() async {
+    @Test func finishWithSlowEffect() async {
         let store = TestStore(initialState: SlowEffectFeature.State()) {
             SlowEffectFeature()
         }
@@ -169,8 +167,7 @@ final class TestStoreEdgeCaseTests: XCTestCase {
 
     // MARK: TEST-08 gap 4 — non-exhaustive receive with .off
 
-    @MainActor
-    func testNonExhaustiveReceiveOff() async {
+    @Test func nonExhaustiveReceiveOff() async {
         let store = TestStore(initialState: NonExhaustiveReceiveFeature.State()) {
             NonExhaustiveReceiveFeature()
         }
