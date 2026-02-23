@@ -20,6 +20,10 @@ struct ContactsFeature {
     @ObservableState
     struct State: Equatable {
         var contacts: IdentifiedArrayOf<Contact> = []
+        // TODO: ANDROID - StackState path binding is silently unused on Android.
+        // NavigationStack does not bind the path on this platform (see ContactsView
+        // #if os(Android) branch which uses plain NavigationStack without path:).
+        // Implement path binding in skip-ui or use a platform-appropriate navigation pattern.
         var path = StackState<ContactsFeaturePath.State>()
         @Presents var destination: Destination.State?
     }
