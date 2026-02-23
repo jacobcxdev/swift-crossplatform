@@ -11,7 +11,7 @@ struct AsyncFeature {
         var loadingComplete = false
         var count = 0
     }
-    enum Action: Equatable {
+    enum Action {
         case startLoading
         case loadingFinished
         case increment
@@ -39,7 +39,7 @@ struct BindingExtFeature {
         var text = ""
         var isOn = false
     }
-    enum Action: BindableAction, Equatable {
+    enum Action: BindableAction {
         case binding(BindingAction<State>)
     }
     var body: some ReducerOf<Self> {
@@ -60,7 +60,7 @@ struct NestedObservableFeature {
     struct ChildModel: Equatable {
         var value = 0
     }
-    enum Action: Equatable {
+    enum Action {
         case setChildValue(Int)
         case setParentName(String)
     }
@@ -86,7 +86,7 @@ struct FormFeature {
         var buttonBTapped = false
         var buttonCTapped = false
     }
-    enum Action: Equatable {
+    enum Action {
         case tapA
         case tapB
         case tapC
@@ -109,26 +109,51 @@ struct FormFeature {
 }
 
 @Reducer
+struct SheetContent {
+    @ObservableState
+    struct State: Equatable {
+        var count = 0
+    }
+    enum Action {
+        case increment
+    }
+    var body: some ReducerOf<Self> {
+        Reduce { state, action in
+            switch action {
+            case .increment:
+                state.count += 1
+                return .none
+            }
+        }
+    }
+}
+
+@Reducer
 struct SheetToggleFeature {
     @ObservableState
     struct State: Equatable {
-        var showSheet = false
-        var sheetCount = 0
+        @Presents var sheet: SheetContent.State?
     }
-    enum Action: Equatable {
+    enum Action {
         case toggleSheet
-        case incrementInSheet
+        case sheet(PresentationAction<SheetContent.Action>)
     }
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case .toggleSheet:
-                state.showSheet.toggle()
+                if state.sheet != nil {
+                    state.sheet = nil
+                } else {
+                    state.sheet = SheetContent.State()
+                }
                 return .none
-            case .incrementInSheet:
-                state.sheetCount += 1
+            case .sheet:
                 return .none
             }
+        }
+        .ifLet(\.$sheet, action: \.sheet) {
+            SheetContent()
         }
     }
 }
@@ -147,7 +172,7 @@ struct UIPatternTests {
         }
 
         await store.send(.startLoading)
-        await store.receive(.loadingFinished) {
+        await store.receive(\.loadingFinished) {
             $0.loadingComplete = true
         }
     }
@@ -247,11 +272,11 @@ struct UIPatternTests {
             SheetToggleFeature()
         }
 
-        // Toggle on
-        await store.send(.toggleSheet) { $0.showSheet = true }
+        // Present sheet
+        await store.send(.toggleSheet) { $0.sheet = SheetContent.State() }
 
-        // Toggle off
-        await store.send(.toggleSheet) { $0.showSheet = false }
+        // Dismiss sheet
+        await store.send(.toggleSheet) { $0.sheet = nil }
     }
 
     @Test
@@ -260,15 +285,14 @@ struct UIPatternTests {
             SheetToggleFeature()
         }
 
-        // Toggle sheet on
-        await store.send(.toggleSheet) { $0.showSheet = true }
+        // Present sheet
+        await store.send(.toggleSheet) { $0.sheet = SheetContent.State() }
 
         // Interact with content while sheet is showing
-        await store.send(.incrementInSheet) { $0.sheetCount = 1 }
+        await store.send(.sheet(.presented(.increment))) { $0.sheet?.count = 1 }
 
-        // Toggle sheet off — state persists
-        await store.send(.toggleSheet) { $0.showSheet = false }
-        #expect(store.state.sheetCount == 1)
+        // Dismiss sheet
+        await store.send(.toggleSheet) { $0.sheet = nil }
     }
 
     // MARK: - .task Modifier Pattern (UI-06)
@@ -285,7 +309,7 @@ struct UIPatternTests {
         // send the action that triggers async work
         await store.send(.startLoading)
         // receive the result — proves async effect completes (task lifecycle)
-        await store.receive(.loadingFinished) {
+        await store.receive(\.loadingFinished) {
             $0.loadingComplete = true
         }
     }
