@@ -1,5 +1,7 @@
 import ComposableArchitecture
-import XCTest
+import CustomDump
+import Foundation
+import Testing
 
 // MARK: - Test Reducers
 
@@ -187,99 +189,93 @@ struct SyncEffectFeature {
 
 // MARK: - Tests
 
-final class StoreReducerTests: XCTestCase {
+@Suite(.serialized) @MainActor
+struct StoreReducerTests {
 
     // MARK: TCA-01: Store initializes with correct state
 
-    @MainActor
-    func testStoreInitialState() {
+    @Test func storeInitialState() {
         let store = Store(initialState: Counter.State(count: 42)) {
             Counter()
         }
-        XCTAssertEqual(store.withState(\.count), 42)
+        #expect(store.withState(\.count) == 42)
     }
 
     // MARK: TCA-02: Store init with dependency override
 
-    @MainActor
-    func testStoreInitWithDependencies() {
+    @Test func storeInitWithDependencies() {
         let store = Store(initialState: UUIDFeature.State()) {
             UUIDFeature()
         } withDependencies: {
             $0.uuid = .incrementing
         }
         store.send(.generate)
-        XCTAssertEqual(
-            store.withState(\.lastID),
+        #expect(
+            store.withState(\.lastID) ==
             UUID(uuidString: "00000000-0000-0000-0000-000000000000")!.uuidString
         )
     }
 
     // MARK: TCA-03: store.send returns StoreTask
 
-    @MainActor
-    func testStoreSendReturnsStoreTask() async {
+    @Test func storeSendReturnsStoreTask() async {
         let store = Store(initialState: Counter.State()) {
             Counter()
         }
         let task = store.send(.increment)
-        XCTAssertEqual(store.withState(\.count), 1)
+        #expect(store.withState(\.count) == 1)
         await task.finish()
     }
 
     // MARK: TCA-04: Store scope derives child store
 
-    @MainActor
-    func testStoreScopeDerivesChildStore() {
+    @Test func storeScopeDerivesChildStore() {
         let parentStore = Store(initialState: Parent.State()) {
             Parent()
         }
         let childStore = parentStore.scope(state: \.child, action: \.child)
         childStore.send(.increment)
-        XCTAssertEqual(parentStore.withState(\.child.count), 1)
-        XCTAssertEqual(childStore.withState(\.count), 1)
+        #expect(parentStore.withState(\.child.count) == 1)
+        #expect(childStore.withState(\.count) == 1)
     }
 
     // MARK: TCA-05: Scope reducer composition
 
-    @MainActor
-    func testScopeReducer() {
+    @Test func scopeReducer() {
         let store = Store(initialState: Parent.State()) {
             Parent()
         }
         store.send(.child(.increment))
-        XCTAssertEqual(store.withState(\.child.count), 1)
+        #expect(store.withState(\.child.count) == 1)
         store.send(.child(.decrement))
-        XCTAssertEqual(store.withState(\.child.count), 0)
+        #expect(store.withState(\.child.count) == 0)
     }
 
     // MARK: TCA-06: ifLet reducer composition
 
-    @MainActor
-    func testIfLetReducer() {
+    @Test func ifLetReducer() {
         let store = Store(initialState: OptionalChild.State()) {
             OptionalChild()
         }
         // detail starts nil
-        XCTAssertNil(store.withState(\.detail))
+        #expect(store.withState(\.detail) == nil)
 
         // set detail to non-nil
         store.send(.setDetail(true))
-        XCTAssertEqual(store.withState(\.detail), Counter.State(count: 0))
+        #expect(store.withState(\.detail) == Counter.State(count: 0))
 
         // now child action should update
         store.send(.detail(.increment))
-        XCTAssertEqual(store.withState(\.detail), Counter.State(count: 1))
+        #expect(store.withState(\.detail) == Counter.State(count: 1))
 
         // nil it out
         store.send(.setDetail(false))
-        XCTAssertNil(store.withState(\.detail))
+        #expect(store.withState(\.detail) == nil)
     }
 
     // MARK: TCA-07: forEach reducer composition
 
-    @MainActor
-    func testForEachReducer() {
+    @Test func forEachReducer() {
         let id1 = UUID()
         let id2 = UUID()
         let store = Store(
@@ -292,59 +288,55 @@ final class StoreReducerTests: XCTestCase {
         }
 
         store.send(.items(.element(id: id1, action: .increment)))
-        XCTAssertEqual(store.withState(\.items[id: id1]?.value), 1)
-        XCTAssertEqual(store.withState(\.items[id: id2]?.value), 10)
+        #expect(store.withState(\.items[id: id1]?.value) == 1)
+        #expect(store.withState(\.items[id: id2]?.value) == 10)
     }
 
     // MARK: TCA-08: ifCaseLet reducer composition
 
-    @MainActor
-    func testIfCaseLetReducer() {
+    @Test func ifCaseLetReducer() {
         // When in the correct case, child reducer runs
         let store = Store(initialState: EnumFeature.State.loaded(Counter.State(count: 5))) {
             EnumFeature()
         }
         store.send(.loaded(.increment))
-        XCTAssertEqual(store.withState(\.[case: \.loaded]?.count), 6)
+        #expect(store.withState(\.[case: \.loaded]?.count) == 6)
 
         // Verify the loaded case is still active
         store.send(.loaded(.decrement))
-        XCTAssertEqual(store.withState(\.[case: \.loaded]?.count), 5)
+        #expect(store.withState(\.[case: \.loaded]?.count) == 5)
     }
 
     // MARK: TCA-09: CombineReducers composition
 
-    @MainActor
-    func testCombineReducers() {
+    @Test func combineReducers() {
         let store = Store(initialState: Combined.State()) {
             Combined()
         }
         store.send(.increment)
-        XCTAssertEqual(store.withState(\.count), 1)
-        XCTAssertEqual(store.withState(\.log), ["logged"])
+        #expect(store.withState(\.count) == 1)
+        expectNoDifference(store.withState(\.log), ["logged"])
     }
 
     // MARK: TCA-16: Effect.send synchronous dispatch
 
-    @MainActor
-    func testEffectSend() async {
+    @Test func effectSend() async {
         let store = Store(initialState: SyncEffectFeature.State()) {
             SyncEffectFeature()
         }
         let task = store.send(.tap)
         await task.finish()
-        XCTAssertEqual(store.withState(\.count), 1)
-        XCTAssertEqual(store.withState(\.doubled), true)
+        #expect(store.withState(\.count) == 1)
+        #expect(store.withState(\.doubled) == true)
     }
 
     // MARK: withState reads correctly
 
-    @MainActor
-    func testStoreWithState() {
+    @Test func storeWithState() {
         let store = Store(initialState: Counter.State(count: 99)) {
             Counter()
         }
         let result = store.withState { $0.count }
-        XCTAssertEqual(result, 99)
+        #expect(result == 99)
     }
 }

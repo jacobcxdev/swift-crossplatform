@@ -1,5 +1,6 @@
+import Foundation
 import Sharing
-import XCTest
+import Testing
 
 // MARK: - File-scope types (macros can't attach to local types)
 
@@ -12,138 +13,137 @@ struct TestSettings: Codable, Equatable, Sendable {
 
 // MARK: - Tests
 
-final class SharedPersistenceTests: XCTestCase {
+@Suite(.serialized) @MainActor
+struct SharedPersistenceTests {
 
     // MARK: SHR-01 — AppStorage round-trips for each supported type
 
-    @MainActor func testAppStorageBool() {
+    @Test func appStorageBool() {
         @Shared(.appStorage("shr01_bool")) var value = false
         $value.withLock { $0 = true }
-        XCTAssertEqual(value, true)
+        #expect(value == true)
     }
 
-    @MainActor func testAppStorageInt() {
+    @Test func appStorageInt() {
         @Shared(.appStorage("shr01_int")) var value = 0
         $value.withLock { $0 = 42 }
-        XCTAssertEqual(value, 42)
+        #expect(value == 42)
     }
 
-    @MainActor func testAppStorageDouble() {
+    @Test func appStorageDouble() {
         @Shared(.appStorage("shr01_double")) var value = 0.0
         $value.withLock { $0 = 3.14 }
-        XCTAssertEqual(value, 3.14, accuracy: 0.001)
+        #expect(abs(value - 3.14) < 0.001)
     }
 
-    @MainActor func testAppStorageString() {
+    @Test func appStorageString() {
         @Shared(.appStorage("shr01_string")) var value = ""
         $value.withLock { $0 = "hello" }
-        XCTAssertEqual(value, "hello")
+        #expect(value == "hello")
     }
 
-    @MainActor func testAppStorageData() {
+    @Test func appStorageData() {
         @Shared(.appStorage("shr01_data")) var value = Data()
         let testData = Data("hello".utf8)
         $value.withLock { $0 = testData }
-        XCTAssertEqual(value, testData)
+        #expect(value == testData)
     }
 
-    @MainActor func testAppStorageURL() {
+    @Test func appStorageURL() {
         @Shared(.appStorage("shr01_url")) var value: URL = URL(string: "https://example.com")!
         let newURL = URL(string: "https://updated.com")!
         $value.withLock { $0 = newURL }
-        XCTAssertEqual(value, newURL)
+        #expect(value == newURL)
     }
 
-    @MainActor func testAppStorageDate() {
+    @Test func appStorageDate() {
         let now = Date()
         @Shared(.appStorage("shr01_date")) var value: Date = .distantPast
         $value.withLock { $0 = now }
-        XCTAssertEqual(value.timeIntervalSince1970, now.timeIntervalSince1970, accuracy: 0.001)
+        #expect(abs(value.timeIntervalSince1970 - now.timeIntervalSince1970) < 0.001)
     }
 
-    @MainActor func testAppStorageRawRepresentable() {
+    @Test func appStorageRawRepresentable() {
         @Shared(.appStorage("shr01_theme")) var value: Theme = .light
         $value.withLock { $0 = .dark }
-        XCTAssertEqual(value, .dark)
+        #expect(value == .dark)
     }
 
     // MARK: SHR-01 — AppStorage optional nil/non-nil
 
-    @MainActor func testAppStorageOptionalNil() {
+    @Test func appStorageOptionalNil() {
         @Shared(.appStorage("shr01_optInt")) var value: Int?
-        XCTAssertNil(value)
+        #expect(value == nil)
         $value.withLock { $0 = 42 }
-        XCTAssertEqual(value, 42)
+        #expect(value == 42)
         $value.withLock { $0 = nil }
-        XCTAssertNil(value)
+        #expect(value == nil)
     }
 
     // MARK: SHR-01 edge cases
 
-    @MainActor func testAppStorageLargeData() {
+    @Test func appStorageLargeData() {
         let largeBlob = Data(repeating: 0xAB, count: 1_048_576) // 1 MB
         @Shared(.appStorage("shr01_largeData")) var value = Data()
         $value.withLock { $0 = largeBlob }
-        XCTAssertEqual(value, largeBlob)
+        #expect(value == largeBlob)
     }
 
-    @MainActor func testAppStorageUnicodeString() {
+    @Test func appStorageUnicodeString() {
         @Shared(.appStorage("shr01_unicode")) var value = ""
         $value.withLock { $0 = "Hello \u{1F30D} \u{65E5}\u{672C}\u{8A9E} \u{627F}\u{631}\u{628}\u{6CC}\u{647}" }
-        XCTAssertEqual(value, "Hello \u{1F30D} \u{65E5}\u{672C}\u{8A9E} \u{627F}\u{631}\u{628}\u{6CC}\u{647}")
+        #expect(value == "Hello \u{1F30D} \u{65E5}\u{672C}\u{8A9E} \u{627F}\u{631}\u{628}\u{6CC}\u{647}")
     }
 
-    @MainActor func testAppStorageConcurrentAccess() async {
+    @Test func appStorageConcurrentAccess() async {
         @Shared(.appStorage("shr01_concurrent")) var value = 0
         for _ in 0..<10 {
             $value.withLock { $0 += 1 }
         }
-        XCTAssertEqual(value, 10)
+        #expect(value == 10)
     }
 
     // MARK: SHR-02 — FileStorage round-trip
 
-    @MainActor func testFileStorageRoundTrip() throws {
+    @Test func fileStorageRoundTrip() throws {
         let tempURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("test-\(UUID()).json")
+        defer { try? FileManager.default.removeItem(at: tempURL) }
         @Shared(.fileStorage(tempURL)) var settings = TestSettings()
         $settings.withLock { $0.name = "updated"; $0.count = 42 }
         // FileStorage debounces writes — verify in-memory state is correct immediately
-        XCTAssertEqual(settings.name, "updated")
-        XCTAssertEqual(settings.count, 42)
-        addTeardownBlock {
-            try? FileManager.default.removeItem(at: tempURL)
-        }
+        #expect(settings.name == "updated")
+        #expect(settings.count == 42)
     }
 
     // MARK: SHR-03 — InMemory sharing across references
 
-    @MainActor func testInMemorySharing() {
+    @Test func inMemorySharing() {
         @Shared(.inMemory("shr03_counter")) var ref1 = 0
         @Shared(.inMemory("shr03_counter")) var ref2 = 0
         $ref1.withLock { $0 = 42 }
-        XCTAssertEqual(ref2, 42)
+        #expect(ref2 == 42)
     }
 
-    @MainActor func testInMemoryCrossFeature() {
+    @Test func inMemoryCrossFeature() {
         @Shared(.inMemory("shr03_token")) var token1 = ""
         @Shared(.inMemory("shr03_token")) var token2 = ""
         $token1.withLock { $0 = "abc" }
-        XCTAssertEqual(token2, "abc")
+        #expect(token2 == "abc")
     }
 
     // MARK: SHR-04 — Default value
 
-    @MainActor func testSharedKeyDefaultValue() {
+    @Test func sharedKeyDefaultValue() {
         @Shared(.appStorage("shr04_default")) var value: String = "defaultValue"
-        XCTAssertEqual(value, "defaultValue")
+        #expect(value == "defaultValue")
     }
 
     // MARK: SHR-14 — Custom SharedKey (using inMemory as proxy)
 
-    @MainActor func testCustomSharedKeyCompiles() {
+    @Test func customSharedKeyCompiles() {
         @Shared(.inMemory("shr14_custom")) var value = "initial"
         $value.withLock { $0 = "custom" }
-        XCTAssertEqual(value, "custom")
+        #expect(value == "custom")
     }
 }

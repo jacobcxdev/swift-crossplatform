@@ -1,5 +1,5 @@
-import XCTest
 import SQLiteData
+import Testing
 
 // MARK: - @Table models (must be file-scope for macro expansion)
 
@@ -30,9 +30,8 @@ struct ItemSummary: Equatable {
 
 // MARK: - Test Suite
 
-// TODO: Wave 4 — Migrate to Swift Testing @Suite with .dependencies { try $0.bootstrapDatabase() } trait
-// This will replace the manual makeDatabase() helper with consistent bootstrap.
-final class StructuredQueriesTests: XCTestCase {
+@Suite(.serialized)
+struct StructuredQueriesTests {
 
     // MARK: - Helpers
 
@@ -90,19 +89,19 @@ final class StructuredQueriesTests: XCTestCase {
 
     // MARK: - SQL-01: @Table macro generates metadata
 
-    func testTableMacro() {
+    @Test func tableMacro() {
         // @Table generates tableName and column accessors
-        XCTAssertEqual(Item.tableName, "items")
-        XCTAssertEqual(Category.tableName, "categories")
+        #expect(Item.tableName == "items")
+        #expect(Category.tableName == "categories")
 
         // Verify the table can produce a valid SELECT query
         let query = Item.all.query
-        XCTAssertFalse(query.isEmpty, "@Table should generate a valid query")
+        #expect(!query.isEmpty, "@Table should generate a valid query")
     }
 
     // MARK: - SQL-02: @Column(primaryKey:) -- auto-increment
 
-    func testColumnPrimaryKey() throws {
+    @Test func columnPrimaryKey() throws {
         let dbQueue = try makeDatabase()
         try dbQueue.write { db in
             // Insert without explicit id -- auto-increment should assign ids
@@ -114,17 +113,17 @@ final class StructuredQueriesTests: XCTestCase {
             }.execute(db)
 
             let items = try Item.all.order(by: \.id).fetchAll(db)
-            XCTAssertEqual(items.count, 2)
-            XCTAssertEqual(items[0].id, 1)
-            XCTAssertEqual(items[0].name, "first")
-            XCTAssertEqual(items[1].id, 2)
-            XCTAssertEqual(items[1].name, "second")
+            #expect(items.count == 2)
+            #expect(items[0].id == 1)
+            #expect(items[0].name == "first")
+            #expect(items[1].id == 2)
+            #expect(items[1].name == "second")
         }
     }
 
     // MARK: - SQL-03: @Column(as:) -- custom column representation
 
-    func testColumnCustomRepresentation() throws {
+    @Test func columnCustomRepresentation() throws {
         let dbQueue = try makeDatabase()
         try dbQueue.write { db in
             try seedAll(db)
@@ -140,15 +139,15 @@ final class StructuredQueriesTests: XCTestCase {
                 as: ItemSummary.self
             ).fetchAll(db)
 
-            XCTAssertEqual(results.count, 2)
-            XCTAssertEqual(results[0], ItemSummary(isActive: false, itemCount: 2))
-            XCTAssertEqual(results[1], ItemSummary(isActive: true, itemCount: 3))
+            #expect(results.count == 2)
+            #expect(results[0] == ItemSummary(isActive: false, itemCount: 2))
+            #expect(results[1] == ItemSummary(isActive: true, itemCount: 3))
         }
     }
 
     // MARK: - SQL-04: @Selection multi-column grouping
 
-    func testSelectionTypeComposition() throws {
+    @Test func selectionTypeComposition() throws {
         let dbQueue = try makeDatabase()
         try dbQueue.write { db in
             try seedAll(db)
@@ -163,19 +162,19 @@ final class StructuredQueriesTests: XCTestCase {
                 as: ItemSummary.self
             ).fetchAll(db)
 
-            XCTAssertEqual(results.count, 2)
+            #expect(results.count == 2)
             // false group: gamma, epsilon
-            XCTAssertEqual(results[0].isActive, false)
-            XCTAssertEqual(results[0].itemCount, 2)
+            #expect(results[0].isActive == false)
+            #expect(results[0].itemCount == 2)
             // true group: alpha, beta, delta
-            XCTAssertEqual(results[1].isActive, true)
-            XCTAssertEqual(results[1].itemCount, 3)
+            #expect(results[1].isActive == true)
+            #expect(results[1].itemCount == 3)
         }
     }
 
     // MARK: - SQL-05: Select specific columns
 
-    func testSelectColumns() throws {
+    @Test func selectColumns() throws {
         let dbQueue = try makeDatabase()
         try dbQueue.write { db in
             try seedAll(db)
@@ -184,17 +183,17 @@ final class StructuredQueriesTests: XCTestCase {
                 .order(by: \.id)
                 .fetchAll(db)
 
-            XCTAssertEqual(results.count, 5)
-            XCTAssertEqual(results[0].0, "alpha")
-            XCTAssertEqual(results[0].1, 5)
-            XCTAssertEqual(results[2].0, "gamma")
-            XCTAssertEqual(results[2].1, 25)
+            #expect(results.count == 5)
+            #expect(results[0].0 == "alpha")
+            #expect(results[0].1 == 5)
+            #expect(results[2].0 == "gamma")
+            #expect(results[2].1 == 25)
         }
     }
 
     // MARK: - SQL-06: Where predicates
 
-    func testWherePredicates() throws {
+    @Test func wherePredicates() throws {
         let dbQueue = try makeDatabase()
         try dbQueue.write { db in
             try seedAll(db)
@@ -203,29 +202,29 @@ final class StructuredQueriesTests: XCTestCase {
                 .order(by: \.id)
                 .fetchAll(db)
 
-            XCTAssertEqual(results.count, 1)
-            XCTAssertEqual(results[0].name, "beta")
-            XCTAssertEqual(results[0].value, 15)
+            #expect(results.count == 1)
+            #expect(results[0].name == "beta")
+            #expect(results[0].value == 15)
         }
     }
 
     // MARK: - SQL-07: Find by ID
 
-    func testFindById() throws {
+    @Test func findById() throws {
         let dbQueue = try makeDatabase()
         try dbQueue.write { db in
             try seedAll(db)
 
             let results = try Item.find(1).fetchAll(db)
-            XCTAssertEqual(results.count, 1)
-            XCTAssertEqual(results[0].id, 1)
-            XCTAssertEqual(results[0].name, "alpha")
+            #expect(results.count == 1)
+            #expect(results[0].id == 1)
+            #expect(results[0].name == "alpha")
         }
     }
 
     // MARK: - SQL-08: Where IN operator
 
-    func testWhereInOperator() throws {
+    @Test func whereInOperator() throws {
         let dbQueue = try makeDatabase()
         try dbQueue.write { db in
             try seedAll(db)
@@ -234,15 +233,15 @@ final class StructuredQueriesTests: XCTestCase {
                 .order(by: \.name)
                 .fetchAll(db)
 
-            XCTAssertEqual(results.count, 2)
-            XCTAssertEqual(results[0].name, "alpha")
-            XCTAssertEqual(results[1].name, "gamma")
+            #expect(results.count == 2)
+            #expect(results[0].name == "alpha")
+            #expect(results[1].name == "gamma")
         }
     }
 
     // MARK: - SQL-09: Join operations
 
-    func testJoinOperations() throws {
+    @Test func joinOperations() throws {
         let dbQueue = try makeDatabase()
         try dbQueue.write { db in
             try seedAll(db)
@@ -254,11 +253,11 @@ final class StructuredQueriesTests: XCTestCase {
                 .select { ($0.name, $1.name) }
                 .fetchAll(db)
 
-            XCTAssertEqual(innerResults.count, 4) // epsilon has no category
-            XCTAssertEqual(innerResults[0].0, "alpha")
-            XCTAssertEqual(innerResults[0].1, "Tools")
-            XCTAssertEqual(innerResults[2].0, "gamma")
-            XCTAssertEqual(innerResults[2].1, "Gadgets")
+            #expect(innerResults.count == 4) // epsilon has no category
+            #expect(innerResults[0].0 == "alpha")
+            #expect(innerResults[0].1 == "Tools")
+            #expect(innerResults[2].0 == "gamma")
+            #expect(innerResults[2].1 == "Gadgets")
 
             // Left join -- all items, categories nullable
             let leftResults = try Item
@@ -267,9 +266,9 @@ final class StructuredQueriesTests: XCTestCase {
                 .select { ($0.name, $1.name) }
                 .fetchAll(db)
 
-            XCTAssertEqual(leftResults.count, 5)
-            XCTAssertEqual(leftResults[4].0, "epsilon")
-            XCTAssertNil(leftResults[4].1) // no category
+            #expect(leftResults.count == 5)
+            #expect(leftResults[4].0 == "epsilon")
+            #expect(leftResults[4].1 == nil) // no category
 
             // Right join -- all categories, items nullable
             let rightResults = try Item
@@ -278,10 +277,10 @@ final class StructuredQueriesTests: XCTestCase {
                 .fetchAll(db)
 
             // Both categories have items, so right join returns all category rows
-            XCTAssertGreaterThanOrEqual(rightResults.count, 2)
+            #expect(rightResults.count >= 2)
             // Verify at least one category name appears
-            XCTAssertTrue(rightResults.contains(where: { $0.1 == "Tools" }))
-            XCTAssertTrue(rightResults.contains(where: { $0.1 == "Gadgets" }))
+            #expect(rightResults.contains(where: { $0.1 == "Tools" }))
+            #expect(rightResults.contains(where: { $0.1 == "Gadgets" }))
 
             // Full join -- all rows from both sides
             let fullResults = try Item
@@ -290,13 +289,13 @@ final class StructuredQueriesTests: XCTestCase {
                 .fetchAll(db)
 
             // Full join includes epsilon (no category) + all category-matched items
-            XCTAssertGreaterThanOrEqual(fullResults.count, 5)
+            #expect(fullResults.count >= 5)
         }
     }
 
     // MARK: - SQL-10: Order by (asc, desc, collation)
 
-    func testOrderBy() throws {
+    @Test func orderBy() throws {
         let dbQueue = try makeDatabase()
         try dbQueue.write { db in
             try seedAll(db)
@@ -305,13 +304,13 @@ final class StructuredQueriesTests: XCTestCase {
             let ascResults = try Item.select(\.name)
                 .order(by: \.name)
                 .fetchAll(db)
-            XCTAssertEqual(ascResults, ["alpha", "beta", "delta", "epsilon", "gamma"])
+            #expect(ascResults == ["alpha", "beta", "delta", "epsilon", "gamma"])
 
             // Descending order by name
             let descResults = try Item.select(\.name)
                 .order { $0.name.desc() }
                 .fetchAll(db)
-            XCTAssertEqual(descResults, ["gamma", "epsilon", "delta", "beta", "alpha"])
+            #expect(descResults == ["gamma", "epsilon", "delta", "beta", "alpha"])
         }
 
         // Case-insensitive collation ordering
@@ -328,13 +327,13 @@ final class StructuredQueriesTests: XCTestCase {
             let collateResults = try Item.select(\.name)
                 .order { $0.name.collate(.nocase) }
                 .fetchAll(db)
-            XCTAssertEqual(collateResults, ["apple", "Banana", "Cherry"])
+            #expect(collateResults == ["apple", "Banana", "Cherry"])
         }
     }
 
     // MARK: - SQL-11: Group by with aggregations
 
-    func testGroupByAggregation() throws {
+    @Test func groupByAggregation() throws {
         let dbQueue = try makeDatabase()
         try dbQueue.write { db in
             try seedAll(db)
@@ -346,11 +345,11 @@ final class StructuredQueriesTests: XCTestCase {
                 .order(by: \.isActive)
                 .fetchAll(db)
 
-            XCTAssertEqual(countResults.count, 2)
-            XCTAssertEqual(countResults[0].0, false) // inactive
-            XCTAssertEqual(countResults[0].1, 2)     // gamma, epsilon
-            XCTAssertEqual(countResults[1].0, true)  // active
-            XCTAssertEqual(countResults[1].1, 3)     // alpha, beta, delta
+            #expect(countResults.count == 2)
+            #expect(countResults[0].0 == false) // inactive
+            #expect(countResults[0].1 == 2)     // gamma, epsilon
+            #expect(countResults[1].0 == true)  // active
+            #expect(countResults[1].1 == 3)     // alpha, beta, delta
 
             // Sum of values per group
             let sumResults = try Item
@@ -359,8 +358,8 @@ final class StructuredQueriesTests: XCTestCase {
                 .order(by: \.isActive)
                 .fetchAll(db)
 
-            XCTAssertEqual(sumResults[0].1, 55)  // gamma(25) + epsilon(30)
-            XCTAssertEqual(sumResults[1].1, 30)  // alpha(5) + beta(15) + delta(10)
+            #expect(sumResults[0].1 == 55)  // gamma(25) + epsilon(30)
+            #expect(sumResults[1].1 == 30)  // alpha(5) + beta(15) + delta(10)
 
             // Avg of values per group
             let avgResults = try Item
@@ -369,21 +368,21 @@ final class StructuredQueriesTests: XCTestCase {
                 .order(by: \.isActive)
                 .fetchAll(db)
 
-            XCTAssertEqual(avgResults[0].1, 27.5) // (25+30)/2
-            XCTAssertEqual(avgResults[1].1, 10.0) // (5+15+10)/3
+            #expect(avgResults[0].1 == 27.5) // (25+30)/2
+            #expect(avgResults[1].1 == 10.0) // (5+15+10)/3
 
             // Min and max
             let minResult = try Item.select { $0.value.min() }.fetchAll(db)
-            XCTAssertEqual(minResult.first, 5)
+            #expect(minResult.first == 5)
 
             let maxResult = try Item.select { $0.value.max() }.fetchAll(db)
-            XCTAssertEqual(maxResult.first, 30)
+            #expect(maxResult.first == 30)
         }
     }
 
     // MARK: - SQL-12: Limit and offset
 
-    func testLimitOffset() throws {
+    @Test func limitOffset() throws {
         let dbQueue = try makeDatabase()
         try dbQueue.write { db in
             try seedAll(db)
@@ -393,15 +392,15 @@ final class StructuredQueriesTests: XCTestCase {
                 .limit(2, offset: 1)
                 .fetchAll(db)
 
-            XCTAssertEqual(results.count, 2)
-            XCTAssertEqual(results[0], "beta")   // id=2
-            XCTAssertEqual(results[1], "gamma")  // id=3
+            #expect(results.count == 2)
+            #expect(results[0] == "beta")   // id=2
+            #expect(results[1] == "gamma")  // id=3
         }
     }
 
     // MARK: - SQL-13: Insert and upsert
 
-    func testInsertAndUpsert() throws {
+    @Test func insertAndUpsert() throws {
         let dbQueue = try makeDatabase()
         try dbQueue.write { db in
             try seedCategories(db)
@@ -412,9 +411,9 @@ final class StructuredQueriesTests: XCTestCase {
             }.execute(db)
 
             let items = try Item.all.fetchAll(db)
-            XCTAssertEqual(items.count, 1)
-            XCTAssertEqual(items[0].name, "newItem")
-            XCTAssertEqual(items[0].value, 42)
+            #expect(items.count == 1)
+            #expect(items[0].name == "newItem")
+            #expect(items[0].value == 42)
 
             // Upsert -- insert new row (no conflict)
             try Item.upsert {
@@ -422,8 +421,8 @@ final class StructuredQueriesTests: XCTestCase {
             }.execute(db)
 
             let allItems = try Item.all.order(by: \.id).fetchAll(db)
-            XCTAssertEqual(allItems.count, 2)
-            XCTAssertEqual(allItems[1].name, "upserted")
+            #expect(allItems.count == 2)
+            #expect(allItems[1].name == "upserted")
 
             // Upsert -- conflict on existing id updates the row
             let existingId = allItems[0].id
@@ -432,14 +431,14 @@ final class StructuredQueriesTests: XCTestCase {
             }.execute(db)
 
             let updated = try Item.find(existingId).fetchAll(db)
-            XCTAssertEqual(updated.first?.name, "updated")
-            XCTAssertEqual(updated.first?.value, 100)
+            #expect(updated.first?.name == "updated")
+            #expect(updated.first?.value == 100)
         }
     }
 
     // MARK: - SQL-14: Update and delete
 
-    func testUpdateAndDelete() throws {
+    @Test func updateAndDelete() throws {
         let dbQueue = try makeDatabase()
         try dbQueue.write { db in
             try seedAll(db)
@@ -452,22 +451,22 @@ final class StructuredQueriesTests: XCTestCase {
             let highValue = try Item.where { $0.value.eq(999) }
                 .order(by: \.id)
                 .fetchAll(db)
-            XCTAssertEqual(highValue.count, 2) // gamma(25), epsilon(30) -> both 999
-            XCTAssertEqual(highValue[0].name, "gamma")
-            XCTAssertEqual(highValue[1].name, "epsilon")
+            #expect(highValue.count == 2) // gamma(25), epsilon(30) -> both 999
+            #expect(highValue[0].name == "gamma")
+            #expect(highValue[1].name == "epsilon")
 
             // Delete: remove item with id=1
             try Item.find(1).delete().execute(db)
 
             let remaining = try Item.all.fetchAll(db)
-            XCTAssertEqual(remaining.count, 4) // was 5, removed 1
-            XCTAssertFalse(remaining.contains(where: { $0.id == 1 }))
+            #expect(remaining.count == 4) // was 5, removed 1
+            #expect(!remaining.contains(where: { $0.id == 1 }))
         }
     }
 
     // MARK: - SQL-15: #sql macro for safe interpolation
 
-    func testSqlMacro() throws {
+    @Test func sqlMacro() throws {
         let dbQueue = try makeDatabase()
         try dbQueue.write { db in
             try seedAll(db)
@@ -482,10 +481,10 @@ final class StructuredQueriesTests: XCTestCase {
                 as: Item.self
             ).fetchAll(db)
 
-            XCTAssertEqual(results.count, 3) // beta(15), gamma(25), epsilon(30)
-            XCTAssertEqual(results[0].name, "beta")
-            XCTAssertEqual(results[1].name, "gamma")
-            XCTAssertEqual(results[2].name, "epsilon")
+            #expect(results.count == 3) // beta(15), gamma(25), epsilon(30)
+            #expect(results[0].name == "beta")
+            #expect(results[1].name == "gamma")
+            #expect(results[2].name == "epsilon")
         }
     }
 }

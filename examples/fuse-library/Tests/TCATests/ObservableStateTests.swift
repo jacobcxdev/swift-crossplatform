@@ -1,5 +1,6 @@
 import ComposableArchitecture
-import XCTest
+import Foundation
+import Testing
 
 // MARK: - Test Reducers (file scope — macros can't attach to local types)
 
@@ -228,45 +229,43 @@ struct ViewActionFeature {
 
 // MARK: - Tests
 
-final class ObservableStateTests: XCTestCase {
+@Suite(.serialized) @MainActor
+struct ObservableStateTests {
 
     // MARK: TCA-17: @ObservableState _$id changes on mutation
 
-    @MainActor
-    func testObservableStateIdentity() {
+    @Test func observableStateIdentity() {
         // _$willModify() updates the _$id by generating a new UUID for the location.
         // After copy, the two states share storage (CoW). Calling _$willModify on one
         // triggers CoW and assigns a new UUID, making the IDs diverge.
         var state = ObservableFeature.State()
         let snapshot = state  // CoW copy — shares storage reference
-        XCTAssertTrue(_$isIdentityEqual(state, snapshot), "Copy should have equal identity initially")
+        #expect(_$isIdentityEqual(state, snapshot), "Copy should have equal identity initially")
 
         state._$willModify()  // triggers CoW + new UUID
-        XCTAssertFalse(_$isIdentityEqual(state, snapshot), "_$id should diverge after _$willModify()")
+        #expect(!_$isIdentityEqual(state, snapshot), "_$id should diverge after _$willModify()")
 
         // Verify the protocol requirement exists and returns a valid ID
         let id = state._$id
-        XCTAssertEqual(id, state._$id, "_$id should be stable between reads without mutation")
+        #expect(id == state._$id, "_$id should be stable between reads without mutation")
     }
 
     // MARK: TCA-18: @ObservationStateIgnored does not change _$id
 
-    @MainActor
-    func testObservationStateIgnored() {
+    @Test func observationStateIgnored() {
         let store = Store(initialState: ObservableFeature.State()) {
             ObservableFeature()
         }
         let idBefore = store.withState(\._$id)
         store.send(.setIgnored(999))
         let idAfter = store.withState(\._$id)
-        XCTAssertEqual(idBefore, idAfter, "_$id should NOT change for @ObservationStateIgnored property")
-        XCTAssertEqual(store.withState(\.ignored), 999)
+        #expect(idBefore == idAfter, "_$id should NOT change for @ObservationStateIgnored property")
+        #expect(store.withState(\.ignored) == 999)
     }
 
     // MARK: TCA-23: ForEach scoping — scope to child, mutate middle row, add/remove
 
-    @MainActor
-    func testForEachScoping() {
+    @Test func forEachScoping() {
         let id1 = UUID()
         let id2 = UUID()
         let id3 = UUID()
@@ -283,28 +282,27 @@ final class ObservableStateTests: XCTestCase {
         // Scope to middle row and mutate
         let childStore = store.scope(state: \.rows[id: id2]!, action: \.rows[id: id2])
         childStore.send(.increment)
-        XCTAssertEqual(store.withState(\.rows[id: id2]?.value), 11)
+        #expect(store.withState(\.rows[id: id2]?.value) == 11)
 
         // Other rows unchanged
-        XCTAssertEqual(store.withState(\.rows[id: id1]?.value), 0)
-        XCTAssertEqual(store.withState(\.rows[id: id3]?.value), 20)
+        #expect(store.withState(\.rows[id: id1]?.value) == 0)
+        #expect(store.withState(\.rows[id: id3]?.value) == 20)
 
         // Add a row
         let id4 = UUID()
         store.send(.addRow(id4))
-        XCTAssertEqual(store.withState(\.rows.count), 4)
-        XCTAssertEqual(store.withState(\.rows[id: id4]?.value), 0)
+        #expect(store.withState(\.rows.count) == 4)
+        #expect(store.withState(\.rows[id: id4]?.value) == 0)
 
         // Remove a row
         store.send(.removeRow(id1))
-        XCTAssertEqual(store.withState(\.rows.count), 3)
-        XCTAssertNil(store.withState(\.rows[id: id1]))
+        #expect(store.withState(\.rows.count) == 3)
+        #expect(store.withState(\.rows[id: id1]) == nil)
     }
 
     // MARK: TCA-23: ForEach identity stability — child _$id stable when sibling mutated
 
-    @MainActor
-    func testForEachIdentityStability() {
+    @Test func forEachIdentityStability() {
         let id1 = UUID()
         let id2 = UUID()
         let store = Store(
@@ -321,112 +319,107 @@ final class ObservableStateTests: XCTestCase {
         // Mutate row 1, check row 2's identity is stable
         store.send(.rows(.element(id: id1, action: .increment)))
         let id2After = store.withState(\.rows[id: id2]!._$id)
-        XCTAssertEqual(id2Before, id2After, "Child _$id should not change when sibling is mutated")
+        #expect(id2Before == id2After, "Child _$id should not change when sibling is mutated")
     }
 
     // MARK: TCA-24: Optional scoping — nil → present → nil
 
-    @MainActor
-    func testOptionalScoping() {
+    @Test func optionalScoping() {
         let store = Store(initialState: OptionalParent.State()) {
             OptionalParent()
         }
 
         // Starts nil
-        XCTAssertNil(store.withState(\.detail))
+        #expect(store.withState(\.detail) == nil)
 
         // Show detail → non-nil
         store.send(.showDetail)
-        XCTAssertNotNil(store.withState(\.detail))
-        XCTAssertEqual(store.withState(\.detail?.title), "Detail")
+        #expect(store.withState(\.detail) != nil)
+        #expect(store.withState(\.detail?.title) == "Detail")
 
         // Mutate child through presentation action
         store.send(.detail(.presented(.setTitle("Updated"))))
-        XCTAssertEqual(store.withState(\.detail?.title), "Updated")
+        #expect(store.withState(\.detail?.title) == "Updated")
 
         // Hide detail → nil
         store.send(.hideDetail)
-        XCTAssertNil(store.withState(\.detail))
+        #expect(store.withState(\.detail) == nil)
     }
 
     // MARK: TCA-25: Enum case switching with teardown
 
-    @MainActor
-    func testEnumCaseSwitching() {
+    @Test func enumCaseSwitching() {
         let store = Store(initialState: EnumParent.State()) {
             EnumParent()
         }
 
         // Starts nil
-        XCTAssertNil(store.withState(\.destination))
+        #expect(store.withState(\.destination) == nil)
 
         // Show case A
         store.send(.showA)
-        XCTAssertTrue(store.withState(\.destination)?.is(\.featureA) == true)
+        #expect(store.withState(\.destination)?.is(\.featureA) == true)
 
         // Switch to case B (tears down A)
         store.send(.showB)
-        XCTAssertTrue(store.withState(\.destination)?.is(\.featureB) == true)
+        #expect(store.withState(\.destination)?.is(\.featureB) == true)
 
         // Dismiss (tears down B)
         store.send(.dismiss)
-        XCTAssertNil(store.withState(\.destination))
+        #expect(store.withState(\.destination) == nil)
     }
 
     // MARK: TCA-29: onChange fires on value change, not on same-value
 
-    @MainActor
-    func testOnChange() {
+    @Test func onChange() {
         let store = Store(initialState: OnChangeFeature.State()) {
             OnChangeFeature()
         }
 
         // Initial — no changes
-        XCTAssertEqual(store.withState(\.changeCount), 0)
+        #expect(store.withState(\.changeCount) == 0)
 
         // Change value from 0 → 1: onChange should fire
         store.send(.setValue(1))
-        XCTAssertEqual(store.withState(\.value), 1)
-        XCTAssertEqual(store.withState(\.changeCount), 1)
+        #expect(store.withState(\.value) == 1)
+        #expect(store.withState(\.changeCount) == 1)
 
         // Same value 1 → 1: onChange should NOT fire
         store.send(.setValue(1))
-        XCTAssertEqual(store.withState(\.changeCount), 1, "onChange should not fire for same value")
+        #expect(store.withState(\.changeCount) == 1, "onChange should not fire for same value")
 
         // Change value 1 → 2: onChange should fire again
         store.send(.setValue(2))
-        XCTAssertEqual(store.withState(\.changeCount), 2)
+        #expect(store.withState(\.changeCount) == 2)
     }
 
     // MARK: TCA-30: _printChanges doesn't crash
 
-    @MainActor
-    func testPrintChanges() {
+    @Test func printChanges() {
         let store = Store(initialState: ObservableFeature.State()) {
             ObservableFeature()._printChanges()
         }
         // Just verify it doesn't crash
         store.send(.setText("hello"))
         store.send(.setCount(42))
-        XCTAssertEqual(store.withState(\.text), "hello")
-        XCTAssertEqual(store.withState(\.count), 42)
+        #expect(store.withState(\.text) == "hello")
+        #expect(store.withState(\.count) == 42)
     }
 
     // MARK: TCA-31: ViewAction send() dispatches correctly
 
-    @MainActor
-    func testViewAction() {
+    @Test func viewAction() {
         let store = Store(initialState: ViewActionFeature.State()) {
             ViewActionFeature()
         }
 
         store.send(.view(.increment))
-        XCTAssertEqual(store.withState(\.count), 1)
+        #expect(store.withState(\.count) == 1)
 
         store.send(.view(.increment))
-        XCTAssertEqual(store.withState(\.count), 2)
+        #expect(store.withState(\.count) == 2)
 
         store.send(.view(.decrement))
-        XCTAssertEqual(store.withState(\.count), 1)
+        #expect(store.withState(\.count) == 1)
     }
 }

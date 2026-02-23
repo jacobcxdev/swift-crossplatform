@@ -1,5 +1,6 @@
 import ComposableArchitecture
-import XCTest
+import CustomDump
+import Testing
 
 // MARK: - Test Reducers (file scope — macros can't attach to local types)
 
@@ -48,90 +49,85 @@ struct SendingFeature {
 
 // MARK: - Tests
 
-final class BindingTests: XCTestCase {
+@Suite(.serialized) @MainActor
+struct BindingTests {
 
     // MARK: TCA-19: BindableAction compiles
 
-    @MainActor
-    func testBindableActionCompiles() {
+    @Test func bindableActionCompiles() {
         // Verify that BindingFeature with BindableAction protocol compiles and initialises
         let store = Store(initialState: BindingFeature.State()) {
             BindingFeature()
         }
-        XCTAssertEqual(store.withState(\.text), "")
-        XCTAssertEqual(store.withState(\.count), 0)
-        XCTAssertEqual(store.withState(\.flag), false)
+        #expect(store.withState(\.text) == "")
+        #expect(store.withState(\.count) == 0)
+        #expect(store.withState(\.flag) == false)
     }
 
     // MARK: TCA-20: BindingReducer applies mutations via .binding(.set(...))
 
-    @MainActor
-    func testBindingReducerAppliesMutations() {
+    @Test func bindingReducerAppliesMutations() {
         let store = Store(initialState: BindingFeature.State()) {
             BindingFeature()
         }
         store.send(.binding(.set(\.text, "hello")))
-        XCTAssertEqual(store.withState(\.text), "hello")
+        #expect(store.withState(\.text) == "hello")
 
         store.send(.binding(.set(\.count, 42)))
-        XCTAssertEqual(store.withState(\.count), 42)
+        #expect(store.withState(\.count) == 42)
 
         store.send(.binding(.set(\.flag, true)))
-        XCTAssertEqual(store.withState(\.flag), true)
+        #expect(store.withState(\.flag) == true)
     }
 
     // MARK: TCA-21: Store binding projection via dynamicMember setter
 
-    @MainActor
-    func testStoreBindingProjection() {
+    @Test func storeBindingProjection() {
         let store = Store(initialState: BindingFeature.State()) {
             BindingFeature()
         }
         // The Store dynamicMember subscript setter sends .binding(.set(\.text, "world")) internally
         store.text = "world"
-        XCTAssertEqual(store.withState(\.text), "world")
+        #expect(store.withState(\.text) == "world")
     }
 
     // MARK: TCA-21: Multiple sequential mutations via binding projection
 
-    @MainActor
-    func testBindingProjectionMultipleMutations() {
+    @Test func bindingProjectionMultipleMutations() {
         let store = Store(initialState: BindingFeature.State()) {
             BindingFeature()
         }
         store.text = "first"
-        XCTAssertEqual(store.withState(\.text), "first")
+        #expect(store.withState(\.text) == "first")
 
         store.text = "second"
-        XCTAssertEqual(store.withState(\.text), "second")
+        #expect(store.withState(\.text) == "second")
 
         store.count = 10
-        XCTAssertEqual(store.withState(\.count), 10)
+        #expect(store.withState(\.count) == 10)
 
         store.count = 20
-        XCTAssertEqual(store.withState(\.count), 20)
+        #expect(store.withState(\.count) == 20)
 
         store.flag = true
-        XCTAssertEqual(store.withState(\.flag), true)
+        #expect(store.withState(\.flag) == true)
     }
 
     // MARK: TCA-22: Sending path — direct action dispatch
 
-    @MainActor
-    func testSendingBinding() async {
+    @Test func sendingBinding() async {
         let store = Store(initialState: SendingFeature.State()) {
             SendingFeature()
         }
         let task = store.send(.setCount(42))
         await task.finish()
-        XCTAssertEqual(store.withState(\.count), 42)
-        XCTAssertEqual(store.withState(\.effectLog), [42])
+        #expect(store.withState(\.count) == 42)
+        expectNoDifference(store.withState(\.effectLog), [42])
     }
 
     // MARK: TCA-20: BindingReducer is a no-op for non-binding actions
 
-    @MainActor
-    func testBindingReducerNoopForNonBindingAction() {
+    @Test func bindingReducerNoopForNonBindingAction() {
         // BindingFeature only has .binding actions, so any .binding(.set(...)) that writes
         // the same value should be idempotent
         let store = Store(initialState: BindingFeature.State(text: "same")) {
@@ -140,7 +136,7 @@ final class BindingTests: XCTestCase {
         let idBefore = store.withState(\._$id)
         store.send(.binding(.set(\.text, "same")))
         // State should still be "same"
-        XCTAssertEqual(store.withState(\.text), "same")
+        #expect(store.withState(\.text) == "same")
         // _$id may or may not change — binding reducer always calls the setter.
         // The key test is that the value is still correct.
         _ = store.withState(\._$id)
@@ -149,8 +145,7 @@ final class BindingTests: XCTestCase {
 
     // MARK: TCA-22: Sending cancellation — rapid sends, last effect wins
 
-    @MainActor
-    func testSendingCancellation() async {
+    @Test func sendingCancellation() async {
         let store = Store(initialState: SendingFeature.State()) {
             SendingFeature()
         }
@@ -159,15 +154,14 @@ final class BindingTests: XCTestCase {
         let task2 = store.send(.setCount(2))
         await task2.finish()
         // Final state reflects last send
-        XCTAssertEqual(store.withState(\.count), 2)
+        #expect(store.withState(\.count) == 2)
         // Both effects should complete (no cancellation by default)
-        XCTAssertTrue(store.withState(\.effectLog).contains(2))
+        #expect(store.withState(\.effectLog).contains(2))
     }
 
     // MARK: TCA-21: Rapid mutation loop does not infinite-loop
 
-    @MainActor
-    func testBindingDoesNotInfiniteLoop() {
+    @Test func bindingDoesNotInfiniteLoop() {
         let store = Store(initialState: BindingFeature.State()) {
             BindingFeature()
         }
@@ -175,6 +169,6 @@ final class BindingTests: XCTestCase {
         for i in 0..<100 {
             store.count = i
         }
-        XCTAssertEqual(store.withState(\.count), 99)
+        #expect(store.withState(\.count) == 99)
     }
 }
