@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 8 — PFW skill alignment (Waves 1-3 complete, 2 plans remaining).
+**Current focus:** Phase 8 — PFW skill alignment (Waves 1-4 complete, 1 plan remaining).
 
 ## Current Position
 
 Phase: 8 of 8 (PFW Skill Alignment)
-Plan: 4 of 5 in current phase (08-01, 08-02, 08-03 complete)
-Status: Wave 3 database & import cleanup applied. import SQLiteData only, defaultDatabase(), @FetchAll/@FetchOne, #sql macro, .dependencies trait TODOs. 277 tests (30 fuse-app, 156+91 fuse-library, all pre-existing failures only).
-Last activity: 2026-02-23 -- 08-03 Wave 3 complete.
+Plan: 5 of 5 in current phase (08-01, 08-02, 08-03, 08-04 complete)
+Status: Wave 4 test modernisation complete. 12 XCTestCase files migrated to Swift Testing @Suite/@Test. 225 fuse-library tests + 30 fuse-app tests passing. 2 ObservationTests files kept as XCTest (Skip transpilation constraint).
+Last activity: 2026-02-23 -- 08-04 Wave 4 complete.
 
-Progress: [██████----] 60%
+Progress: [███████---] 70%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
-- Average duration: ~9min
-- Total execution time: ~2.6 hours
+- Total plans completed: 17
+- Average duration: ~10min
+- Total execution time: ~2.9 hours
 
 **By Phase:**
 
@@ -32,10 +32,10 @@ Progress: [██████----] 60%
 | 5 - Navigation & Presentation | 3 | 20min | 7min |
 | 6 - Database & Queries | 2 | 13min | 6.5min |
 | 7 - Integration Testing | 4 | 29min | 7min |
-| 8 - PFW Skill Alignment | 3 | 40min | 13min |
+| 8 - PFW Skill Alignment | 4 | 58min | 14.5min |
 
 **Recent Trend:**
-- Last 5 plans: 07-04, 08-01, 08-02, 08-03
+- Last 5 plans: 08-01, 08-02, 08-03, 08-04
 - Trend: stable, fast execution
 
 *Updated after each plan completion*
@@ -89,6 +89,10 @@ Recent decisions affecting current work:
 - [Phase 08]: ComposableArchitecture kept in FuseAppIntegrationTests (not transitively available via FuseApp)
 - [Phase 08]: bootstrapDatabase() stays in FuseAppRootView.init() -- correct for Skip Fuse architecture (no @main App struct)
 - [Phase 08]: BOOLEAN replaced with INTEGER in STRICT table DDL (STRICT only supports 5 column types)
+- [Phase 08]: ObservationTests (FuseLibraryTests + ObservationTests) kept as XCTest -- Skip-transpiled target cannot use Swift Testing macros
+- [Phase 08]: @_spi(Reflection) import CasePaths kept in DependencyTests -- EnumMetadata requires SPI access
+- [Phase 08]: Combine publishers kept in SharedObservationTests -- Observations {} async sequence not available in swift-sharing
+- [Phase 08]: nonisolated(unsafe) var for onChange counters in SharedBindingTests -- LockIsolated not in SharingTests target
 
 ### Pending Todos
 
@@ -116,5 +120,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Completed 08-03-PLAN.md (Wave 3 database & import cleanup). Next: 08-04-PLAN.md (Wave 4 test modernisation).
-Resume file: .planning/phases/08-pfw-skill-alignment/08-04-PLAN.md
+Stopped at: Completed 08-04-PLAN.md (Wave 4 test modernisation). Next: 08-05-PLAN.md (Wave 5 fork cleanup + assertion sweep).
+Resume file: .planning/phases/08-pfw-skill-alignment/08-05-PLAN.md
