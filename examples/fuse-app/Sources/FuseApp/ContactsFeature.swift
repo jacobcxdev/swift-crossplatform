@@ -46,9 +46,9 @@ struct ContactsFeature {
                 state.path.append(.detail(ContactDetailFeature.State(contact: contact)))
                 return .none
 
-            case .path(.element(_, .detail(.delegate(.deleteContact(let id))))):
-                state.contacts.remove(id: id)
-                _ = state.path.popLast()
+            case .path(.element(let stackID, .detail(.delegate(.deleteContact(let contactID))))):
+                state.contacts.remove(id: contactID)
+                state.path.pop(from: stackID)
                 return .none
 
             case .path:
