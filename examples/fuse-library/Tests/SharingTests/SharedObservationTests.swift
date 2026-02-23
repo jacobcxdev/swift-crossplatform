@@ -1,6 +1,7 @@
 import Combine
+import Foundation
 import Sharing
-import XCTest
+import Testing
 
 // MARK: - File-scope types
 
@@ -10,75 +11,77 @@ struct ObsParent: Codable, Equatable, Sendable {
 
 // MARK: - Tests
 
-final class SharedObservationTests: XCTestCase {
+@Suite(.serialized) @MainActor
+struct SharedObservationTests {
 
     // MARK: SHR-10 — Publisher emits on mutation
 
-    @MainActor func testSharedPublisher() {
+    @Test func sharedPublisher() async throws {
         @Shared(.inMemory("pubTest")) var count = 0
         var received: [Int] = []
-        let expectation = expectation(description: "publisher emits")
-        expectation.expectedFulfillmentCount = 1
 
-        let cancellable = $count.publisher
-            .dropFirst() // skip initial prepend value
-            .sink { value in
-                received.append(value)
-                expectation.fulfill()
-            }
+        try await confirmation(expectedCount: 1) { confirm in
+            let cancellable = $count.publisher
+                .dropFirst() // skip initial prepend value
+                .sink { value in
+                    received.append(value)
+                    confirm()
+                }
 
-        $count.withLock { $0 = 42 }
+            $count.withLock { $0 = 42 }
 
-        wait(for: [expectation], timeout: 2.0)
-        XCTAssertTrue(received.contains(42), "Publisher should have emitted 42, got: \(received)")
-        _ = cancellable
+            // Give publisher time to emit
+            try await Task.sleep(for: .milliseconds(500))
+            _ = cancellable
+        }
+        #expect(received.contains(42), "Publisher should have emitted 42, got: \(received)")
     }
 
     // MARK: SHR-10 — Publisher emits multiple values
 
-    @MainActor func testSharedPublisherMultipleValues() {
+    @Test func sharedPublisherMultipleValues() async throws {
         @Shared(.inMemory("pubMulti")) var count = 0
         var received: [Int] = []
-        let expectation = expectation(description: "publisher emits multiple")
-        expectation.expectedFulfillmentCount = 3
 
-        let cancellable = $count.publisher
-            .dropFirst()
-            .sink { value in
-                received.append(value)
-                expectation.fulfill()
-            }
+        try await confirmation(expectedCount: 3) { confirm in
+            let cancellable = $count.publisher
+                .dropFirst()
+                .sink { value in
+                    received.append(value)
+                    confirm()
+                }
 
-        $count.withLock { $0 = 1 }
-        $count.withLock { $0 = 2 }
-        $count.withLock { $0 = 3 }
+            $count.withLock { $0 = 1 }
+            $count.withLock { $0 = 2 }
+            $count.withLock { $0 = 3 }
 
-        wait(for: [expectation], timeout: 2.0)
-        XCTAssertEqual(received, [1, 2, 3])
-        _ = cancellable
+            try await Task.sleep(for: .milliseconds(500))
+            _ = cancellable
+        }
+        #expect(received == [1, 2, 3])
     }
 
     // MARK: SHR-12 — Multiple @Shared same key synchronize
 
-    @MainActor func testMultipleSharedSameKeySynchronize() {
+    @Test func multipleSharedSameKeySynchronize() {
         @Shared(.inMemory("syncKey")) var ref1 = 0
         @Shared(.inMemory("syncKey")) var ref2 = 0
         $ref1.withLock { $0 = 99 }
-        XCTAssertEqual(ref2, 99)
+        #expect(ref2 == 99)
     }
 
     // MARK: SHR-13 — Child mutation visible in parent
 
-    @MainActor func testChildMutationVisibleInParent() {
+    @Test func childMutationVisibleInParent() {
         @Shared(.inMemory("obsParent")) var parent = ObsParent()
         let childShared: Shared<String> = $parent.child
         childShared.withLock { $0 = "mutated" }
-        XCTAssertEqual(parent.child, "mutated")
+        #expect(parent.child == "mutated")
     }
 
     // MARK: SHR-12 — Concurrent shared mutations (thread safety)
 
-    @MainActor func testConcurrentSharedMutations() async {
+    @Test func concurrentSharedMutations() async {
         @Shared(.inMemory("concurrent")) var value = 0
 
         await withTaskGroup(of: Void.self) { group in
@@ -89,78 +92,78 @@ final class SharedObservationTests: XCTestCase {
             }
         }
 
-        XCTAssertEqual(value, 10)
+        #expect(value == 10)
     }
 
     // MARK: SHR-09 — Async publisher values sequence
 
-    @MainActor func testPublisherValuesAsyncSequence() async {
+    @Test func publisherValuesAsyncSequence() async throws {
         @Shared(.inMemory("asyncPub")) var count = 0
         var received: [Int] = []
 
-        let expectation = expectation(description: "async values received")
+        try await confirmation(expectedCount: 1) { confirm in
+            let cancellable = $count.publisher
+                .dropFirst()
+                .prefix(3)
+                .sink(
+                    receiveCompletion: { _ in confirm() },
+                    receiveValue: { received.append($0) }
+                )
 
-        let cancellable = $count.publisher
-            .dropFirst()
-            .prefix(3)
-            .sink(
-                receiveCompletion: { _ in expectation.fulfill() },
-                receiveValue: { received.append($0) }
-            )
+            $count.withLock { $0 = 10 }
+            $count.withLock { $0 = 20 }
+            $count.withLock { $0 = 30 }
 
-        $count.withLock { $0 = 10 }
-        $count.withLock { $0 = 20 }
-        $count.withLock { $0 = 30 }
-
-        await fulfillment(of: [expectation], timeout: 2.0)
-        XCTAssertEqual(received, [10, 20, 30])
-        _ = cancellable
+            try await Task.sleep(for: .milliseconds(500))
+            _ = cancellable
+        }
+        #expect(received == [10, 20, 30])
     }
 
     // MARK: SHR-09 + SHR-10 — Publisher and observation both work
 
-    @MainActor func testPublisherAndObservationBothWork() {
+    @Test func publisherAndObservationBothWork() async throws {
         @Shared(.inMemory("bothChannels")) var count = 0
         var publisherReceived = false
 
-        let expectation = expectation(description: "publisher fires")
-
-        let cancellable = $count.publisher
-            .dropFirst()
-            .sink { value in
-                if value == 7 {
-                    publisherReceived = true
-                    expectation.fulfill()
+        try await confirmation(expectedCount: 1) { confirm in
+            let cancellable = $count.publisher
+                .dropFirst()
+                .sink { value in
+                    if value == 7 {
+                        publisherReceived = true
+                        confirm()
+                    }
                 }
-            }
 
-        $count.withLock { $0 = 7 }
+            $count.withLock { $0 = 7 }
 
-        wait(for: [expectation], timeout: 2.0)
-        XCTAssertTrue(publisherReceived)
-        XCTAssertEqual(count, 7)
-        _ = cancellable
+            try await Task.sleep(for: .milliseconds(500))
+            _ = cancellable
+        }
+        #expect(publisherReceived)
+        #expect(count == 7)
     }
 
     // MARK: SHR-12 — Bidirectional sync between shared refs
 
-    @MainActor func testBidirectionalSync() {
+    @Test func bidirectionalSync() {
         @Shared(.inMemory("bidir")) var ref1 = "a"
         @Shared(.inMemory("bidir")) var ref2 = "a"
 
         $ref1.withLock { $0 = "fromRef1" }
-        XCTAssertEqual(ref2, "fromRef1")
+        #expect(ref2 == "fromRef1")
 
         $ref2.withLock { $0 = "fromRef2" }
-        XCTAssertEqual(ref1, "fromRef2")
+        #expect(ref1 == "fromRef2")
     }
 
     // MARK: SHR-13 — Parent mutation visible in child
 
-    @MainActor func testParentMutationVisibleInChild() {
+    @Test func parentMutationVisibleInChild() {
         @Shared(.inMemory("parentMutChild")) var parent = ObsParent()
         let childShared: Shared<String> = $parent.child
         $parent.withLock { $0.child = "fromParent" }
-        XCTAssertEqual(childShared.wrappedValue, "fromParent")
+        #expect(childShared.wrappedValue == "fromParent")
     }
 }

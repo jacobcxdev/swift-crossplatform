@@ -1,6 +1,6 @@
-import XCTest
-import SQLiteData
 import DependenciesTestSupport
+import SQLiteData
+import Testing
 
 // MARK: - @Table model (must be file-scope for macro expansion)
 
@@ -15,9 +15,8 @@ struct DataItem: Identifiable, Equatable, Sendable {
 
 // MARK: - Test Suite
 
-// TODO: Wave 4 — Migrate to Swift Testing @Suite with .dependencies { try $0.bootstrapDatabase() } trait
-// This will replace the manual makeDatabase()/setupSchema() helpers with consistent bootstrap.
-final class SQLiteDataTests: XCTestCase {
+@Suite(.serialized)
+struct SQLiteDataTests {
 
     // MARK: - Helpers
 
@@ -58,7 +57,7 @@ final class SQLiteDataTests: XCTestCase {
 
     // MARK: - SD-01: Database initialization
 
-    func testDatabaseInit() throws {
+    @Test func databaseInit() throws {
         // Test defaultDatabase() via withDependencies
         let testDB = try DatabaseQueue()
         try withDependencies {
@@ -76,7 +75,7 @@ final class SQLiteDataTests: XCTestCase {
             let count = try database.read { db in
                 try Int.fetchOne(db, sql: "SELECT count(*) FROM test")
             }
-            XCTAssertEqual(count, 0)
+            #expect(count == 0)
         }
 
         // Test DatabaseQueue() in-memory fallback
@@ -91,12 +90,12 @@ final class SQLiteDataTests: XCTestCase {
         let count2 = try inMemory.read { db in
             try Int.fetchOne(db, sql: "SELECT count(*) FROM test2")
         }
-        XCTAssertEqual(count2, 0)
+        #expect(count2 == 0)
     }
 
     // MARK: - SD-02: DatabaseMigrator
 
-    func testDatabaseMigrator() throws {
+    @Test func databaseMigrator() throws {
         let dbQueue = try DatabaseQueue()
         var migrator = DatabaseMigrator()
         migrator.registerMigration("v1") { db in
@@ -122,27 +121,27 @@ final class SQLiteDataTests: XCTestCase {
         let items = try dbQueue.read { db in
             try DataItem.all.fetchAll(db)
         }
-        XCTAssertEqual(items.count, 1)
-        XCTAssertEqual(items[0].name, "migrated")
+        #expect(items.count == 1)
+        #expect(items[0].name == "migrated")
     }
 
     // MARK: - SD-03: Sync read
 
-    func testSyncRead() throws {
+    @Test func syncRead() throws {
         let dbQueue = try makeSeededDatabase()
 
         let items = try dbQueue.read { db in
             try DataItem.all.order(by: \.id).fetchAll(db)
         }
-        XCTAssertEqual(items.count, 3)
-        XCTAssertEqual(items[0].name, "alpha")
-        XCTAssertEqual(items[1].name, "beta")
-        XCTAssertEqual(items[2].name, "gamma")
+        #expect(items.count == 3)
+        #expect(items[0].name == "alpha")
+        #expect(items[1].name == "beta")
+        #expect(items[2].name == "gamma")
     }
 
     // MARK: - SD-04: Sync write
 
-    func testSyncWrite() throws {
+    @Test func syncWrite() throws {
         let dbQueue = try makeDatabase()
 
         try dbQueue.write { db in
@@ -155,26 +154,26 @@ final class SQLiteDataTests: XCTestCase {
         let items = try dbQueue.read { db in
             try DataItem.all.fetchAll(db)
         }
-        XCTAssertEqual(items.count, 1)
-        XCTAssertEqual(items[0].name, "written")
-        XCTAssertEqual(items[0].value, 99)
+        #expect(items.count == 1)
+        #expect(items[0].name == "written")
+        #expect(items[0].value == 99)
     }
 
     // MARK: - SD-05: Async read
 
-    func testAsyncRead() async throws {
+    @Test func asyncRead() async throws {
         let dbQueue = try makeSeededDatabase()
 
         let items = try await dbQueue.read { db in
             try DataItem.all.order(by: \.id).fetchAll(db)
         }
-        XCTAssertEqual(items.count, 3)
-        XCTAssertEqual(items[0].name, "alpha")
+        #expect(items.count == 3)
+        #expect(items[0].name == "alpha")
     }
 
     // MARK: - SD-05: Async write
 
-    func testAsyncWrite() async throws {
+    @Test func asyncWrite() async throws {
         let dbQueue = try makeDatabase()
 
         try await dbQueue.write { db in
@@ -186,149 +185,151 @@ final class SQLiteDataTests: XCTestCase {
         let items = try await dbQueue.read { db in
             try DataItem.all.fetchAll(db)
         }
-        XCTAssertEqual(items.count, 1)
-        XCTAssertEqual(items[0].name, "async-written")
-        XCTAssertEqual(items[0].value, 77)
+        #expect(items.count == 1)
+        #expect(items[0].name == "async-written")
+        #expect(items[0].value == 77)
     }
 
     // MARK: - SD-06: fetchAll
 
-    func testFetchAll() throws {
+    @Test func fetchAll() throws {
         let dbQueue = try makeSeededDatabase()
 
         let allItems = try dbQueue.read { db in
             try DataItem.all.fetchAll(db)
         }
-        XCTAssertEqual(allItems.count, 3)
+        #expect(allItems.count == 3)
 
         // Filtered fetchAll
         let activeItems = try dbQueue.read { db in
             try DataItem.where { $0.isActive }.fetchAll(db)
         }
-        XCTAssertEqual(activeItems.count, 2)
-        XCTAssertTrue(activeItems.allSatisfy { $0.isActive })
+        #expect(activeItems.count == 2)
+        #expect(activeItems.allSatisfy { $0.isActive })
     }
 
     // MARK: - SD-07: fetchOne
 
-    func testFetchOne() throws {
+    @Test func fetchOne() throws {
         let dbQueue = try makeSeededDatabase()
 
         // fetchOne returns first match
         let first = try dbQueue.read { db in
             try DataItem.find(1).fetchOne(db)
         }
-        XCTAssertNotNil(first)
-        XCTAssertEqual(first?.name, "alpha")
+        #expect(first != nil)
+        #expect(first?.name == "alpha")
 
         // fetchOne returns nil for no match
         let missing = try dbQueue.read { db in
             try DataItem.where { $0.name.eq("nonexistent") }.limit(1).fetchOne(db)
         }
-        XCTAssertNil(missing)
+        #expect(missing == nil)
     }
 
     // MARK: - SD-08: fetchCount
 
-    func testFetchCount() throws {
+    @Test func fetchCount() throws {
         let dbQueue = try makeSeededDatabase()
 
         let totalCount = try dbQueue.read { db in
             try DataItem.all.fetchCount(db)
         }
-        XCTAssertEqual(totalCount, 3)
+        #expect(totalCount == 3)
 
         let activeCount = try dbQueue.read { db in
             try DataItem.where { $0.isActive }.fetchCount(db)
         }
-        XCTAssertEqual(activeCount, 2)
+        #expect(activeCount == 2)
 
         let inactiveCount = try dbQueue.read { db in
             try DataItem.where { !$0.isActive }.fetchCount(db)
         }
-        XCTAssertEqual(inactiveCount, 1)
+        #expect(inactiveCount == 1)
     }
 
     // MARK: - SD-09: @FetchAll observation via ValueObservation
 
     @MainActor
-    func testFetchAllObservation() async throws {
+    @Test func fetchAllObservation() async throws {
         let dbQueue = try makeDatabase()
 
         let observation = ValueObservation.tracking { db in
             try DataItem.all.order(by: \.id).fetchAll(db)
         }
 
-        let expectation = XCTestExpectation(description: "observation triggers on insert")
         var observedValues: [[DataItem]] = []
 
-        let cancellable = observation.start(in: dbQueue, onError: { _ in }, onChange: { items in
-            observedValues.append(items)
-            if observedValues.count >= 2 {
-                expectation.fulfill()
+        try await confirmation(expectedCount: 1) { confirm in
+            let cancellable = observation.start(in: dbQueue, onError: { _ in }, onChange: { items in
+                observedValues.append(items)
+                if observedValues.count >= 2 {
+                    confirm()
+                }
+            })
+
+            // Initial value should be empty array
+            try await Task.sleep(for: .milliseconds(100))
+
+            // Mutate database — should trigger onChange
+            try await dbQueue.write { db in
+                try DataItem.insert {
+                    DataItem.Draft(name: "observed", value: 42, isActive: true)
+                }.execute(db)
             }
-        })
 
-        // Initial value should be empty array
-        try await Task.sleep(for: .milliseconds(100))
-
-        // Mutate database — should trigger onChange
-        try await dbQueue.write { db in
-            try DataItem.insert {
-                DataItem.Draft(name: "observed", value: 42, isActive: true)
-            }.execute(db)
+            try await Task.sleep(for: .milliseconds(500))
+            cancellable.cancel()
         }
 
-        await fulfillment(of: [expectation], timeout: 5.0)
-        cancellable.cancel()
-
-        XCTAssertGreaterThanOrEqual(observedValues.count, 2)
-        XCTAssertEqual(observedValues.first?.count, 0) // initial empty
-        XCTAssertEqual(observedValues.last?.count, 1)  // after insert
-        XCTAssertEqual(observedValues.last?.first?.name, "observed")
+        #expect(observedValues.count >= 2)
+        #expect(observedValues.first?.count == 0) // initial empty
+        #expect(observedValues.last?.count == 1)  // after insert
+        #expect(observedValues.last?.first?.name == "observed")
     }
 
     // MARK: - SD-10: @FetchOne observation via ValueObservation
 
     @MainActor
-    func testFetchOneObservation() async throws {
+    @Test func fetchOneObservation() async throws {
         let dbQueue = try makeDatabase()
 
         let observation = ValueObservation.tracking { db in
             try DataItem.all.limit(1).fetchOne(db)
         }
 
-        let expectation = XCTestExpectation(description: "observation triggers for single row")
         var observedValues: [DataItem?] = []
 
-        let cancellable = observation.start(in: dbQueue, onError: { _ in }, onChange: { item in
-            observedValues.append(item)
-            if observedValues.count >= 2 {
-                expectation.fulfill()
+        try await confirmation(expectedCount: 1) { confirm in
+            let cancellable = observation.start(in: dbQueue, onError: { _ in }, onChange: { item in
+                observedValues.append(item)
+                if observedValues.count >= 2 {
+                    confirm()
+                }
+            })
+
+            try await Task.sleep(for: .milliseconds(100))
+
+            // Insert a row — should trigger onChange
+            try await dbQueue.write { db in
+                try DataItem.insert {
+                    DataItem.Draft(name: "single", value: 10, isActive: true)
+                }.execute(db)
             }
-        })
 
-        try await Task.sleep(for: .milliseconds(100))
-
-        // Insert a row — should trigger onChange
-        try await dbQueue.write { db in
-            try DataItem.insert {
-                DataItem.Draft(name: "single", value: 10, isActive: true)
-            }.execute(db)
+            try await Task.sleep(for: .milliseconds(500))
+            cancellable.cancel()
         }
 
-        await fulfillment(of: [expectation], timeout: 5.0)
-        cancellable.cancel()
-
-        XCTAssertGreaterThanOrEqual(observedValues.count, 2)
-        XCTAssertNil(observedValues.first!) // initial: no rows
-        XCTAssertEqual(observedValues.last??.name, "single")
+        #expect(observedValues.count >= 2)
+        #expect(observedValues.first! == nil) // initial: no rows
+        #expect(observedValues.last??.name == "single")
     }
 
     // MARK: - SD-11: @Fetch composite observation via ValueObservation
 
     @MainActor
-    func testFetchCompositeObservation() async throws {
+    @Test func fetchCompositeObservation() async throws {
         let dbQueue = try makeDatabase()
 
         // Composite observation: fetch count + filtered items in single tracking block
@@ -338,45 +339,46 @@ final class SQLiteDataTests: XCTestCase {
             return (count, activeItems)
         }
 
-        let expectation = XCTestExpectation(description: "composite observation triggers")
         var observedValues: [(Int, [DataItem])] = []
 
-        let cancellable = observation.start(in: dbQueue, onError: { _ in }, onChange: { value in
-            observedValues.append(value)
-            if observedValues.count >= 2 {
-                expectation.fulfill()
+        try await confirmation(expectedCount: 1) { confirm in
+            let cancellable = observation.start(in: dbQueue, onError: { _ in }, onChange: { value in
+                observedValues.append(value)
+                if observedValues.count >= 2 {
+                    confirm()
+                }
+            })
+
+            try await Task.sleep(for: .milliseconds(100))
+
+            // Insert mixed active/inactive rows
+            try await dbQueue.write { db in
+                try DataItem.insert {
+                    ($0.name, $0.value, $0.isActive)
+                } values: {
+                    ("active1", 1, true)
+                    ("inactive1", 2, false)
+                    ("active2", 3, true)
+                }.execute(db)
             }
-        })
 
-        try await Task.sleep(for: .milliseconds(100))
-
-        // Insert mixed active/inactive rows
-        try await dbQueue.write { db in
-            try DataItem.insert {
-                ($0.name, $0.value, $0.isActive)
-            } values: {
-                ("active1", 1, true)
-                ("inactive1", 2, false)
-                ("active2", 3, true)
-            }.execute(db)
+            try await Task.sleep(for: .milliseconds(500))
+            cancellable.cancel()
         }
 
-        await fulfillment(of: [expectation], timeout: 5.0)
-        cancellable.cancel()
-
-        XCTAssertGreaterThanOrEqual(observedValues.count, 2)
+        #expect(observedValues.count >= 2)
         // Initial: count=0, activeItems=[]
-        XCTAssertEqual(observedValues.first?.0, 0)
-        XCTAssertEqual(observedValues.first?.1.count, 0)
+        #expect(observedValues.first?.0 == 0)
+        #expect(observedValues.first?.1.count == 0)
         // After insert: count=3, activeItems=2
-        XCTAssertEqual(observedValues.last?.0, 3)
-        XCTAssertEqual(observedValues.last?.1.count, 2)
-        XCTAssertEqual(observedValues.last?.1.first?.name, "active1")
+        #expect(observedValues.last?.0 == 3)
+        #expect(observedValues.last?.1.count == 2)
+        #expect(observedValues.last?.1.first?.name == "active1")
     }
 
     // MARK: - SD-12: @Dependency(\.defaultDatabase) injection
 
-    func testDefaultDatabaseDependency() throws {
+    @Test func defaultDatabaseDependency() throws {
         let testDB = try makeDatabase()
 
         try withDependencies {
@@ -395,12 +397,12 @@ final class SQLiteDataTests: XCTestCase {
             let count = try database.read { db in
                 try DataItem.all.fetchCount(db)
             }
-            XCTAssertEqual(count, 1)
+            #expect(count == 1)
 
             let items = try database.read { db in
                 try DataItem.all.fetchAll(db)
             }
-            XCTAssertEqual(items.first?.name, "injected")
+            #expect(items.first?.name == "injected")
         }
     }
 }

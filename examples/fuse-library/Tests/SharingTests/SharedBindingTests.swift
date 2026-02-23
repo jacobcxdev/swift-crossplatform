@@ -1,7 +1,8 @@
+import Foundation
 import Observation
 import Sharing
 import SwiftUI
-import XCTest
+import Testing
 
 // MARK: - File-scope types
 
@@ -18,53 +19,54 @@ class SharedModel {
 
 // MARK: - Tests
 
-final class SharedBindingTests: XCTestCase {
+@Suite(.serialized) @MainActor
+struct SharedBindingTests {
 
     // MARK: SHR-05 — Binding projection from @Shared
 
-    @MainActor func testSharedBindingProjection() {
+    @Test func sharedBindingProjection() {
         @Shared(.inMemory("bindProj")) var value = "initial"
         let binding = Binding($value)
-        XCTAssertEqual(binding.wrappedValue, "initial")
+        #expect(binding.wrappedValue == "initial")
         binding.wrappedValue = "updated"
-        XCTAssertEqual(value, "updated")
+        #expect(value == "updated")
     }
 
     // MARK: SHR-06 — Binding mutation triggers change
 
-    @MainActor func testSharedBindingMutationTriggersChange() {
+    @Test func sharedBindingMutationTriggersChange() {
         @Shared(.inMemory("bindMutate")) var value = 0
         let binding = Binding($value)
         binding.wrappedValue = 42
-        XCTAssertEqual(value, 42)
+        #expect(value == 42)
     }
 
     // MARK: SHR-07 — Keypath projection from @Shared
 
-    @MainActor func testSharedKeypathProjection() {
+    @Test func sharedKeypathProjection() {
         @Shared(.inMemory("keypathParent")) var parent = BindingParent()
         let childShared: Shared<String> = $parent.child
-        XCTAssertEqual(childShared.wrappedValue, "hello")
+        #expect(childShared.wrappedValue == "hello")
         childShared.withLock { $0 = "world" }
-        XCTAssertEqual(parent.child, "world")
+        #expect(parent.child == "world")
     }
 
     // MARK: SHR-08 — Optional unwrapping
 
-    @MainActor func testSharedOptionalUnwrapping() {
+    @Test func sharedOptionalUnwrapping() {
         @Shared(.inMemory("optUnwrap")) var optional: String? = "present"
         if let unwrapped = Shared($optional) {
-            XCTAssertEqual(unwrapped.wrappedValue, "present")
+            #expect(unwrapped.wrappedValue == "present")
         } else {
-            XCTFail("Expected non-nil Shared unwrap")
+            Issue.record("Expected non-nil Shared unwrap")
         }
         $optional.withLock { $0 = nil }
-        XCTAssertNil(Shared($optional))
+        #expect(Shared($optional) == nil)
     }
 
     // MARK: SHR-11 — Double notification prevention (@ObservationIgnored @Shared)
 
-    @MainActor func testDoubleNotificationPrevention() {
+    @Test func doubleNotificationPrevention() async throws {
         // When @Shared is used with @ObservationIgnored in an @Observable class,
         // mutating the @Shared property should NOT trigger the @Observable's
         // observation registrar. Only @Shared's own observation handles tracking.
@@ -75,8 +77,7 @@ final class SharedBindingTests: XCTestCase {
 
         // Track ONLY the @Observable class's properties (not @Shared directly).
         // If @ObservationIgnored works, mutating sharedCount should NOT trigger onChange.
-        let sharedMutationFired = expectation(description: "shared mutation onChange")
-        sharedMutationFired.isInverted = true // must NOT be fulfilled
+        nonisolated(unsafe) var sharedMutationCount = 0
 
         withObservationTracking {
             // Access normalCount to establish tracking on the @Observable registrar.
@@ -84,50 +85,52 @@ final class SharedBindingTests: XCTestCase {
             // class does not generate tracking for @ObservationIgnored properties.
             _ = model.normalCount
         } onChange: {
-            sharedMutationFired.fulfill()
+            sharedMutationCount += 1
         }
 
         // Mutate @ObservationIgnored @Shared — should NOT trigger @Observable's onChange
         model.$sharedCount.withLock { $0 = 42 }
-        XCTAssertEqual(model.sharedCount, 42)
-        wait(for: [sharedMutationFired], timeout: 0.1)
+        #expect(model.sharedCount == 42)
+        try await Task.sleep(for: .milliseconds(100))
+        #expect(sharedMutationCount == 0, "onChange should NOT fire for @ObservationIgnored @Shared mutation")
 
         // Verify normal @Observable property mutation DOES fire onChange
-        let normalMutationFired = expectation(description: "normal mutation onChange")
+        nonisolated(unsafe) var normalMutationCount = 0
 
         withObservationTracking {
             _ = model.normalCount
         } onChange: {
-            normalMutationFired.fulfill()
+            normalMutationCount += 1
         }
 
         model.normalCount = 1
-        wait(for: [normalMutationFired], timeout: 1.0)
+        try await Task.sleep(for: .milliseconds(100))
+        #expect(normalMutationCount > 0, "onChange SHOULD fire for normal @Observable property mutation")
     }
 
     // MARK: SHR-06 regression — Rapid binding mutations
 
-    @MainActor func testSharedBindingRapidMutations() {
+    @Test func sharedBindingRapidMutations() {
         @Shared(.inMemory("rapidBind")) var value = 0
         let binding = Binding($value)
         for i in 1...100 {
             binding.wrappedValue = i
         }
-        XCTAssertEqual(value, 100)
+        #expect(value == 100)
     }
 
     // MARK: SHR-05 — Binding two-way sync
 
-    @MainActor func testBindingTwoWaySync() {
+    @Test func bindingTwoWaySync() {
         @Shared(.inMemory("twoWayBind")) var value = "start"
         let binding = Binding($value)
 
         // Mutate via binding
         binding.wrappedValue = "fromBinding"
-        XCTAssertEqual(value, "fromBinding")
+        #expect(value == "fromBinding")
 
         // Mutate via withLock
         $value.withLock { $0 = "fromShared" }
-        XCTAssertEqual(binding.wrappedValue, "fromShared")
+        #expect(binding.wrappedValue == "fromShared")
     }
 }
