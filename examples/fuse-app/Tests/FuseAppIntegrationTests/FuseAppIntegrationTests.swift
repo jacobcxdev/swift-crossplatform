@@ -1,13 +1,16 @@
 import ComposableArchitecture
+import CustomDump
+import Foundation
 import SQLiteData
-import XCTest
+import Testing
 @testable import FuseApp
 
 // MARK: - CounterFeature Integration Tests
 
-final class CounterFeatureTests: XCTestCase {
+@Suite(.serialized) @MainActor
+struct CounterFeatureTests {
 
-    @MainActor func testIncrement() async {
+    @Test func increment() async {
         let store = TestStore(initialState: CounterFeature.State()) {
             CounterFeature()
         }
@@ -18,7 +21,7 @@ final class CounterFeatureTests: XCTestCase {
         }
     }
 
-    @MainActor func testDecrement() async {
+    @Test func decrement() async {
         let store = TestStore(initialState: CounterFeature.State()) {
             CounterFeature()
         }
@@ -29,7 +32,7 @@ final class CounterFeatureTests: XCTestCase {
         }
     }
 
-    @MainActor func testDelayedIncrement() async {
+    @Test func delayedIncrement() async {
         let clock = TestClock()
         let store = TestStore(initialState: CounterFeature.State()) {
             CounterFeature()
@@ -44,7 +47,7 @@ final class CounterFeatureTests: XCTestCase {
         }
     }
 
-    @MainActor func testFactRequest() async {
+    @Test func factRequest() async {
         let store = TestStore(initialState: CounterFeature.State()) {
             CounterFeature()
         } withDependencies: {
@@ -61,7 +64,7 @@ final class CounterFeatureTests: XCTestCase {
         }
     }
 
-    @MainActor func testReset() async {
+    @Test func reset() async {
         var state = CounterFeature.State()
         state.count = 5
         state.fact = "Some fact"
@@ -79,9 +82,10 @@ final class CounterFeatureTests: XCTestCase {
 
 // MARK: - TodosFeature Integration Tests
 
-final class TodosFeatureTests: XCTestCase {
+@Suite(.serialized) @MainActor
+struct TodosFeatureTests {
 
-    @MainActor func testAddTodo() async {
+    @Test func addTodo() async {
         let testUUID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
         let testDate = Date(timeIntervalSince1970: 1_000_000)
         let store = TestStore(initialState: TodosFeature.State()) {
@@ -93,10 +97,10 @@ final class TodosFeatureTests: XCTestCase {
         await store.send(.addButtonTapped) {
             $0.todos.append(Todo(id: testUUID, title: "New Todo", isComplete: false, createdAt: testDate))
         }
-        XCTAssertEqual(store.state.todos.count, 1)
+        #expect(store.state.todos.count == 1)
     }
 
-    @MainActor func testToggleTodo() async {
+    @Test func toggleTodo() async {
         let todo = Todo(id: UUID(), title: "Test", isComplete: false, createdAt: .distantPast)
         let store = TestStore(initialState: TodosFeature.State(todos: [todo])) {
             TodosFeature()
@@ -106,7 +110,7 @@ final class TodosFeatureTests: XCTestCase {
         }
     }
 
-    @MainActor func testDeleteWithAlertConfirmation() async {
+    @Test func deleteWithAlertConfirmation() async {
         let todo = Todo(id: UUID(), title: "Delete me", createdAt: .distantPast)
         let store = TestStore(initialState: TodosFeature.State(todos: [todo])) {
             TodosFeature()
@@ -133,7 +137,7 @@ final class TodosFeatureTests: XCTestCase {
         }
     }
 
-    @MainActor func testFilter() async {
+    @Test func filter() async {
         let todo1 = Todo(id: UUID(), title: "Active", isComplete: false, createdAt: .distantPast)
         let todo2 = Todo(id: UUID(), title: "Done", isComplete: true, createdAt: .distantPast)
         let store = TestStore(initialState: TodosFeature.State(todos: [todo1, todo2])) {
@@ -142,11 +146,11 @@ final class TodosFeatureTests: XCTestCase {
         await store.send(.filterChanged(.completed)) {
             $0.filter = .completed
         }
-        XCTAssertEqual(store.state.filteredTodos.count, 1)
-        XCTAssertEqual(store.state.filteredTodos.first?.title, "Done")
+        #expect(store.state.filteredTodos.count == 1)
+        #expect(store.state.filteredTodos.first?.title == "Done")
     }
 
-    @MainActor func testSortConfirmationDialog() async {
+    @Test func sortConfirmationDialog() async {
         let store = TestStore(initialState: TodosFeature.State()) {
             TodosFeature()
         }
@@ -165,9 +169,10 @@ final class TodosFeatureTests: XCTestCase {
 
 // MARK: - ContactsFeature Integration Tests
 
-final class ContactsFeatureTests: XCTestCase {
+@Suite(.serialized) @MainActor
+struct ContactsFeatureTests {
 
-    @MainActor func testOnAppearLoadsContacts() async {
+    @Test func onAppearLoadsContacts() async {
         let testUUIDs = [
             UUID(uuidString: "00000000-0000-0000-0000-000000000001")!,
             UUID(uuidString: "00000000-0000-0000-0000-000000000002")!,
@@ -192,7 +197,7 @@ final class ContactsFeatureTests: XCTestCase {
         }
     }
 
-    @MainActor func testPushContactDetail() async {
+    @Test func pushContactDetail() async {
         let contact = Contact(id: UUID(), name: "Alice", email: "alice@example.com")
         let store = TestStore(initialState: ContactsFeature.State(contacts: [contact])) {
             ContactsFeature()
@@ -202,7 +207,7 @@ final class ContactsFeatureTests: XCTestCase {
         }
     }
 
-    @MainActor func testAddContactSheet() async {
+    @Test func addContactSheet() async {
         let store = TestStore(initialState: ContactsFeature.State()) {
             ContactsFeature()
         }
@@ -211,7 +216,7 @@ final class ContactsFeatureTests: XCTestCase {
         }
     }
 
-    @MainActor func testAddContactSaveAndDismiss() async {
+    @Test func addContactSaveAndDismiss() async {
         let testUUID = UUID(uuidString: "00000000-0000-0000-0000-000000000099")!
         let newContact = Contact(id: testUUID, name: "Dave", email: "dave@example.com")
         let store = TestStore(
@@ -234,9 +239,10 @@ final class ContactsFeatureTests: XCTestCase {
 
 // MARK: - ContactDetailFeature Integration Tests
 
-final class ContactDetailFeatureTests: XCTestCase {
+@Suite(.serialized) @MainActor
+struct ContactDetailFeatureTests {
 
-    @MainActor func testEditButtonPresentsSheet() async {
+    @Test func editButtonPresentsSheet() async {
         let contact = Contact(id: UUID(), name: "Alice", email: "alice@example.com")
         let store = TestStore(initialState: ContactDetailFeature.State(contact: contact)) {
             ContactDetailFeature()
@@ -246,7 +252,7 @@ final class ContactDetailFeatureTests: XCTestCase {
         }
     }
 
-    @MainActor func testDeleteButtonPresentsConfirmationDialog() async {
+    @Test func deleteButtonPresentsConfirmationDialog() async {
         let contact = Contact(id: UUID(), name: "Alice", email: "alice@example.com")
         let store = TestStore(initialState: ContactDetailFeature.State(contact: contact)) {
             ContactDetailFeature()
@@ -264,7 +270,7 @@ final class ContactDetailFeatureTests: XCTestCase {
         }
     }
 
-    @MainActor func testDeleteConfirmation() async {
+    @Test func deleteConfirmation() async {
         let contact = Contact(id: UUID(), name: "Alice", email: "alice@example.com")
         let store = TestStore(
             initialState: ContactDetailFeature.State(
@@ -291,7 +297,7 @@ final class ContactDetailFeatureTests: XCTestCase {
         await store.receive(\.delegate.deleteContact)
     }
 
-    @MainActor func testEditSavesContact() async {
+    @Test func editSavesContact() async {
         let contact = Contact(id: UUID(), name: "Alice", email: "alice@example.com")
         let updated = Contact(id: contact.id, name: "Alice Updated", email: "alice2@example.com")
         let store = TestStore(
@@ -313,9 +319,8 @@ final class ContactDetailFeatureTests: XCTestCase {
 
 // MARK: - DatabaseFeature Integration Tests
 
-// TODO: Wave 4 — Migrate to Swift Testing @Suite with .dependencies { try $0.bootstrapDatabase() } trait
-// This will replace createMigratedDatabase() with consistent bootstrap and fix pre-existing test failures.
-final class DatabaseFeatureTests: XCTestCase {
+@Suite(.serialized) @MainActor
+struct DatabaseFeatureTests {
 
     private func createMigratedDatabase() throws -> DatabaseQueue {
         let db = try DatabaseQueue()
@@ -335,9 +340,9 @@ final class DatabaseFeatureTests: XCTestCase {
         return db
     }
 
-    @MainActor func testAddNote() async {
+    @Test func addNote() async throws {
         let testDate = Date(timeIntervalSince1970: 1_000_000)
-        let db = try! createMigratedDatabase()
+        let db = try createMigratedDatabase()
         let store = TestStore(initialState: DatabaseFeature.State()) {
             DatabaseFeature()
         } withDependencies: {
@@ -352,9 +357,9 @@ final class DatabaseFeatureTests: XCTestCase {
         }
     }
 
-    @MainActor func testDeleteNote() async {
-        let db = try! createMigratedDatabase()
-        try! await db.write { db in
+    @Test func deleteNote() async throws {
+        let db = try createMigratedDatabase()
+        try await db.write { db in
             try #sql(
                     """
                     INSERT INTO "note" ("id", "title", "body", "category", "createdAt")
@@ -378,7 +383,7 @@ final class DatabaseFeatureTests: XCTestCase {
         }
     }
 
-    @MainActor func testCategoryFilter() async {
+    @Test func categoryFilter() async {
         let store = TestStore(initialState: DatabaseFeature.State()) {
             DatabaseFeature()
         }
@@ -390,9 +395,10 @@ final class DatabaseFeatureTests: XCTestCase {
 
 // MARK: - SettingsFeature Integration Tests
 
-final class SettingsFeatureTests: XCTestCase {
+@Suite(.serialized) @MainActor
+struct SettingsFeatureTests {
 
-    @MainActor func testUserNameChange() async {
+    @Test func userNameChange() async {
         let store = TestStore(initialState: SettingsFeature.State()) {
             SettingsFeature()
         }
@@ -402,7 +408,7 @@ final class SettingsFeatureTests: XCTestCase {
         }
     }
 
-    @MainActor func testAppearanceChange() async {
+    @Test func appearanceChange() async {
         let store = TestStore(initialState: SettingsFeature.State()) {
             SettingsFeature()
         }
@@ -412,7 +418,7 @@ final class SettingsFeatureTests: XCTestCase {
         }
     }
 
-    @MainActor func testNotificationsToggle() async {
+    @Test func notificationsToggle() async {
         let store = TestStore(initialState: SettingsFeature.State()) {
             SettingsFeature()
         }
@@ -422,7 +428,7 @@ final class SettingsFeatureTests: XCTestCase {
         }
     }
 
-    @MainActor func testResetToDefaults() async {
+    @Test func resetToDefaults() async {
         let store = TestStore(initialState: SettingsFeature.State()) {
             SettingsFeature()
         }
@@ -438,7 +444,7 @@ final class SettingsFeatureTests: XCTestCase {
         }
     }
 
-    @MainActor func testSessionActionCountIncrementsAcrossActions() async {
+    @Test func sessionActionCountIncrementsAcrossActions() async {
         let store = TestStore(initialState: SettingsFeature.State()) {
             SettingsFeature()
         }
@@ -459,18 +465,19 @@ final class SettingsFeatureTests: XCTestCase {
 
 // MARK: - AppFeature Integration Tests
 
-final class AppFeatureTests: XCTestCase {
+@Suite(.serialized) @MainActor
+struct AppFeatureTests {
 
-    @MainActor func testInitialState() async {
+    @Test func initialState() async {
         let store = TestStore(initialState: AppFeature.State()) {
             AppFeature()
         }
-        XCTAssertEqual(store.state.selectedTab, .counter)
-        XCTAssertEqual(store.state.counter.count, 0)
-        XCTAssertEqual(store.state.todos.todos.count, 0)
+        #expect(store.state.selectedTab == .counter)
+        #expect(store.state.counter.count == 0)
+        #expect(store.state.todos.todos.count == 0)
     }
 
-    @MainActor func testTabSwitching() async {
+    @Test func tabSwitching() async {
         let store = TestStore(initialState: AppFeature.State()) {
             AppFeature()
         }
@@ -488,7 +495,7 @@ final class AppFeatureTests: XCTestCase {
         }
     }
 
-    @MainActor func testChildStatePreservedOnTabSwitch() async {
+    @Test func childStatePreservedOnTabSwitch() async {
         let store = TestStore(initialState: AppFeature.State()) {
             AppFeature()
         }
@@ -502,10 +509,10 @@ final class AppFeatureTests: XCTestCase {
         await store.send(.tabSelected(.counter)) {
             $0.selectedTab = .counter
         }
-        XCTAssertEqual(store.state.counter.count, 1)
+        #expect(store.state.counter.count == 1)
     }
 
-    @MainActor func testChildActionsRouteCorrectly() async {
+    @Test func childActionsRouteCorrectly() async {
         let testUUID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
         let testDate = Date(timeIntervalSince1970: 1_000_000)
         let store = TestStore(initialState: AppFeature.State()) {
@@ -519,6 +526,6 @@ final class AppFeatureTests: XCTestCase {
                 Todo(id: testUUID, title: "New Todo", isComplete: false, createdAt: testDate)
             )
         }
-        XCTAssertEqual(store.state.todos.todos.count, 1)
+        #expect(store.state.todos.todos.count == 1)
     }
 }

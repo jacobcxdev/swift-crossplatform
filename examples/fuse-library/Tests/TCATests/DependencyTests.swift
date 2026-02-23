@@ -2,13 +2,14 @@
 import ComposableArchitecture
 import Dependencies
 import DependenciesMacros
-import XCTest
+import Foundation
+import Testing
 
 // MARK: - Test Fixtures
 
 private struct TestCounterKey: DependencyKey {
-    static let liveValue: Int = 42
-    static let testValue: Int = 0
+    static var liveValue: Int { 42 }
+    static var testValue: Int { 0 }
 }
 
 extension DependencyValues {
@@ -19,8 +20,8 @@ extension DependencyValues {
 }
 
 private struct AnotherKey: DependencyKey {
-    static let liveValue: String = "live"
-    static let testValue: String = "test"
+    static var liveValue: String { "live" }
+    static var testValue: String { "test" }
 }
 
 extension DependencyValues {
@@ -38,7 +39,7 @@ private struct DepCounter {
         var count = 0
         var id: UUID?
     }
-    enum Action: Equatable {
+    enum Action {
         case increment
         case setID
         case gotID(UUID)
@@ -70,7 +71,7 @@ private struct DepParent {
     struct State: Equatable {
         var child = DepCounter.State()
     }
-    enum Action: Equatable {
+    enum Action {
         case child(DepCounter.Action)
     }
     var body: some ReducerOf<Self> {
@@ -83,7 +84,7 @@ private struct DepGrandparent {
     struct State: Equatable {
         var parent = DepParent.State()
     }
-    enum Action: Equatable {
+    enum Action {
         case parent(DepParent.Action)
     }
     var body: some ReducerOf<Self> {
@@ -93,82 +94,83 @@ private struct DepGrandparent {
 
 // MARK: - DependencyTests
 
-final class DependencyTests: XCTestCase {
+@Suite(.serialized) @MainActor
+struct DependencyTests {
 
     // MARK: DEP-01: @Dependency key path resolution
 
-    func testDependencyKeyPathResolution() {
+    @Test func dependencyKeyPathResolution() {
         withDependencies {
             $0.testCounter = 99
         } operation: {
             @Dependency(\.testCounter) var testCounter
-            XCTAssertEqual(testCounter, 99)
+            #expect(testCounter == 99)
         }
     }
 
     // MARK: DEP-02: @Dependency type-based resolution
 
-    func testDependencyTypeResolution() {
+    @Test func dependencyTypeResolution() {
         // Type-based resolution uses DependencyValues subscript with key type
         withDependencies {
             $0[TestCounterKey.self] = 77
         } operation: {
             @Dependency(\.testCounter) var testCounter
-            XCTAssertEqual(testCounter, 77)
+            #expect(testCounter == 77)
         }
     }
 
     // MARK: DEP-03: liveValue used in live context
 
-    func testLiveValueInProductionContext() {
+    @Test func liveValueInProductionContext() {
         withDependencies {
             $0.context = .live
         } operation: {
             @Dependency(\.testCounter) var testCounter
             // liveValue for TestCounterKey is 42
-            XCTAssertEqual(testCounter, 42)
+            #expect(testCounter == 42)
         }
     }
 
     // MARK: DEP-04: testValue used in test context
 
-    func testTestValueInTestContext() {
-        // In XCTest execution, context is automatically .test
+    @Test func testValueInTestContext() {
+        // In test execution, context is automatically .test
         @Dependency(\.context) var context
-        XCTAssertEqual(context, .test)
+        #expect(context == .test)
 
         // testValue for TestCounterKey is 0
         @Dependency(\.testCounter) var testCounter
-        XCTAssertEqual(testCounter, 0)
+        #expect(testCounter == 0)
     }
 
     // MARK: DEP-05: preview context not active in non-preview environments
 
-    func testPreviewContextNotAvailableOnAndroid() {
+    @Test func previewContextNotAvailableOnAndroid() {
         @Dependency(\.context) var context
         // In test execution, context should be .test, never .preview
-        XCTAssertNotEqual(context, .preview)
-        XCTAssertEqual(context, .test)
+        #expect(context != .preview)
+        #expect(context == .test)
     }
 
     // MARK: DEP-06: custom DependencyKey registration
 
-    func testCustomDependencyKeyRegistration() {
+    @Test func customDependencyKeyRegistration() {
         withDependencies {
             $0.anotherValue = "custom"
         } operation: {
             @Dependency(\.anotherValue) var value
-            XCTAssertEqual(value, "custom")
+            #expect(value == "custom")
         }
 
         // Without override, should get testValue
         @Dependency(\.anotherValue) var defaultValue
-        XCTAssertEqual(defaultValue, "test")
+        #expect(defaultValue == "test")
     }
 
     // MARK: DEP-09: withDependencies synchronous scoping
 
-    func testWithDependenciesSyncScoping() {
+    @Test func withDependenciesSyncScoping() {
         withDependencies {
             $0.uuid = .incrementing
         } operation: {
@@ -176,15 +178,14 @@ final class DependencyTests: XCTestCase {
             let first = uuid()
             let second = uuid()
             // Incrementing UUIDs start at 00000000-0000-0000-0000-000000000000
-            XCTAssertEqual(first, UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
-            XCTAssertEqual(second, UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
+            #expect(first == UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+            #expect(second == UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
         }
     }
 
     // MARK: DEP-10: Store prepareDependencies closure
 
-    @MainActor
-    func testPrepareDependencies() {
+    @Test func prepareDependencies() {
         let store = Store(
             initialState: DepCounter.State()
         ) {
@@ -195,14 +196,13 @@ final class DependencyTests: XCTestCase {
 
         store.send(.increment)
         store.withState { state in
-            XCTAssertEqual(state.count, 777)
+            #expect(state.count == 777)
         }
     }
 
     // MARK: DEP-11: child reducer inherits parent dependencies (2 levels)
 
-    @MainActor
-    func testChildReducerInheritsDependencies() {
+    @Test func childReducerInheritsDependencies() {
         let store = Store(
             initialState: DepParent.State()
         ) {
@@ -214,14 +214,13 @@ final class DependencyTests: XCTestCase {
         let childStore = store.scope(state: \.child, action: \.child)
         childStore.send(.increment)
         childStore.withState { state in
-            XCTAssertEqual(state.count, 555)
+            #expect(state.count == 555)
         }
     }
 
     // MARK: DEP-11: child reducer inherits parent dependencies (3 levels)
 
-    @MainActor
-    func testGrandchildReducerInheritsDependencies() {
+    @Test func grandchildReducerInheritsDependencies() {
         let store = Store(
             initialState: DepGrandparent.State()
         ) {
@@ -234,90 +233,89 @@ final class DependencyTests: XCTestCase {
         let childStore = parentStore.scope(state: \.child, action: \.child)
         childStore.send(.increment)
         childStore.withState { state in
-            XCTAssertEqual(state.count, 333)
+            #expect(state.count == 333)
         }
     }
 
     // MARK: Built-in dependency resolution (all available keys)
 
-    func testBuiltInDependencyResolution() {
+    @Test func builtInDependencyResolution() {
         withDependencies {
             $0.context = .live
         } operation: {
             // UUID
             @Dependency(\.uuid) var uuid
             let id = uuid()
-            XCTAssertNotNil(id)
+            #expect(id != nil)
 
             // Date
             @Dependency(\.date) var date
             let now = date()
-            XCTAssertNotNil(now)
+            #expect(now != nil)
 
             // ContinuousClock
             @Dependency(\.continuousClock) var continuousClock
-            XCTAssertNotNil(continuousClock)
+            #expect(continuousClock != nil)
 
             // SuspendingClock
             @Dependency(\.suspendingClock) var suspendingClock
-            XCTAssertNotNil(suspendingClock)
+            #expect(suspendingClock != nil)
 
             // Calendar
             @Dependency(\.calendar) var calendar
-            XCTAssertNotNil(calendar)
+            #expect(calendar != nil)
 
             // TimeZone
             @Dependency(\.timeZone) var timeZone
-            XCTAssertNotNil(timeZone)
+            #expect(timeZone != nil)
 
             // Locale
             @Dependency(\.locale) var locale
-            XCTAssertNotNil(locale)
+            #expect(locale != nil)
 
             // Context
             @Dependency(\.context) var context
-            XCTAssertEqual(context, .live)
+            #expect(context == .live)
 
             // Assert (access doesn't crash)
             @Dependency(\.assert) var assertDep
-            XCTAssertNotNil(assertDep)
+            #expect(assertDep != nil)
 
             // FireAndForget (access doesn't crash)
             @Dependency(\.fireAndForget) var fireAndForget
-            XCTAssertNotNil(fireAndForget)
+            #expect(fireAndForget != nil)
 
             // WithRandomNumberGenerator (access doesn't crash)
             @Dependency(\.withRandomNumberGenerator) var rng
-            XCTAssertNotNil(rng)
+            #expect(rng != nil)
 
             // MainQueue (DispatchQueue.main via combine-schedulers)
             @Dependency(\.mainQueue) var mainQueue
-            XCTAssertNotNil(mainQueue)
+            #expect(mainQueue != nil)
 
             // MainRunLoop (RunLoop.main via combine-schedulers)
             @Dependency(\.mainRunLoop) var mainRunLoop
-            XCTAssertNotNil(mainRunLoop)
+            #expect(mainRunLoop != nil)
 
             // NotificationCenter
             @Dependency(\.notificationCenter) var notificationCenter
-            XCTAssertNotNil(notificationCenter)
+            #expect(notificationCenter != nil)
 
             // URLSession
             @Dependency(\.urlSession) var urlSession
-            XCTAssertNotNil(urlSession)
+            #expect(urlSession != nil)
 
             // OpenURL (macOS only, guarded by #if canImport(SwiftUI) && !os(Android))
             #if canImport(SwiftUI) && !os(Android)
             @Dependency(\.openURL) var openURL
-            XCTAssertNotNil(openURL)
+            #expect(openURL != nil)
             #endif
         }
     }
 
     // MARK: DEP-11: sibling isolation
 
-    @MainActor
-    func testDependencyIsolationBetweenSiblings() {
+    @Test func dependencyIsolationBetweenSiblings() {
         // Create two sibling stores with different dependency overrides
         let siblingA = Store(
             initialState: DepCounter.State()
@@ -338,19 +336,19 @@ final class DependencyTests: XCTestCase {
         // Sibling A should see 111
         siblingA.send(.increment)
         siblingA.withState { state in
-            XCTAssertEqual(state.count, 111)
+            #expect(state.count == 111)
         }
 
         // Sibling B should see 999 (not leaked from A)
         siblingB.send(.increment)
         siblingB.withState { state in
-            XCTAssertEqual(state.count, 999)
+            #expect(state.count == 999)
         }
 
         // Verify A is still 111 after B was mutated
         siblingA.send(.increment)
         siblingA.withState { state in
-            XCTAssertEqual(state.count, 111)
+            #expect(state.count == 111)
         }
     }
 
@@ -358,34 +356,31 @@ final class DependencyTests: XCTestCase {
 
     // MARK: DEP-07: @DependencyClient unimplemented reports issue
 
-    func testDependencyClientUnimplementedReportsIssue() {
+    @Test func dependencyClientUnimplementedReportsIssue() {
         let client = NumberClient()
 
-        XCTExpectFailure {
-            $0.compactDescription.contains("Unimplemented")
+        withKnownIssue {
+            // Calling unimplemented endpoint should report issue via reportIssue
+            let result = client.fetch(42)
+            // Default return for Int is 0 when unimplemented
+            #expect(result == 0)
         }
-
-        // Calling unimplemented endpoint should report issue via reportIssue
-        let result = client.fetch(42)
-        // Default return for Int is 0 when unimplemented
-        XCTAssertEqual(result, 0)
     }
 
     // MARK: DEP-07: @DependencyClient implemented endpoint
 
-    func testDependencyClientImplementedEndpoint() {
+    @Test func dependencyClientImplementedEndpoint() {
         withDependencies {
             $0[NumberClient.self] = NumberClient(fetch: { $0 * 2 })
         } operation: {
             @Dependency(NumberClient.self) var client
-            XCTAssertEqual(client.fetch(21), 42)
+            #expect(client.fetch(21) == 42)
         }
     }
 
     // MARK: DEP-08: Reducer .dependency modifier
 
-    @MainActor
-    func testReducerDependencyModifier() {
+    @Test func reducerDependencyModifier() {
         let store = Store(
             initialState: DepCounter.State()
         ) {
@@ -395,14 +390,13 @@ final class DependencyTests: XCTestCase {
 
         store.send(.increment)
         store.withState { state in
-            XCTAssertEqual(state.count, 999)
+            #expect(state.count == 999)
         }
     }
 
     // MARK: DEP-12: dependency resolves in effect closure
 
-    @MainActor
-    func testDependencyResolvesInEffectClosure() async throws {
+    @Test func dependencyResolvesInEffectClosure() async throws {
         let store = Store(
             initialState: DepCounter.State()
         ) {
@@ -416,14 +410,13 @@ final class DependencyTests: XCTestCase {
         store.withState { state in
             // Should be the first incrementing UUID, proving the dependency
             // propagated through the Effect.run boundary
-            XCTAssertEqual(state.id, UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+            #expect(state.id == UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
         }
     }
 
     // MARK: DEP-12: dependency resolves in merged effects
 
-    @MainActor
-    func testDependencyResolvesInMergedEffects() async throws {
+    @Test func dependencyResolvesInMergedEffects() async throws {
         let store = Store(
             initialState: MergedEffectFeature.State()
         ) {
@@ -436,20 +429,20 @@ final class DependencyTests: XCTestCase {
         try await Task.sleep(for: .milliseconds(100))
         store.withState { state in
             // Both effects should get incrementing UUIDs from the overridden dependency
-            XCTAssertNotNil(state.id1)
-            XCTAssertNotNil(state.id2)
+            #expect(state.id1 != nil)
+            #expect(state.id2 != nil)
             // They should be different (incrementing)
-            XCTAssertNotEqual(state.id1, state.id2)
+            #expect(state.id1 != state.id2)
         }
     }
 
     // MARK: NavigationID EnumMetadata tag validation
 
-    func testNavigationIDEnumMetadataTag() {
+    @Test func navigationIDEnumMetadataTag() {
         // Validate EnumMetadata.tag(of:) — the same code path NavigationID uses for hashing
         // TestAction is defined at file scope (macros can't attach to local types)
         guard let metadata = EnumMetadata(TestAction.self) else {
-            XCTFail("EnumMetadata should be constructible from TestAction enum")
+            Issue.record("EnumMetadata should be constructible from TestAction enum")
             return
         }
 
@@ -458,23 +451,23 @@ final class DependencyTests: XCTestCase {
         let tag2 = metadata.tag(of: TestAction.third)
 
         // Tags should be consistent for same case
-        XCTAssertEqual(tag0, metadata.tag(of: TestAction.first(99)))
-        XCTAssertEqual(tag1, metadata.tag(of: TestAction.second("world")))
+        #expect(tag0 == metadata.tag(of: TestAction.first(99)))
+        #expect(tag1 == metadata.tag(of: TestAction.second("world")))
 
         // Tags should be different between cases
-        XCTAssertNotEqual(tag0, tag1)
-        XCTAssertNotEqual(tag1, tag2)
-        XCTAssertNotEqual(tag0, tag2)
+        #expect(tag0 != tag1)
+        #expect(tag1 != tag2)
+        #expect(tag0 != tag2)
 
         // Verify case names
-        XCTAssertEqual(metadata.caseName(forTag: tag0), "first")
-        XCTAssertEqual(metadata.caseName(forTag: tag1), "second")
-        XCTAssertEqual(metadata.caseName(forTag: tag2), "third")
+        #expect(metadata.caseName(forTag: tag0) == "first")
+        #expect(metadata.caseName(forTag: tag1) == "second")
+        #expect(metadata.caseName(forTag: tag2) == "third")
     }
 
     // MARK: DEP-09: @TaskLocal propagation through async closures
 
-    func testTaskLocalPropagation() async {
+    @Test func taskLocalPropagation() async {
         await withDependencies {
             $0.uuid = .incrementing
         } operation: {
@@ -486,11 +479,11 @@ final class DependencyTests: XCTestCase {
                 return innerUUID()
             }.value
 
-            XCTAssertNotNil(id)
+            #expect(id != nil)
             // The incrementing generator should produce sequential UUIDs
             // even when accessed from within a Task
             let directID = uuid()
-            XCTAssertNotNil(directID)
+            #expect(directID != nil)
         }
     }
 }
@@ -517,7 +510,7 @@ private struct MergedEffectFeature {
         var id1: UUID?
         var id2: UUID?
     }
-    enum Action: Equatable {
+    enum Action {
         case fetchBoth
         case gotID1(UUID)
         case gotID2(UUID)
