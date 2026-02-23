@@ -192,7 +192,7 @@ struct UIPatternTests {
         try await Task.sleep(for: .milliseconds(500))
 
         #if os(Android)
-        withKnownIssue("Android timing: 500ms sleep insufficient for async effects to complete via JNI") {
+        withKnownIssue("Android timing: 500ms sleep insufficient for async effects to complete via JNI", isIntermittent: true) {
             #expect(store.loadingComplete == true)
         }
         #else

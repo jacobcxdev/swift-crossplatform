@@ -2,373 +2,190 @@
 [1/1] Compiling plugin Create SkipLink
 [2/2] Compiling plugin skipstone
 Building for debugging...
-[2/71] Write sources
-[3/71] Write swift-version-532228193F22D882.txt
-[5/15] Emitting module TCATests
-[6/15] Compiling TCATests DependencyTests.swift
-/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/Tests/TCATests/DependencyTests.swift:249:24: warning: comparing non-optional value of type 'UUID' to 'nil' always returns true
-247 |             @Dependency(\.uuid) var uuid
-248 |             let id = uuid()
-249 |             #expect(id != nil)
-    |                        `- warning: comparing non-optional value of type 'UUID' to 'nil' always returns true
-250 | 
-251 |             // Date
-
-/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/Tests/TCATests/DependencyTests.swift:254:25: warning: comparing non-optional value of type 'Date' to 'nil' always returns true
-252 |             @Dependency(\.date) var date
-253 |             let now = date()
-254 |             #expect(now != nil)
-    |                         `- warning: comparing non-optional value of type 'Date' to 'nil' always returns true
-255 | 
-256 |             // ContinuousClock
-
-/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/Tests/TCATests/DependencyTests.swift:258:37: warning: comparing non-optional value of type 'any Clock<Duration>' to 'nil' always returns true
-256 |             // ContinuousClock
-257 |             @Dependency(\.continuousClock) var continuousClock
-258 |             #expect(continuousClock != nil)
-    |                                     `- warning: comparing non-optional value of type 'any Clock<Duration>' to 'nil' always returns true
-259 | 
-260 |             // SuspendingClock
-
-/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/Tests/TCATests/DependencyTests.swift:262:37: warning: comparing non-optional value of type 'any Clock<Duration>' to 'nil' always returns true
-260 |             // SuspendingClock
-261 |             @Dependency(\.suspendingClock) var suspendingClock
-262 |             #expect(suspendingClock != nil)
-    |                                     `- warning: comparing non-optional value of type 'any Clock<Duration>' to 'nil' always returns true
-263 | 
-264 |             // Calendar
-
-/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/Tests/TCATests/DependencyTests.swift:266:30: warning: comparing non-optional value of type 'Calendar' to 'nil' always returns true
-264 |             // Calendar
-265 |             @Dependency(\.calendar) var calendar
-266 |             #expect(calendar != nil)
-    |                              `- warning: comparing non-optional value of type 'Calendar' to 'nil' always returns true
-267 | 
-268 |             // TimeZone
-
-/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/Tests/TCATests/DependencyTests.swift:270:30: warning: comparing non-optional value of type 'TimeZone' to 'nil' always returns true
-268 |             // TimeZone
-269 |             @Dependency(\.timeZone) var timeZone
-270 |             #expect(timeZone != nil)
-    |                              `- warning: comparing non-optional value of type 'TimeZone' to 'nil' always returns true
-271 | 
-272 |             // Locale
-
-/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/Tests/TCATests/DependencyTests.swift:274:28: warning: comparing non-optional value of type 'Locale' to 'nil' always returns true
-272 |             // Locale
-273 |             @Dependency(\.locale) var locale
-274 |             #expect(locale != nil)
-    |                            `- warning: comparing non-optional value of type 'Locale' to 'nil' always returns true
-275 | 
-276 |             // Context
-
-/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/Tests/TCATests/DependencyTests.swift:282:31: warning: comparing non-optional value of type 'any AssertionEffect' to 'nil' always returns true
-280 |             // Assert (access doesn't crash)
-281 |             @Dependency(\.assert) var assertDep
-282 |             #expect(assertDep != nil)
-    |                               `- warning: comparing non-optional value of type 'any AssertionEffect' to 'nil' always returns true
-283 | 
-284 |             // FireAndForget (access doesn't crash)
-
-/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/Tests/TCATests/DependencyTests.swift:286:35: warning: comparing non-optional value of type 'FireAndForget' to 'nil' always returns true
-284 |             // FireAndForget (access doesn't crash)
-285 |             @Dependency(\.fireAndForget) var fireAndForget
-286 |             #expect(fireAndForget != nil)
-    |                                   `- warning: comparing non-optional value of type 'FireAndForget' to 'nil' always returns true
-287 | 
-288 |             // WithRandomNumberGenerator (access doesn't crash)
-
-/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/Tests/TCATests/DependencyTests.swift:290:25: warning: comparing non-optional value of type 'WithRandomNumberGenerator' to 'nil' always returns true
-288 |             // WithRandomNumberGenerator (access doesn't crash)
-289 |             @Dependency(\.withRandomNumberGenerator) var rng
-290 |             #expect(rng != nil)
-    |                         `- warning: comparing non-optional value of type 'WithRandomNumberGenerator' to 'nil' always returns true
-291 | 
-292 |             // MainQueue (DispatchQueue.main via combine-schedulers) — Darwin only
-
-/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/Tests/TCATests/DependencyTests.swift:304:40: warning: comparing non-optional value of type 'NotificationCenter' to 'nil' always returns true
-302 |             // NotificationCenter
-303 |             @Dependency(\.notificationCenter) var notificationCenter
-304 |             #expect(notificationCenter != nil)
-    |                                        `- warning: comparing non-optional value of type 'NotificationCenter' to 'nil' always returns true
-305 | 
-306 |             // URLSession
-
-/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/Tests/TCATests/DependencyTests.swift:308:32: warning: comparing non-optional value of type 'URLSession' to 'nil' always returns true
-306 |             // URLSession
-307 |             @Dependency(\.urlSession) var urlSession
-308 |             #expect(urlSession != nil)
-    |                                `- warning: comparing non-optional value of type 'URLSession' to 'nil' always returns true
-309 | 
-310 |             // OpenURL (macOS only, guarded by #if canImport(SwiftUI) && !os(Android))
-
-/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/Tests/TCATests/DependencyTests.swift:484:24: warning: comparing non-optional value of type 'UUID' to 'nil' always returns true
-482 |             }.value
-483 | 
-484 |             #expect(id != nil)
-    |                        `- warning: comparing non-optional value of type 'UUID' to 'nil' always returns true
-485 |             // The incrementing generator should produce sequential UUIDs
-486 |             // even when accessed from within a Task
-
-/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/Tests/TCATests/DependencyTests.swift:488:30: warning: comparing non-optional value of type 'UUID' to 'nil' always returns true
-486 |             // even when accessed from within a Task
-487 |             let directID = uuid()
-488 |             #expect(directID != nil)
-    |                              `- warning: comparing non-optional value of type 'UUID' to 'nil' always returns true
-489 |         }
-490 |     }
-[7/20] Compiling TCATests TestStoreEdgeCaseTests.swift
-[8/20] Compiling TCATests TestStoreTests.swift
-[9/20] Compiling TCATests StoreReducerTests.swift
-[10/20] Compiling TCATests EffectTests.swift
-[11/20] Compiling TCATests ObservableStateTests.swift
-[12/21] /Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageDiscoveredTests.derived/all-discovered-tests.swift
-[13/21] Write sources
-[14/21] Wrapping AST for TCATests for debugging
-[16/29] Compiling fuse_libraryPackageDiscoveredTests TCATests.swift
-[17/29] Compiling fuse_libraryPackageDiscoveredTests all-discovered-tests.swift
-[18/29] Compiling fuse_libraryPackageDiscoveredTests SharingTests.swift
-[19/29] Compiling fuse_libraryPackageDiscoveredTests NavigationTests.swift
-[20/29] Emitting module fuse_libraryPackageDiscoveredTests
-[21/29] Compiling fuse_libraryPackageDiscoveredTests ObservationTests.swift
-[22/29] Compiling fuse_libraryPackageDiscoveredTests FoundationTests.swift
-[23/29] Compiling fuse_libraryPackageDiscoveredTests DatabaseTests.swift
-[24/30] /Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.derived/runner.swift
-[25/30] Write sources
-[26/32] Wrapping AST for fuse-libraryPackageDiscoveredTests for debugging
-[28/32] Compiling fuse_libraryPackageTests runner.swift
-[29/32] Emitting module fuse_libraryPackageTests
-[30/33] Wrapping AST for fuse-libraryPackageTests for debugging
-[31/33] Write Objects.LinkFileList
-[32/33] Linking fuse-libraryPackageTests.xctest
-Build complete! (14.92s)
-[[36m⠁[0m] Check Swift Package[2K[[36m⠄[0m] Check Swift Package[2K[[36m⢈[0m] Check Swift Package[2K[[36m⢠[0m] Check Swift Package[2K[[36m⣀[0m] Check Swift Package[2K[[36m⣐[0m] Check Swift Package[2K[[36m⣄[0m] Check Swift Package[2K[[36m⣌[0m] Check Swift Package[2K[[36m⣆[0m] Check Swift Package[2K[[36m⣤[0m] Check Swift Package[2K[[36m⣥[0m] Check Swift Package[2K[[36m⣴[0m] Check Swift Package[2K[[32m✓[0m] Check Swift Package (0.66s)
-[[36m⠙[0m] Connecting to Android[2K[[36m⠦[0m] Connecting to Android[2K[[36m⢤[0m] Connecting to Android[2K[[32m✓[0m] Connecting to Android (0.16s)
-[[36m⠁[0m] Copying test files[2K[[36m⢀[0m] Copying test files[2K[[36m⢂[0m] Copying test files[2K[[36m⢠[0m] Copying test files[2K[[36m⣁[0m] Copying test files[2K[[36m⣐[0m] Copying test files[2K[[36m⣄[0m] Copying test files[2K[[36m⣌[0m] Copying test files[2K[[36m⣆[0m] Copying test files[2K[[36m⣤[0m] Copying test files[2K[[36m⣥[0m] Copying test files[2K[[36m⣴[0m] Copying test files[2K[[36m⣼[0m] Copying test files[2K[[36m⣶[0m] Copying test files[2K[[36m⣷[0m] Copying test files[2K[[36m⣿[0m] Copying test files[2K[[36m⣾[0m] Copying test files[2K[[36m⣶[0m] Copying test files[2K[2K[[36m⣦[0m] Copying test files[2K[[36m⣤[0m] Copying test files[2K[[36m⣠[0m] Copying test files[2K[[36m⣀[0m] Copying test files[2K[2K[[36m⡀[0m] Copying test files[2K[[36m⠀[0m] Copying test files[2K[2K[2K[[36m⠁[0m] Copying test files[2K[2K[[36m⠐[0m] Copying test files[2K[[36m⠄[0m] Copying test files[2K[2K[[36m⢀[0m] Copying test files[2K[[36m⢈[0m] Copying test files[2K[2K[[36m⢂[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.xctest: 1 file pushed, 0 skipped. 32.6 MB/s (64414480 bytes in 1.884s)[0m[2K[[36m⢠[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.xctest: 1 file pushed, 0 skipped. 32.6 MB/s (64414480 bytes in 1.884s)[0m[2K[[36m⢠[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.xctest: 1 file pushed, 0 skipped. 32.6 MB/s (64414480 bytes in 1.884s)[0m[2K[[36m⣀[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.xctest: 1 file pushed, 0 skipped. 32.6 MB/s (64414480 bytes in 1.884s)[0m[2K[[36m⣁[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.xctest: 1 file pushed, 0 skipped. 32.6 MB/s (64414480 bytes in 1.884s)[0m[2K[[36m⣁[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.xctest: 1 file pushed, 0 skipped. 32.6 MB/s (64414480 bytes in 1.884s)[0m[2K[[36m⣐[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.xctest: 1 file pushed, 0 skipped. 32.6 MB/s (64414480 bytes in 1.884s)[0m[2K[[36m⣐[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.xctest: 1 file pushed, 0 skipped. 32.6 MB/s (64414480 bytes in 1.884s)[0m[2K[[36m⣄[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.xctest: 1 file pushed, 0 skipped. 32.6 MB/s (64414480 bytes in 1.884s)[0m[2K[[36m⣌[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.xctest: 1 file pushed, 0 skipped. 32.6 MB/s (64414480 bytes in 1.884s)[0m[2K[[36m⣌[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.xctest: 1 file pushed, 0 skipped. 32.6 MB/s (64414480 bytes in 1.884s)[0m[2K[[36m⣆[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.xctest: 1 file pushed, 0 skipped. 32.6 MB/s (64414480 bytes in 1.884s)[0m[2K[[36m⣆[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.xctest: 1 file pushed, 0 skipped. 32.6 MB/s (64414480 bytes in 1.884s)[0m[2K[[36m⣤[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.xctest: 1 file pushed, 0 skipped. 32.6 MB/s (64414480 bytes in 1.884s)[0m[2K[[36m⣥[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.xctest: 1 file pushed, 0 skipped. 32.6 MB/s (64414480 bytes in 1.884s)[0m[2K[[36m⣥[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.xctest: 1 file pushed, 0 skipped. 32.6 MB/s (64414480 bytes in 1.884s)[0m[2K[[36m⣴[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.xctest: 1 file pushed, 0 skipped. 32.6 MB/s (64414480 bytes in 1.884s)[0m[2K[[36m⣴[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.xctest: 1 file pushed, 0 skipped. 32.6 MB/s (64414480 bytes in 1.884s)[0m[2K[[36m⣼[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.xctest: 1 file pushed, 0 skipped. 32.6 MB/s (64414480 bytes in 1.884s)[0m[2K[[36m⣼[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.xctest: 1 file pushed, 0 skipped. 32.6 MB/s (64414480 bytes in 1.884s)[0m[2K[[36m⣶[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.xctest: 1 file pushed, 0 skipped. 32.6 MB/s (64414480 bytes in 1.884s)[0m[2K[[36m⣷[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.xctest: 1 file pushed, 0 skipped. 32.6 MB/s (64414480 bytes in 1.884s)[0m[2K[[36m⣷[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/GRDB_GRDB.resources/: 2 files pushed, 0 skipped. 0.0 MB/s (649 bytes in 1.364s)[0m[2K[[36m⣿[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/GRDB_GRDB.resources/: 2 files pushed, 0 skipped. 0.0 MB/s (649 bytes in 1.364s)[0m[2K[[36m⣿[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/GRDB_GRDB.resources/: 2 files pushed, 0 skipped. 0.0 MB/s (649 bytes in 1.364s)[0m[2K[[36m⣾[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/GRDB_GRDB.resources/: 2 files pushed, 0 skipped. 0.0 MB/s (649 bytes in 1.364s)[0m[2K[[36m⣾[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/GRDB_GRDB.resources/: 2 files pushed, 0 skipped. 0.0 MB/s (649 bytes in 1.364s)[0m[2K[[36m⣶[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⣶[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⣦[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⣦[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⣤[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⣤[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⣠[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⣠[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⣀[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⣀[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⡀[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⡀[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⠀[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⠀[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⠀[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⠁[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⠁[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⠁[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⠐[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⠐[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⠄[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⠄[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⢀[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⢀[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⢈[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibrary.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (14162 bytes in 0.271s)[0m[2K[[36m⢈[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibraryTests.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (681 bytes in 1.410s)[0m[2K[[36m⢂[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibraryTests.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (681 bytes in 1.410s)[0m[2K[[36m⢂[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibraryTests.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (681 bytes in 1.410s)[0m[2K[[36m⢠[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-library_FuseLibraryTests.resources/: 3 files pushed, 0 skipped. 0.0 MB/s (681 bytes in 1.410s)[0m[2K[[36m⢠[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/skip-android-bridge_SkipAndroidBridge.resources/: 2 files pushed, 0 skipped. 0.0 MB/s (1412 bytes in 0.030s)[0m[2K[[36m⣀[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/skip-bridge_SkipBridge.resources/: 1 file pushed, 0 skipped. 0.0 MB/s (998 bytes in 0.053s)[0m[2K[[36m⣀[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/skip-lib_SkipLib.resources/: 1 file pushed, 0 skipped. 0.9 MB/s (5289 bytes in 0.005s)[0m[2K[[36m⣁[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/skip-ui_SkipUI.resources/: 1 file pushed, 0 skipped. 0.6 MB/s (23270 bytes in 0.039s)[0m[2K[[36m⣁[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/libSkipAndroidBridge.so: 1 file pushed, 0 skipped. 333.7 MB/s (3715896 bytes in 0.011s)[0m[2K[[36m⣐[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/libSkipFuse.so: 1 file pushed, 0 skipped. 380.4 MB/s (32528 bytes in 0.000s)[0m[2K[[36m⣐[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/libSkipFuse.so: 1 file pushed, 0 skipped. 380.4 MB/s (32528 bytes in 0.000s)[0m[2K[[36m⣄[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/libSkipModel.so: 1 file pushed, 0 skipped. 154.2 MB/s (72576 bytes in 0.000s)[0m[2K[[36m⣄[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libBlocksRuntime.so: 1 file pushed, 0 skipped. 168.0 MB/s (14720 bytes in 0.000s)[0m[2K[[36m⣄[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libFoundation.so: 1 file pushed, 0 skipped. 94.4 MB/s (9085696 bytes in 0.092s)[0m[2K[[36m⣌[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libFoundationInternationalization.so: 1 file pushed, 0 skipped. 458.7 MB/s (3927896 bytes in 0.008s)[0m[2K[[36m⣌[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libFoundationInternationalization.so: 1 file pushed, 0 skipped. 458.7 MB/s (3927896 bytes in 0.008s)[0m[2K[[36m⣆[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libFoundationInternationalization.so: 1 file pushed, 0 skipped. 458.7 MB/s (3927896 bytes in 0.008s)[0m[2K[[36m⣆[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libFoundationInternationalization.so: 1 file pushed, 0 skipped. 458.7 MB/s (3927896 bytes in 0.008s)[0m[2K[[36m⣤[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libFoundationInternationalization.so: 1 file pushed, 0 skipped. 458.7 MB/s (3927896 bytes in 0.008s)[0m[2K[[36m⣤[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libFoundationInternationalization.so: 1 file pushed, 0 skipped. 458.7 MB/s (3927896 bytes in 0.008s)[0m[2K[[36m⣥[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libFoundationNetworking.so: 1 file pushed, 0 skipped. 46.4 MB/s (16614280 bytes in 0.342s)[0m[2K[[36m⣥[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libFoundationXML.so: 1 file pushed, 0 skipped. 86.0 MB/s (6030128 bytes in 0.067s)[0m[2K[[36m⣥[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libXCTest.so: 1 file pushed, 0 skipped. 275.9 MB/s (550864 bytes in 0.002s)[0m[2K[[36m⣴[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libXCTest.so: 1 file pushed, 0 skipped. 275.9 MB/s (550864 bytes in 0.002s)[0m[2K[[36m⣴[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libXCTest.so: 1 file pushed, 0 skipped. 275.9 MB/s (550864 bytes in 0.002s)[0m[2K[[36m⣼[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libXCTest.so: 1 file pushed, 0 skipped. 275.9 MB/s (550864 bytes in 0.002s)[0m[2K[[36m⣼[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libXCTest.so: 1 file pushed, 0 skipped. 275.9 MB/s (550864 bytes in 0.002s)[0m[2K[[36m⣶[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libXCTest.so: 1 file pushed, 0 skipped. 275.9 MB/s (550864 bytes in 0.002s)[0m[2K[[36m⣶[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libXCTest.so: 1 file pushed, 0 skipped. 275.9 MB/s (550864 bytes in 0.002s)[0m[2K[[36m⣷[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libXCTest.so: 1 file pushed, 0 skipped. 275.9 MB/s (550864 bytes in 0.002s)[0m[2K[[36m⣷[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libXCTest.so: 1 file pushed, 0 skipped. 275.9 MB/s (550864 bytes in 0.002s)[0m[2K[[36m⣷[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libXCTest.so: 1 file pushed, 0 skipped. 275.9 MB/s (550864 bytes in 0.002s)[0m[2K[[36m⣿[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libXCTest.so: 1 file pushed, 0 skipped. 275.9 MB/s (550864 bytes in 0.002s)[0m[2K[[36m⣿[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libswiftAndroid.so: 1 file pushed, 0 skipped. 174.8 MB/s (80648 bytes in 0.000s)[0m[2K[[36m⣾[0m] Copying test files: [36m/opt/homebrew/Caskroom/android-ndk/29/AndroidNDK14206865.app/Contents/NDK/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so: 1 file pushed, 0 skipped. 456.2 MB/s (9290184 bytes in 0.019s)[0m[2K[[36m⣾[0m] Copying test files: [36m/opt/homebrew/Caskroom/android-ndk/29/AndroidNDK14206865.app/Contents/NDK/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so: 1 file pushed, 0 skipped. 456.2 MB/s (9290184 bytes in 0.019s)[0m[2K[[36m⣶[0m] Copying test files: [36m/opt/homebrew/Caskroom/android-ndk/29/AndroidNDK14206865.app/Contents/NDK/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so: 1 file pushed, 0 skipped. 456.2 MB/s (9290184 bytes in 0.019s)[0m[2K[[36m⣶[0m] Copying test files: [36m/opt/homebrew/Caskroom/android-ndk/29/AndroidNDK14206865.app/Contents/NDK/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so: 1 file pushed, 0 skipped. 456.2 MB/s (9290184 bytes in 0.019s)[0m[2K[[36m⣶[0m] Copying test files: [36m/opt/homebrew/Caskroom/android-ndk/29/AndroidNDK14206865.app/Contents/NDK/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so: 1 file pushed, 0 skipped. 456.2 MB/s (9290184 bytes in 0.019s)[0m[2K[[36m⣦[0m] Copying test files: [36m/opt/homebrew/Caskroom/android-ndk/29/AndroidNDK14206865.app/Contents/NDK/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so: 1 file pushed, 0 skipped. 456.2 MB/s (9290184 bytes in 0.019s)[0m[2K[[36m⣦[0m] Copying test files: [36m/opt/homebrew/Caskroom/android-ndk/29/AndroidNDK14206865.app/Contents/NDK/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so: 1 file pushed, 0 skipped. 456.2 MB/s (9290184 bytes in 0.019s)[0m[2K[[36m⣤[0m] Copying test files: [36m/opt/homebrew/Caskroom/android-ndk/29/AndroidNDK14206865.app/Contents/NDK/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so: 1 file pushed, 0 skipped. 456.2 MB/s (9290184 bytes in 0.019s)[0m[2K[[36m⣤[0m] Copying test files: [36m/opt/homebrew/Caskroom/android-ndk/29/AndroidNDK14206865.app/Contents/NDK/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so: 1 file pushed, 0 skipped. 456.2 MB/s (9290184 bytes in 0.019s)[0m[2K[[36m⣠[0m] Copying test files: [36m/opt/homebrew/Caskroom/android-ndk/29/AndroidNDK14206865.app/Contents/NDK/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so: 1 file pushed, 0 skipped. 456.2 MB/s (9290184 bytes in 0.019s)[0m[2K[[36m⣠[0m] Copying test files: [36m/opt/homebrew/Caskroom/android-ndk/29/AndroidNDK14206865.app/Contents/NDK/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so: 1 file pushed, 0 skipped. 456.2 MB/s (9290184 bytes in 0.019s)[0m[2K[[36m⣠[0m] Copying test files: [36m63 files pushed, 0 skipped. 27.0 MB/s (212311881 bytes in 7.492s)[0m[2K[[32m✓[0m] Copying test files (7.61s)
-Test Suite 'All tests' started at 2026-02-23 17:38:39.461
-Test Suite 'fuse-library-55EA9715-D08A-4112-824B-F70A27C79830.xctest' started at 2026-02-23 17:38:39.498
-Test Suite 'FuseLibraryTests' started at 2026-02-23 17:38:39.498
-Test Case 'FuseLibraryTests.testAsyncThrowsFunction' started at 2026-02-23 17:38:39.498
-Test Case 'FuseLibraryTests.testAsyncThrowsFunction' passed (0.021 seconds)
-Test Case 'FuseLibraryTests.testFuseLibrary' started at 2026-02-23 17:38:39.519
-Test Case 'FuseLibraryTests.testFuseLibrary' passed (0.007 seconds)
-Test Suite 'FuseLibraryTests' passed at 2026-02-23 17:38:39.526
-	 Executed 2 tests, with 0 failures (0 unexpected) in 0.028 (0.028) seconds
-Test Suite 'ObservationTests' started at 2026-02-23 17:38:39.526
-Test Case 'ObservationTests.testMultiTrackerIndependence' started at 2026-02-23 17:38:39.526
-Test Case 'ObservationTests.testMultiTrackerIndependence' passed (0.004 seconds)
-Test Case 'ObservationTests.testMultipleObservableInstances' started at 2026-02-23 17:38:39.530
-Test Case 'ObservationTests.testMultipleObservableInstances' passed (0.007 seconds)
-Test Case 'ObservationTests.testMutationWithoutObservation' started at 2026-02-23 17:38:39.537
-Test Case 'ObservationTests.testMutationWithoutObservation' passed (0.003 seconds)
-Test Case 'ObservationTests.testNestedObservableProperties' started at 2026-02-23 17:38:39.540
-Test Case 'ObservationTests.testNestedObservableProperties' passed (0.006 seconds)
-Test Case 'ObservationTests.testObservableComputedProperty' started at 2026-02-23 17:38:39.547
-Test Case 'ObservationTests.testObservableComputedProperty' passed (0.002 seconds)
-Test Case 'ObservationTests.testObservablePropertyReadWrite' started at 2026-02-23 17:38:39.549
-Test Case 'ObservationTests.testObservablePropertyReadWrite' passed (0.002 seconds)
-Test Case 'ObservationTests.testObservationIgnoredProperty' started at 2026-02-23 17:38:39.551
-Test Case 'ObservationTests.testObservationIgnoredProperty' passed (0.007 seconds)
-Test Case 'ObservationTests.testVerifyBasicTracking' started at 2026-02-23 17:38:39.559
-Test Case 'ObservationTests.testVerifyBasicTracking' passed (0.006 seconds)
-Test Case 'ObservationTests.testVerifyBulkMutationCoalescing' started at 2026-02-23 17:38:39.565
-Test Case 'ObservationTests.testVerifyBulkMutationCoalescing' passed (0.014 seconds)
-Test Case 'ObservationTests.testVerifyComputedPropertyTracking' started at 2026-02-23 17:38:39.579
-Test Case 'ObservationTests.testVerifyComputedPropertyTracking' passed (0.004 seconds)
-Test Case 'ObservationTests.testVerifyIgnoredProperty' started at 2026-02-23 17:38:39.583
-Test Case 'ObservationTests.testVerifyIgnoredProperty' passed (0.002 seconds)
-Test Case 'ObservationTests.testVerifyMultiPropertySingleOnChange' started at 2026-02-23 17:38:39.585
+[2/18] Write swift-version-532228193F22D882.txt
+Build complete! (12.04s)
+[[36m⠁[0m] Check Swift Package[2K[[36m⢀[0m] Check Swift Package[2K[[36m⢈[0m] Check Swift Package[2K[[36m⢠[0m] Check Swift Package[2K[[36m⣀[0m] Check Swift Package[2K[[36m⣐[0m] Check Swift Package[2K[[36m⣄[0m] Check Swift Package[2K[[36m⣌[0m] Check Swift Package[2K[[36m⣆[0m] Check Swift Package[2K[[36m⣤[0m] Check Swift Package[2K[[36m⣥[0m] Check Swift Package[2K[[36m⣴[0m] Check Swift Package[2K[[36m⣼[0m] Check Swift Package[2K[[36m⣶[0m] Check Swift Package[2K[[36m⣷[0m] Check Swift Package[2K[[32m✓[0m] Check Swift Package (0.81s)
+[[36m⠙[0m] Connecting to Android[2K[[32m✓[0m] Connecting to Android (0.03s)
+[[36m⠁[0m] Copying test files[2K[[36m⢀[0m] Copying test files[2K[[36m⢈[0m] Copying test files[2K[[36m⢠[0m] Copying test files[2K[[36m⣀[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/fuse-libraryPackageTests.xctest: 1 file pushed, 0 skipped. 376.7 MB/s (64416720 bytes in 0.163s)[0m[2K[[36m⣐[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/skip-bridge_SkipBridge.resources/: 1 file pushed, 0 skipped. 0.3 MB/s (998 bytes in 0.004s)[0m[2K[[36m⣄[0m] Copying test files: [36m/Users/jacob/Developer/src/github/jacobcxdev/swift-crossplatform/examples/fuse-library/.build/aarch64-unknown-linux-android28/debug/libSkipFuse.so: 1 file pushed, 0 skipped. 124.7 MB/s (32528 bytes in 0.000s)[0m[2K[[36m⣌[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libBlocksRuntime.so: 1 file pushed, 0 skipped. 146.3 MB/s (14720 bytes in 0.000s)[0m[2K[[36m⣆[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libFoundation.so: 1 file pushed, 0 skipped. 241.4 MB/s (9085696 bytes in 0.036s)[0m[2K[[36m⣤[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libFoundationInternationalization.so: 1 file pushed, 0 skipped. 525.4 MB/s (3927896 bytes in 0.007s)[0m[2K[[36m⣥[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libXCTest.so: 1 file pushed, 0 skipped. 395.6 MB/s (550864 bytes in 0.001s)[0m[2K[[36m⣴[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libXCTest.so: 1 file pushed, 0 skipped. 395.6 MB/s (550864 bytes in 0.001s)[0m[2K[[36m⣼[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libXCTest.so: 1 file pushed, 0 skipped. 395.6 MB/s (550864 bytes in 0.001s)[0m[2K[[36m⣶[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libswiftAndroid.so: 1 file pushed, 0 skipped. 270.3 MB/s (80648 bytes in 0.000s)[0m[2K[[36m⣷[0m] Copying test files: [36m/Users/jacob/Library/org.swift.swiftpm/swift-sdks/swift-6.2.3-RELEASE_android.artifactbundle/swift-android/swift-resources/usr/lib/swift-aarch64/android/libswift_math.so: 1 file pushed, 0 skipped. 131.1 MB/s (11056 bytes in 0.000s)[0m[2K[[36m⣿[0m] Copying test files: [36m/opt/homebrew/Caskroom/android-ndk/29/AndroidNDK14206865.app/Contents/NDK/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so: 1 file pushed, 0 skipped. 232.2 MB/s (9290184 bytes in 0.038s)[0m[2K[[32m✓[0m] Copying test files (0.85s)
+Test Suite 'All tests' started at 2026-02-23 18:38:10.488
+Test Suite 'fuse-library-782544AA-4644-4AFC-B646-B784F0C3A645.xctest' started at 2026-02-23 18:38:10.490
+Test Suite 'FuseLibraryTests' started at 2026-02-23 18:38:10.490
+Test Case 'FuseLibraryTests.testAsyncThrowsFunction' started at 2026-02-23 18:38:10.490
+Test Case 'FuseLibraryTests.testAsyncThrowsFunction' passed (0.007 seconds)
+Test Case 'FuseLibraryTests.testFuseLibrary' started at 2026-02-23 18:38:10.497
+Test Case 'FuseLibraryTests.testFuseLibrary' passed (0.001 seconds)
+Test Suite 'FuseLibraryTests' passed at 2026-02-23 18:38:10.499
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.008 (0.008) seconds
+Test Suite 'ObservationTests' started at 2026-02-23 18:38:10.499
+Test Case 'ObservationTests.testMultiTrackerIndependence' started at 2026-02-23 18:38:10.499
+Test Case 'ObservationTests.testMultiTrackerIndependence' passed (0.0 seconds)
+Test Case 'ObservationTests.testMultipleObservableInstances' started at 2026-02-23 18:38:10.499
+Test Case 'ObservationTests.testMultipleObservableInstances' passed (0.001 seconds)
+Test Case 'ObservationTests.testMutationWithoutObservation' started at 2026-02-23 18:38:10.501
+Test Case 'ObservationTests.testMutationWithoutObservation' passed (0.001 seconds)
+Test Case 'ObservationTests.testNestedObservableProperties' started at 2026-02-23 18:38:10.501
+Test Case 'ObservationTests.testNestedObservableProperties' passed (0.0 seconds)
+Test Case 'ObservationTests.testObservableComputedProperty' started at 2026-02-23 18:38:10.502
+Test Case 'ObservationTests.testObservableComputedProperty' passed (0.001 seconds)
+Test Case 'ObservationTests.testObservablePropertyReadWrite' started at 2026-02-23 18:38:10.502
+Test Case 'ObservationTests.testObservablePropertyReadWrite' passed (0.001 seconds)
+Test Case 'ObservationTests.testObservationIgnoredProperty' started at 2026-02-23 18:38:10.503
+Test Case 'ObservationTests.testObservationIgnoredProperty' passed (0.002 seconds)
+Test Case 'ObservationTests.testVerifyBasicTracking' started at 2026-02-23 18:38:10.505
+Test Case 'ObservationTests.testVerifyBasicTracking' passed (0.003 seconds)
+Test Case 'ObservationTests.testVerifyBulkMutationCoalescing' started at 2026-02-23 18:38:10.508
+Test Case 'ObservationTests.testVerifyBulkMutationCoalescing' passed (0.002 seconds)
+Test Case 'ObservationTests.testVerifyComputedPropertyTracking' started at 2026-02-23 18:38:10.510
+Test Case 'ObservationTests.testVerifyComputedPropertyTracking' passed (0.001 seconds)
+Test Case 'ObservationTests.testVerifyIgnoredProperty' started at 2026-02-23 18:38:10.511
+Test Case 'ObservationTests.testVerifyIgnoredProperty' passed (0.006 seconds)
+Test Case 'ObservationTests.testVerifyMultiPropertySingleOnChange' started at 2026-02-23 18:38:10.517
 Test Case 'ObservationTests.testVerifyMultiPropertySingleOnChange' passed (0.002 seconds)
-Test Case 'ObservationTests.testVerifyMultipleObservables' started at 2026-02-23 17:38:39.587
-Test Case 'ObservationTests.testVerifyMultipleObservables' passed (0.006 seconds)
-Test Case 'ObservationTests.testVerifyMultiplePropertyTracking' started at 2026-02-23 17:38:39.592
-Test Case 'ObservationTests.testVerifyMultiplePropertyTracking' passed (0.004 seconds)
-Test Case 'ObservationTests.testVerifyNestedObservationCycles' started at 2026-02-23 17:38:39.596
-Test Case 'ObservationTests.testVerifyNestedObservationCycles' passed (0.001 seconds)
-Test Case 'ObservationTests.testVerifyNestedTracking' started at 2026-02-23 17:38:39.597
-Test Case 'ObservationTests.testVerifyNestedTracking' passed (0.007 seconds)
-Test Case 'ObservationTests.testVerifyObservationIgnoredNoTracking' started at 2026-02-23 17:38:39.604
-Test Case 'ObservationTests.testVerifyObservationIgnoredNoTracking' passed (0.005 seconds)
-Test Case 'ObservationTests.testVerifySequentialObservationCyclesResubscribe' started at 2026-02-23 17:38:39.609
-Test Case 'ObservationTests.testVerifySequentialObservationCyclesResubscribe' passed (0.003 seconds)
-Test Case 'ObservationTests.testVerifySequentialTracking' started at 2026-02-23 17:38:39.613
-Test Case 'ObservationTests.testVerifySequentialTracking' passed (0.002 seconds)
-Test Suite 'ObservationTests' passed at 2026-02-23 17:38:39.615
-	 Executed 19 tests, with 0 failures (0 unexpected) in 0.087 (0.087) seconds
-Test Suite 'fuse-library-55EA9715-D08A-4112-824B-F70A27C79830.xctest' passed at 2026-02-23 17:38:39.615
-	 Executed 21 tests, with 0 failures (0 unexpected) in 0.115 (0.115) seconds
-Test Suite 'All tests' passed at 2026-02-23 17:38:39.615
-	 Executed 21 tests, with 0 failures (0 unexpected) in 0.115 (0.115) seconds
+Test Case 'ObservationTests.testVerifyMultipleObservables' started at 2026-02-23 18:38:10.518
+Test Case 'ObservationTests.testVerifyMultipleObservables' passed (0.003 seconds)
+Test Case 'ObservationTests.testVerifyMultiplePropertyTracking' started at 2026-02-23 18:38:10.521
+Test Case 'ObservationTests.testVerifyMultiplePropertyTracking' passed (0.002 seconds)
+Test Case 'ObservationTests.testVerifyNestedObservationCycles' started at 2026-02-23 18:38:10.523
+Test Case 'ObservationTests.testVerifyNestedObservationCycles' passed (0.003 seconds)
+Test Case 'ObservationTests.testVerifyNestedTracking' started at 2026-02-23 18:38:10.526
+Test Case 'ObservationTests.testVerifyNestedTracking' passed (0.003 seconds)
+Test Case 'ObservationTests.testVerifyObservationIgnoredNoTracking' started at 2026-02-23 18:38:10.529
+Test Case 'ObservationTests.testVerifyObservationIgnoredNoTracking' passed (0.002 seconds)
+Test Case 'ObservationTests.testVerifySequentialObservationCyclesResubscribe' started at 2026-02-23 18:38:10.531
+Test Case 'ObservationTests.testVerifySequentialObservationCyclesResubscribe' passed (0.002 seconds)
+Test Case 'ObservationTests.testVerifySequentialTracking' started at 2026-02-23 18:38:10.533
+Test Case 'ObservationTests.testVerifySequentialTracking' passed (0.001 seconds)
+Test Suite 'ObservationTests' passed at 2026-02-23 18:38:10.535
+	 Executed 19 tests, with 0 failures (0 unexpected) in 0.036 (0.036) seconds
+Test Suite 'fuse-library-782544AA-4644-4AFC-B646-B784F0C3A645.xctest' passed at 2026-02-23 18:38:10.535
+	 Executed 21 tests, with 0 failures (0 unexpected) in 0.044 (0.044) seconds
+Test Suite 'All tests' passed at 2026-02-23 18:38:10.535
+	 Executed 21 tests, with 0 failures (0 unexpected) in 0.044 (0.044) seconds
 ◇ Test run started.
 ↳ Testing Library Version: 6.2.3
 ↳ Target Platform: aarch64-unknown-linux-android
 ◇ Suite NavigationStackTests started.
 ◇ Suite UIPatternTests started.
-◇ Suite PresentationTests started.
-◇ Suite SQLiteDataTests started.
-◇ Suite StructuredQueriesTests started.
-◇ Suite SharedObservationTests started.
-◇ Suite SharedPersistenceTests started.
-◇ Suite SharedBindingTests started.
-◇ Suite "Observation Bridge Semantics" started.
-◇ Suite "Stress Tests" started.
-◇ Suite DependencyTests started.
-◇ Suite StoreReducerTests started.
-◇ Suite BindingTests started.
-◇ Suite EffectTests started.
-◇ Suite ObservableStateTests started.
-◇ Suite TestStoreEdgeCaseTests started.
 ◇ Suite NavigationTests started.
+◇ Suite PresentationTests started.
+◇ Suite DependencyTests started.
+◇ Suite "Observation Bridge Semantics" started.
+◇ Suite BindingTests started.
+◇ Suite ObservableStateTests started.
+◇ Suite SharedBindingTests started.
 ◇ Suite TestStoreTests started.
+◇ Suite StoreReducerTests started.
+◇ Suite SharedPersistenceTests started.
+◇ Suite SharedObservationTests started.
+◇ Suite StructuredQueriesTests started.
+◇ Suite SQLiteDataTests started.
+◇ Test reportIssueStringMessage() started.
+◇ Suite TestStoreEdgeCaseTests started.
+◇ Test customDumpOptionalNil() started.
+◇ Test withErrorReportingReturnsNilOnError() started.
 ◇ Test subscriptMutation() started.
 ◇ Test diffEnumChanges() started.
-◇ Test diffDetectsChanges() started.
+◇ Test customDumpCollectionOutput() started.
+◇ Test customDumpStructOutput() started.
+◇ Test expectNoDifferencePassesForEqualValues() started.
+◇ Suite EffectTests started.
+◇ Test removeByID() started.
+◇ Test modifyInPlace() started.
 ◇ Test casePathableGeneratesAccessors() started.
-◇ Test withErrorReportingReturnsNilOnError() started.
-◇ Test withErrorReportingAsyncCatchesErrors() started.
+◇ Test subscriptWriteNilRemoves() started.
+◇ Test subscriptReadByID() started.
+◇ Test reportIssueIncludesSourceLocation() started.
+◇ Test allCasePathsCollection() started.
+◇ Test customDumpEnumOutput() started.
+◇ Test enumMetadataABISmokeTest() started.
+◇ Test expectNoDifferenceFailsForDifferentValues() started.
 ◇ Test nestedCasePathable() started.
-◇ Test reportIssueStringMessage() started.
-◇ Test customDumpNestedStruct() started.
 ◇ Test codableConformance() started.
-◇ Test withErrorReportingSyncCatchesErrors() started.
+◇ Test anyCasePathCustomClosures() started.
+◇ Test expectDifferenceDetectsChanges() started.
+◇ Test idsProperty() started.
+◇ Test reportIssueErrorInstance() started.
+◇ Test withErrorReportingAsyncCatchesErrors() started.
 ◇ Test stringCustomDumping() started.
 ◇ Test isCheck() started.
-◇ Test customDumpCollectionOutput() started.
-◇ Test casePathExtraction() started.
-◇ Test idsProperty() started.
-◇ Test allCasePathsCollection() started.
+◇ Test initFromArrayLiteral() started.
 ◇ Test caseSubscriptAndEmbed() started.
-◇ Test customDumpEnumOutput() started.
-◇ Test reportIssueIncludesSourceLocation() started.
-◇ Test customDumpStructOutput() started.
-◇ Test subscriptReadByID() started.
-◇ Test subscriptWriteNilRemoves() started.
-◇ Test reportIssueErrorInstance() started.
-◇ Test modifyInPlace() started.
-◇ Test enumMetadataABISmokeTest() started.
-◇ Test anyCasePathCustomClosures() started.
-◇ Test expectNoDifferencePassesForEqualValues() started.
-◇ Test customDumpOptionalNil() started.
-◇ Test testStackPathScopeBinding() started.
 ◇ Test testNavigationDestinationItemBinding() started.
-◇ Test testNavigationStackPush() started.
-◇ Test testNavigationStackPopAll() started.
 ◇ Test testNavigationStackPop() started.
-◇ Test testNavigationStackChildMutation() started.
 ◇ Test testModernAPIUsage() started.
-◇ Test testAsyncTaskInActionClosure() started.
-◇ Test testMultipleAsyncEffects() started.
-◇ Test testStateMutationSingleUpdate() started.
+◇ Test testNavigationStackPush() started.
+◇ Test casePathExtraction() started.
 ◇ Test testSheetContentInteraction() started.
-◇ Test testBindingProjectionChain() started.
-◇ Test testNestedObservableIndependence() started.
-◇ Test testDynamicMemberLookupBinding() started.
-◇ Test testSheetIsPresentedToggle() started.
-◇ Test testStateInitialization() started.
 ◇ Test testTaskModifierPattern() started.
 ◇ Test testFormMultipleButtonsIndependent() started.
+◇ Test testStackPathScopeBinding() started.
+◇ Test testStateInitialization() started.
+◇ Test testDynamicMemberLookupBinding() started.
+◇ Test testNestedObservableIndependence() started.
+◇ Test testMultipleAsyncEffects() started.
 ◇ Test testNestedObservableGraphMutation() started.
-◇ Test testFullScreenCoverCompiles() started.
-◇ Test testSheetPresentation() started.
-◇ Test testSheetDismissWithDependency() started.
-◇ Test testDismissViaBindingNil() started.
+◇ Test testSheetIsPresentedToggle() started.
+◇ Test testBindingProjectionChain() started.
+◇ Test testAsyncTaskInActionClosure() started.
+◇ Test testStateMutationSingleUpdate() started.
+◇ Test testCaseKeyPathExtraction() started.
+◇ Test testStackActionForEachRouting() started.
+◇ Test withErrorReportingSyncCatchesErrors() started.
+◇ Test testPresentsOptionalLifecycle() started.
+◇ Test testStackStateRemoveLast() started.
+◇ Test testReducerCaseIgnored() started.
+◇ Test testCaseKeyPathSetterSubscript() started.
+◇ Suite "Stress Tests" started.
+◇ Test testDismissDependencyResolvesAndExecutes() started.
+◇ Test testConfirmationDialogStateMap() started.
+◇ Test diffDetectsChanges() started.
+◇ Test testReducerCaseEphemeral() started.
+◇ Test testAlertAutoDismissal() started.
+◇ Test testAlertStateMap() started.
+◇ Test testStackStateInitAndAppend() started.
+◇ Test customDumpNestedStruct() started.
 ◇ Test testSheetOnDismissCleanup() started.
-◇ Test testFullScreenCoverPresentation() started.
-◇ Test tableMacro() started.
-◇ Test testPopoverFallbackPresentation() started.
-◇ Test initFromArrayLiteral() started.
-◇ Test diffReturnsNilForEqualValues() started.
+◇ Test testSheetDismissWithDependency() started.
 ◇ Test testSheetChildMutation() started.
-◇ Test removeByID() started.
+◇ Test testDismissViaChildDependency() started.
+◇ Test testChildMutationThroughPresentation() started.
+◇ Test testNavigationStackChildMutation() started.
+◇ Test testFullScreenCoverPresentation() started.
+◇ Test testSheetPresentation() started.
+◇ Test testPopoverFallbackPresentation() started.
+◇ Test testFullScreenCoverCompiles() started.
+◇ Test "Concurrent observation scopes on multiple threads fire independently" started.
+◇ Test "Bulk mutations on multiple properties coalesce into single onChange" started.
+◇ Test "D8-a: Rapid mutations produce single onChange per tracking scope" started.
+◇ Test "@ObservationIgnored suppresses tracking" started.
+◇ Test "ObservableState registrar round-trip through Store" started.
+◇ Test "Single property mutation triggers exactly one onChange" started.
+◇ Test testPresentationActionDismissNilsState() started.
+◇ Test dependencyKeyPathResolution() started.
+◇ Test bindableActionCompiles() started.
+◇ Test sharedBindingProjection() started.
+◇ Test diffReturnsNilForEqualValues() started.
+◇ Test testDismissDependencyWithPresentation() started.
+◇ Test testAlertStateCreation() started.
+◇ Test testNavigationStackPopAll() started.
+◇ Test testDismissViaBindingNil() started.
+◇ Test "Nested observation scopes are independent" started.
+◇ Test testStoreInit() started.
+◇ Test testDialogAutoDismissal() started.
+◇ Test "D8-b: Parent/child observation scopes fire independently" started.
 ✘ Test reportIssueStringMessage() recorded a known issue at IssueReportingTests.swift:7:20: Issue recorded
 ↳ Something went wrong
-◇ Test expectDifferenceDetectsChanges() started.
-✘ Test withErrorReportingAsyncCatchesErrors() recorded a known issue at IssueReportingTests.swift:35:34: Caught error: TestError()
-✘ Test withErrorReportingReturnsNilOnError() recorded a known issue at IssueReportingTests.swift:52:47: Caught error: TestError()
-◇ Test expectNoDifferenceFailsForDifferentValues() started.
+◇ Test "D8-e: All forks compile together (implicit via test target compilation)" started.
+◇ Test storeInitialState() started.
 ✘ Test reportIssueIncludesSourceLocation() recorded a known issue at IssueReportingTests.swift:44:20: Issue recorded
 ↳ location test
-✘ Test withErrorReportingSyncCatchesErrors() recorded a known issue at IssueReportingTests.swift:25:28: Caught error: TestError()
-✘ Test reportIssueErrorInstance() recorded a known issue at IssueReportingTests.swift:17:20: Caught error: test error occurred
-◇ Test multipleSharedSameKeySynchronize() started.
-◇ Test appStorageBool() started.
-◇ Test "Single property mutation triggers exactly one onChange" started.
-◇ Test "D8-e: All forks compile together (implicit via test target compilation)" started.
-◇ Test "Bulk mutations on multiple properties coalesce into single onChange" started.
-◇ Test "D8-b: Parent/child observation scopes fire independently" started.
-◇ Test "@ObservationIgnored suppresses tracking" started.
-◇ Test "Concurrent observation scopes on multiple threads fire independently" started.
-◇ Test "ObservableState registrar round-trip through Store" started.
-◇ Test "D8-a: Rapid mutations produce single onChange per tracking scope" started.
-◇ Test "Nested observation scopes are independent" started.
-◇ Test "Store reducer throughput exceeds 1000 mutations/sec with bounded memory" started.
-◇ Test "Observation coalescing stable under 5000-iteration load" started.
-◇ Test dependencyKeyPathResolution() started.
-◇ Test storeInitialState() started.
-◇ Test databaseInit() started.
-◇ Test bindableActionCompiles() started.
-◇ Test effectNone() started.
+✘ Test withErrorReportingReturnsNilOnError() recorded a known issue at IssueReportingTests.swift:52:47: Caught error: TestError()
+✘ Test withErrorReportingAsyncCatchesErrors() recorded a known issue at IssueReportingTests.swift:35:34: Caught error: TestError()
 ◇ Test observableStateIdentity() started.
-◇ Test chainedEffectsSettle() started.
-◇ Test testReducerCaseIgnored() started.
-◇ Test testPresentationActionDismissNilsState() started.
-◇ Test testAlertAutoDismissal() started.
-◇ Test testCaseKeyPathSetterSubscript() started.
-◇ Test testStackStateInitAndAppend() started.
-◇ Test testStackStateRemoveLast() started.
-◇ Test testDismissDependencyWithPresentation() started.
-◇ Test testStackActionForEachRouting() started.
-◇ Test testAlertStateCreation() started.
-◇ Test testAlertStateMap() started.
-◇ Test testPresentsOptionalLifecycle() started.
-◇ Test testCaseKeyPathExtraction() started.
-◇ Test testDialogAutoDismissal() started.
-◇ Test testChildMutationThroughPresentation() started.
-◇ Test testConfirmationDialogStateMap() started.
-◇ Test testReducerCaseEphemeral() started.
-◇ Test testStoreInit() started.
-◇ Test sharedBindingProjection() started.
-✔ Test subscriptMutation() passed after 0.145 seconds.
-✔ Test casePathableGeneratesAccessors() passed after 0.130 seconds.
-✔ Test nestedCasePathable() passed after 0.129 seconds.
-◇ Test testDismissViaChildDependency() started.
-✘ Test withErrorReportingAsyncCatchesErrors() passed after 0.131 seconds with 1 known issue.
-✔ Test isCheck() passed after 0.130 seconds.
-✔ Test codableConformance() passed after 0.131 seconds.
-◇ Test testDismissDependencyResolvesAndExecutes() started.
-✔ Test idsProperty() passed after 0.134 seconds.
-✔ Test allCasePathsCollection() passed after 0.134 seconds.
-✔ Test caseSubscriptAndEmbed() passed after 0.134 seconds.
-✔ Test casePathExtraction() passed after 0.135 seconds.
-✘ Test reportIssueIncludesSourceLocation() passed after 0.134 seconds with 1 known issue.
-✘ Test withErrorReportingSyncCatchesErrors() passed after 0.135 seconds with 1 known issue.
-✔ Test subscriptReadByID() passed after 0.135 seconds.
-✔ Test subscriptWriteNilRemoves() passed after 0.135 seconds.
-✔ Test customDumpCollectionOutput() passed after 0.135 seconds.
-✔ Test modifyInPlace() passed after 0.136 seconds.
-✔ Test enumMetadataABISmokeTest() passed after 0.136 seconds.
-✔ Test anyCasePathCustomClosures() passed after 0.136 seconds.
-✔ Test expectNoDifferencePassesForEqualValues() passed after 0.136 seconds.
-✔ Test customDumpEnumOutput() passed after 0.136 seconds.
-✘ Test withErrorReportingReturnsNilOnError() passed after 0.131 seconds with 1 known issue.
-✘ Test reportIssueStringMessage() passed after 0.130 seconds with 1 known issue.
-✔ Test diffDetectsChanges() passed after 0.171 seconds.
-✘ Test reportIssueErrorInstance() passed after 0.169 seconds with 1 known issue.
-✔ Test diffEnumChanges() passed after 0.188 seconds.
-✔ Test customDumpStructOutput() passed after 0.169 seconds.
-✔ Test initFromArrayLiteral() passed after 0.253 seconds.
-✔ Test removeByID() passed after 0.246 seconds.
-✔ Test expectDifferenceDetectsChanges() passed after 0.226 seconds.
-✔ Test diffReturnsNilForEqualValues() passed after 0.250 seconds.
-✔ Test "Single property mutation triggers exactly one onChange" passed after 0.156 seconds.
-✔ Test "D8-e: All forks compile together (implicit via test target compilation)" passed after 0.158 seconds.
-✔ Test "Bulk mutations on multiple properties coalesce into single onChange" passed after 0.159 seconds.
-✔ Test "@ObservationIgnored suppresses tracking" passed after 0.161 seconds.
-✔ Test customDumpOptionalNil() passed after 0.268 seconds.
-✔ Test "D8-a: Rapid mutations produce single onChange per tracking scope" passed after 0.161 seconds.
-✔ Test "Nested observation scopes are independent" passed after 0.161 seconds.
-✔ Test customDumpNestedStruct() passed after 0.270 seconds.
-✔ Test "D8-b: Parent/child observation scopes fire independently" passed after 0.162 seconds.
+◇ Test multipleSharedSameKeySynchronize() started.
+◇ Test tableMacro() started.
+◇ Test databaseInit() started.
+✘ Test reportIssueErrorInstance() recorded a known issue at IssueReportingTests.swift:17:20: Caught error: test error occurred
 ✘ Test expectNoDifferenceFailsForDifferentValues() recorded a known issue at CustomDumpTests.swift:95:27: Issue recorded
 ↳ Difference: …
   
@@ -380,198 +197,236 @@ Test Suite 'All tests' passed at 2026-02-23 17:38:39.615
       )
   
   (First: −, Second: +)
-✘ Test expectNoDifferenceFailsForDifferentValues() passed after 0.196 seconds with 1 known issue.
-✔ Test stringCustomDumping() passed after 0.278 seconds.
-✔ Test tableMacro() passed after 0.274 seconds.
+◇ Test appStorageBool() started.
+✘ Test reportIssueStringMessage() passed after 0.031 seconds with 1 known issue.
+✔ Test expectNoDifferencePassesForEqualValues() passed after 0.032 seconds.
+◇ Test effectNone() started.
+✔ Test casePathableGeneratesAccessors() passed after 0.033 seconds.
+✔ Test subscriptWriteNilRemoves() passed after 0.032 seconds.
+◇ Test chainedEffectsSettle() started.
+✘ Test reportIssueIncludesSourceLocation() passed after 0.032 seconds with 1 known issue.
+✘ Test withErrorReportingReturnsNilOnError() passed after 0.033 seconds with 1 known issue.
+✔ Test allCasePathsCollection() passed after 0.032 seconds.
+✔ Test enumMetadataABISmokeTest() passed after 0.032 seconds.
+✔ Test subscriptReadByID() passed after 0.032 seconds.
+✔ Test customDumpOptionalNil() passed after 0.031 seconds.
+✔ Test removeByID() passed after 0.032 seconds.
+✔ Test modifyInPlace() passed after 0.032 seconds.
+✔ Test nestedCasePathable() passed after 0.032 seconds.
+✔ Test anyCasePathCustomClosures() passed after 0.032 seconds.
+✔ Test diffEnumChanges() passed after 0.033 seconds.
+✔ Test expectDifferenceDetectsChanges() passed after 0.032 seconds.
+✔ Test idsProperty() passed after 0.032 seconds.
+✔ Test subscriptMutation() passed after 0.033 seconds.
+✔ Test customDumpEnumOutput() passed after 0.032 seconds.
+✔ Test stringCustomDumping() passed after 0.032 seconds.
+✘ Test withErrorReportingAsyncCatchesErrors() passed after 0.032 seconds with 1 known issue.
+✔ Test initFromArrayLiteral() passed after 0.032 seconds.
+✔ Test casePathExtraction() passed after 0.032 seconds.
+✔ Test caseSubscriptAndEmbed() passed after 0.033 seconds.
+✔ Test customDumpStructOutput() passed after 0.035 seconds.
+✔ Test codableConformance() passed after 0.038 seconds.
+✔ Test customDumpCollectionOutput() passed after 0.039 seconds.
+◇ Test "Observation coalescing stable under 5000-iteration load" started.
+◇ Test "Store reducer throughput exceeds 1000 mutations/sec with bounded memory" started.
+✔ Test diffDetectsChanges() passed after 0.039 seconds.
+✔ Test isCheck() passed after 0.039 seconds.
+✔ Test "@ObservationIgnored suppresses tracking" passed after 0.034 seconds.
+✔ Test "Bulk mutations on multiple properties coalesce into single onChange" passed after 0.035 seconds.
+✘ Test withErrorReportingSyncCatchesErrors() recorded a known issue at IssueReportingTests.swift:25:28: Caught error: TestError()
+✔ Test "D8-a: Rapid mutations produce single onChange per tracking scope" passed after 0.035 seconds.
+✔ Test "Nested observation scopes are independent" passed after 0.032 seconds.
+✔ Test "D8-b: Parent/child observation scopes fire independently" passed after 0.032 seconds.
+✔ Test diffReturnsNilForEqualValues() passed after 0.033 seconds.
+✔ Test customDumpNestedStruct() passed after 0.040 seconds.
+✔ Test "Single property mutation triggers exactly one onChange" passed after 0.034 seconds.
+✔ Test tableMacro() passed after 0.017 seconds.
+✔ Test "D8-e: All forks compile together (implicit via test target compilation)" passed after 0.026 seconds.
 ◇ Test columnPrimaryKey() started.
-✔ Test "Concurrent observation scopes on multiple threads fire independently" passed after 0.274 seconds.
-✔ Test columnPrimaryKey() passed after 0.136 seconds.
+✘ Test withErrorReportingSyncCatchesErrors() passed after 0.041 seconds with 1 known issue.
+✘ Test expectNoDifferenceFailsForDifferentValues() passed after 0.043 seconds with 1 known issue.
+✘ Test reportIssueErrorInstance() passed after 0.045 seconds with 1 known issue.
+✔ Test columnPrimaryKey() passed after 0.013 seconds.
 ◇ Test columnCustomRepresentation() started.
-✔ Test columnCustomRepresentation() passed after 0.023 seconds.
+✔ Test columnCustomRepresentation() passed after 0.010 seconds.
 ◇ Test selectionTypeComposition() started.
-✔ Test databaseInit() passed after 0.349 seconds.
+✔ Test databaseInit() passed after 0.053 seconds.
 ◇ Test databaseMigrator() started.
-✔ Test selectionTypeComposition() passed after 0.026 seconds.
+Observation coalescing: 5000 cycles in 0.044116709 seconds
+✔ Test "Observation coalescing stable under 5000-iteration load" passed after 0.046 seconds.
+✔ Test selectionTypeComposition() passed after 0.011 seconds.
 ◇ Test selectColumns() started.
-Observation coalescing: 5000 cycles in 0.302148126 seconds
-✔ Test "Observation coalescing stable under 5000-iteration load" passed after 0.370 seconds.
-✔ Test selectColumns() passed after 0.064 seconds.
+✔ Test selectColumns() passed after 0.005 seconds.
 ◇ Test wherePredicates() started.
-✔ Test databaseMigrator() passed after 0.116 seconds.
+✔ Test "Concurrent observation scopes on multiple threads fire independently" passed after 0.090 seconds.
+✔ Test databaseMigrator() passed after 0.017 seconds.
 ◇ Test syncRead() started.
-✔ Test wherePredicates() passed after 0.045 seconds.
-◇ Test findById() started.
-✔ Test findById() passed after 0.022 seconds.
-◇ Test whereInOperator() started.
-✔ Test syncRead() passed after 0.028 seconds.
+✔ Test syncRead() passed after 0.007 seconds.
+✔ Test wherePredicates() passed after 0.011 seconds.
 ◇ Test syncWrite() started.
-✔ Test whereInOperator() passed after 0.027 seconds.
-✔ Test syncWrite() passed after 0.075 seconds.
+◇ Test findById() started.
+✔ Test syncWrite() passed after 0.002 seconds.
 ◇ Test asyncRead() started.
+✔ Test findById() passed after 0.004 seconds.
+◇ Test whereInOperator() started.
+✔ Test whereInOperator() passed after 0.005 seconds.
 ◇ Test joinOperations() started.
-✔ Test asyncRead() passed after 0.121 seconds.
+✔ Test testStackActionForEachRouting() passed after 0.113 seconds.
+✔ Test asyncRead() passed after 0.012 seconds.
 ◇ Test asyncWrite() started.
-✔ Test "ObservableState registrar round-trip through Store" passed after 0.748 seconds.
-✔ Suite "Observation Bridge Semantics" passed after 1.327 seconds.
-✔ Test asyncWrite() passed after 0.039 seconds.
-◇ Test fetchAll() started.
-✔ Test fetchAll() passed after 0.013 seconds.
-◇ Test fetchOne() started.
-✔ Test joinOperations() passed after 0.154 seconds.
+✔ Test joinOperations() passed after 0.012 seconds.
+✔ Test asyncWrite() passed after 0.008 seconds.
 ◇ Test orderBy() started.
-✔ Test fetchOne() passed after 0.011 seconds.
-◇ Test fetchCount() started.
-✔ Test fetchCount() passed after 0.058 seconds.
-◇ Test fetchAllObservation() started.
-✔ Test orderBy() passed after 0.114 seconds.
+◇ Test fetchAll() started.
+✔ Test testReducerCaseEphemeral() passed after 0.132 seconds.
+✔ Test orderBy() passed after 0.007 seconds.
 ◇ Test groupByAggregation() started.
-✔ Test groupByAggregation() passed after 0.091 seconds.
+✔ Test fetchAll() passed after 0.012 seconds.
+◇ Test fetchOne() started.
+✔ Test fetchOne() passed after 0.008 seconds.
+◇ Test fetchCount() started.
+✔ Test groupByAggregation() passed after 0.022 seconds.
 ◇ Test limitOffset() started.
-✔ Test limitOffset() passed after 0.036 seconds.
+✔ Test fetchCount() passed after 0.010 seconds.
+◇ Test fetchAllObservation() started.
+✔ Test limitOffset() passed after 0.006 seconds.
 ◇ Test insertAndUpsert() started.
-✔ Test insertAndUpsert() passed after 0.050 seconds.
+✔ Test insertAndUpsert() passed after 0.013 seconds.
 ◇ Test updateAndDelete() started.
-✔ Test updateAndDelete() passed after 0.014 seconds.
+✔ Test updateAndDelete() passed after 0.006 seconds.
 ◇ Test sqlMacro() started.
-✔ Test sqlMacro() passed after 0.091 seconds.
-✔ Suite StructuredQueriesTests passed after 1.779 seconds.
-Store throughput: 5000 mutations in 0.981430125 seconds (5094 mut/sec)
-Memory: start=86MB end=85MB delta=0MB
-✔ Test "Store reducer throughput exceeds 1000 mutations/sec with bounded memory" passed after 1.738 seconds.
-✔ Suite "Stress Tests" passed after 2.318 seconds.
-✔ Test testDismissDependencyWithPresentation() passed after 1.787 seconds.
-✔ Test testStackActionForEachRouting() passed after 1.810 seconds.
-✔ Test testReducerCaseEphemeral() passed after 1.872 seconds.
-✔ Test testStoreInit() passed after 1.884 seconds.
+✔ Test sqlMacro() passed after 0.002 seconds.
+✔ Suite StructuredQueriesTests passed after 0.193 seconds.
+✔ Test "ObservableState registrar round-trip through Store" passed after 0.197 seconds.
+✔ Suite "Observation Bridge Semantics" passed after 0.208 seconds.
+✔ Test testDismissDependencyWithPresentation() passed after 0.207 seconds.
+✔ Test testStoreInit() passed after 0.219 seconds.
 ◇ Test sendWithStateAssertion() started.
-✘ Test testMultipleAsyncEffects() recorded an issue at UIPatternTests.swift:194:9: Expectation failed: (store.loadingComplete → false) == true
-✘ Test testMultipleAsyncEffects() failed after 2.097 seconds with 1 issue.
-✔ Test testStackPathScopeBinding() passed after 2.706 seconds.
-✔ Test testNavigationDestinationItemBinding() passed after 2.706 seconds.
-✔ Test testNavigationStackPush() passed after 2.706 seconds.
-✔ Test testNavigationStackPopAll() passed after 2.706 seconds.
-✔ Test testNavigationStackPop() passed after 2.705 seconds.
-✔ Test testModernAPIUsage() passed after 2.705 seconds.
-✔ Test testBindingProjectionChain() passed after 2.775 seconds.
-✔ Test testStateInitialization() passed after 2.790 seconds.
-✔ Test testFullScreenCoverCompiles() passed after 2.791 seconds.
-✔ Test testDynamicMemberLookupBinding() passed after 2.797 seconds.
-✔ Test testNavigationStackChildMutation() passed after 2.820 seconds.
-✔ Suite NavigationStackTests passed after 3.303 seconds.
-✔ Test multipleSharedSameKeySynchronize() passed after 2.743 seconds.
-✔ Test appStorageBool() passed after 2.742 seconds.
-✔ Test dependencyKeyPathResolution() passed after 2.727 seconds.
-✔ Test storeInitialState() passed after 2.727 seconds.
-✔ Test bindableActionCompiles() passed after 2.727 seconds.
-✔ Test observableStateIdentity() passed after 2.727 seconds.
-✔ Test testReducerCaseIgnored() passed after 2.724 seconds.
-◇ Test childMutationVisibleInParent() started.
-◇ Test appStorageInt() started.
+Store throughput: 5000 mutations in 0.145685666 seconds (34320 mut/sec)
+Memory: start=88MB end=88MB delta=0MB
+✔ Test "Store reducer throughput exceeds 1000 mutations/sec with bounded memory" passed after 0.372 seconds.
+✔ Suite "Stress Tests" passed after 0.412 seconds.
+✔ Test testNavigationStackPop() passed after 0.577 seconds.
+✔ Test testNavigationDestinationItemBinding() passed after 0.583 seconds.
+✔ Test testModernAPIUsage() passed after 0.583 seconds.
+✔ Test testNavigationStackPush() passed after 0.583 seconds.
+✔ Test testStackPathScopeBinding() passed after 0.601 seconds.
+✔ Test testStateInitialization() passed after 0.601 seconds.
+✔ Test testDynamicMemberLookupBinding() passed after 0.601 seconds.
+✔ Test testBindingProjectionChain() passed after 0.602 seconds.
+✔ Test testStackStateRemoveLast() passed after 0.608 seconds.
+✔ Test testCaseKeyPathSetterSubscript() passed after 0.608 seconds.
+✔ Test testConfirmationDialogStateMap() passed after 0.608 seconds.
+✔ Test testReducerCaseIgnored() passed after 0.608 seconds.
+✔ Test testCaseKeyPathExtraction() passed after 0.604 seconds.
+✔ Test testAlertStateMap() passed after 0.610 seconds.
+✔ Test testNavigationStackChildMutation() passed after 0.619 seconds.
+✔ Test testFullScreenCoverCompiles() passed after 0.619 seconds.
+✔ Test dependencyKeyPathResolution() passed after 0.621 seconds.
 ◇ Test dependencyTypeResolution() started.
-◇ Test storeInitWithDependencies() started.
+✔ Test bindableActionCompiles() passed after 0.622 seconds.
 ◇ Test bindingReducerAppliesMutations() started.
-◇ Test observationStateIgnored() started.
-✔ Test testCaseKeyPathSetterSubscript() passed after 2.727 seconds.
-✔ Test testStackStateInitAndAppend() passed after 2.727 seconds.
-✔ Test testStackStateRemoveLast() passed after 2.728 seconds.
-✔ Test testAlertStateCreation() passed after 2.733 seconds.
-✔ Test testCaseKeyPathExtraction() passed after 2.734 seconds.
-✔ Test testConfirmationDialogStateMap() passed after 2.734 seconds.
-✔ Test effectNone() passed after 2.739 seconds.
-◇ Test effectRun() started.
-✔ Test testAlertStateMap() passed after 2.733 seconds.
-✔ Test sharedBindingProjection() passed after 2.788 seconds.
+✔ Test testAlertStateCreation() passed after 0.629 seconds.
+✔ Test testNavigationStackPopAll() passed after 0.629 seconds.
+✔ Suite NavigationStackTests passed after 0.679 seconds.
+✔ Test sharedBindingProjection() passed after 0.636 seconds.
+✔ Test testStackStateInitAndAppend() passed after 0.639 seconds.
+✔ Test observableStateIdentity() passed after 0.622 seconds.
 ◇ Test sharedBindingMutationTriggersChange() started.
-✔ Test testDismissViaBindingNil() passed after 2.979 seconds.
-✔ Test testSheetOnDismissCleanup() passed after 2.979 seconds.
-✔ Test testSheetChildMutation() passed after 3.310 seconds.
-✔ Test testPresentationActionDismissNilsState() passed after 3.218 seconds.
-✔ Test testChildMutationThroughPresentation() passed after 3.266 seconds.
-✔ Test testDismissDependencyResolvesAndExecutes() passed after 3.261 seconds.
-✔ Test childMutationVisibleInParent() passed after 0.582 seconds.
-◇ Test concurrentSharedMutations() started.
-✔ Test effectRun() passed after 0.570 seconds.
-◇ Test effectRunFromBackgroundThread() started.
-✔ Test appStorageInt() passed after 0.584 seconds.
-◇ Test appStorageDouble() started.
-✔ Test dependencyTypeResolution() passed after 0.585 seconds.
-✔ Test storeInitWithDependencies() passed after 0.585 seconds.
-✔ Test bindingReducerAppliesMutations() passed after 0.585 seconds.
-✔ Test observationStateIgnored() passed after 0.585 seconds.
-✔ Test fetchAllObservation() passed after 2.457 seconds.
-◇ Test liveValueInProductionContext() started.
+◇ Test observationStateIgnored() started.
+✔ Test testMultipleAsyncEffects() passed after 0.640 seconds.
+✔ Test storeInitialState() passed after 0.628 seconds.
+◇ Test storeInitWithDependencies() started.
+✔ Test multipleSharedSameKeySynchronize() passed after 0.629 seconds.
+◇ Test childMutationVisibleInParent() started.
+✔ Test appStorageBool() passed after 0.629 seconds.
+◇ Test appStorageInt() started.
+✔ Test effectNone() passed after 0.627 seconds.
+◇ Test effectRun() started.
+✔ Test testSheetOnDismissCleanup() passed after 0.700 seconds.
+✔ Test testDismissDependencyResolvesAndExecutes() passed after 0.704 seconds.
+✔ Test testChildMutationThroughPresentation() passed after 0.710 seconds.
+✔ Test testSheetChildMutation() passed after 0.717 seconds.
+✔ Test testPresentationActionDismissNilsState() passed after 0.721 seconds.
+✔ Test testDismissViaBindingNil() passed after 0.722 seconds.
+✔ Test bindingReducerAppliesMutations() passed after 0.117 seconds.
 ◇ Test storeBindingProjection() started.
-◇ Test forEachScoping() started.
-◇ Test storeSendReturnsStoreTask() started.
-◇ Test fetchOneObservation() started.
-✔ Test sharedBindingMutationTriggersChange() passed after 0.518 seconds.
+✔ Test dependencyTypeResolution() passed after 0.120 seconds.
+◇ Test liveValueInProductionContext() started.
+✔ Test sharedBindingMutationTriggersChange() passed after 0.123 seconds.
+✔ Test observationStateIgnored() passed after 0.123 seconds.
+✔ Test storeInitWithDependencies() passed after 0.123 seconds.
 ◇ Test sharedKeypathProjection() started.
-✔ Test sendWithStateAssertion() passed after 1.436 seconds.
+◇ Test storeSendReturnsStoreTask() started.
+◇ Test forEachScoping() started.
+✔ Test childMutationVisibleInParent() passed after 0.114 seconds.
+◇ Test concurrentSharedMutations() started.
+✔ Test sendWithStateAssertion() passed after 0.541 seconds.
 ◇ Test receiveEffectAction() started.
-✔ Test testTaskModifierPattern() passed after 3.439 seconds.
-✔ Test testAsyncTaskInActionClosure() passed after 3.458 seconds.
-✔ Test storeSendReturnsStoreTask() passed after 0.043 seconds.
+✔ Test appStorageInt() passed after 0.108 seconds.
+◇ Test appStorageDouble() started.
+✔ Test testSheetDismissWithDependency() passed after 0.766 seconds.
+✔ Test testAsyncTaskInActionClosure() passed after 0.767 seconds.
+✔ Test testTaskModifierPattern() passed after 0.769 seconds.
+✔ Test testDismissViaChildDependency() passed after 0.768 seconds.
+✔ Test storeSendReturnsStoreTask() passed after 0.006 seconds.
 ◇ Test storeScopeDerivesChildStore() started.
-✔ Test testDismissViaChildDependency() passed after 3.352 seconds.
-✔ Test testSheetIsPresentedToggle() passed after 3.649 seconds.
-✔ Test testNestedObservableGraphMutation() passed after 3.649 seconds.
-✔ Test testNestedObservableIndependence() passed after 3.650 seconds.
-✔ Test testSheetPresentation() passed after 3.651 seconds.
-✔ Test concurrentSharedMutations() passed after 0.240 seconds.
-✔ Test appStorageDouble() passed after 0.240 seconds.
-✔ Test liveValueInProductionContext() passed after 0.239 seconds.
-✔ Test storeBindingProjection() passed after 0.239 seconds.
-◇ Test appStorageString() started.
-◇ Test testValueInTestContext() started.
+✔ Test storeBindingProjection() passed after 0.077 seconds.
 ◇ Test bindingProjectionMultipleMutations() started.
-◇ Test bidirectionalSync() started.
-✔ Test forEachScoping() passed after 0.244 seconds.
-✔ Test sharedKeypathProjection() passed after 0.232 seconds.
-◇ Test forEachIdentityStability() started.
+✔ Test liveValueInProductionContext() passed after 0.077 seconds.
+◇ Test testValueInTestContext() started.
+✔ Test sharedKeypathProjection() passed after 0.068 seconds.
 ◇ Test sharedOptionalUnwrapping() started.
-✔ Test testPresentsOptionalLifecycle() passed after 3.589 seconds.
-✔ Test testAlertAutoDismissal() passed after 3.590 seconds.
-✔ Test testSheetDismissWithDependency() passed after 3.735 seconds.
-✔ Test storeScopeDerivesChildStore() passed after 0.275 seconds.
+✔ Test testNestedObservableIndependence() passed after 0.834 seconds.
+✔ Test effectRun() passed after 0.176 seconds.
+◇ Test effectRunFromBackgroundThread() started.
+✔ Test testSheetIsPresentedToggle() passed after 0.836 seconds.
+✔ Test testNestedObservableGraphMutation() passed after 0.837 seconds.
+✔ Test testPresentsOptionalLifecycle() passed after 0.838 seconds.
+✔ Test forEachScoping() passed after 0.074 seconds.
+◇ Test forEachIdentityStability() started.
+✔ Test testDialogAutoDismissal() passed after 0.844 seconds.
+✔ Test concurrentSharedMutations() passed after 0.082 seconds.
+◇ Test bidirectionalSync() started.
+✔ Test testSheetPresentation() passed after 0.847 seconds.
+✔ Test testAlertAutoDismissal() passed after 0.852 seconds.
+✔ Suite NavigationTests passed after 0.886 seconds.
+✔ Test appStorageDouble() passed after 0.089 seconds.
+◇ Test appStorageString() started.
+✔ Test storeScopeDerivesChildStore() passed after 0.086 seconds.
 ◇ Test scopeReducer() started.
-✔ Test testDialogAutoDismissal() passed after 3.626 seconds.
-✔ Test effectRunFromBackgroundThread() passed after 0.320 seconds.
-✔ Suite NavigationTests passed after 4.219 seconds.
-◇ Test effectMerge() started.
-✔ Test appStorageString() passed after 0.109 seconds.
-✔ Test testValueInTestContext() passed after 0.109 seconds.
-✔ Test bindingProjectionMultipleMutations() passed after 0.109 seconds.
-✔ Test bidirectionalSync() passed after 0.106 seconds.
-◇ Test appStorageData() started.
+✔ Test bindingProjectionMultipleMutations() passed after 0.081 seconds.
+✔ Test testValueInTestContext() passed after 0.080 seconds.
+✔ Test sharedOptionalUnwrapping() passed after 0.071 seconds.
 ◇ Test previewContextNotAvailableOnAndroid() started.
-◇ Test parentMutationVisibleInChild() started.
-✔ Test forEachIdentityStability() passed after 0.105 seconds.
-◇ Test optionalScoping() started.
-✔ Test chainedEffectsSettle() passed after 3.662 seconds.
-✔ Test testStateMutationSingleUpdate() passed after 3.770 seconds.
-◇ Test cancelInFlightRapidResend() started.
-✔ Test sharedOptionalUnwrapping() passed after 0.106 seconds.
-◇ Test doubleNotificationPrevention() started.
 ◇ Test sendingBinding() started.
-✔ Test testFormMultipleButtonsIndependent() passed after 3.771 seconds.
-✔ Test testPopoverFallbackPresentation() passed after 3.769 seconds.
-✔ Test testFullScreenCoverPresentation() passed after 3.773 seconds.
-✔ Suite PresentationTests passed after 4.255 seconds.
-✔ Test testSheetContentInteraction() passed after 3.775 seconds.
-✔ Test scopeReducer() passed after 0.037 seconds.
-✘ Suite UIPatternTests failed after 4.256 seconds with 1 issue.
-✔ Test receiveEffectAction() passed after 0.339 seconds.
+◇ Test doubleNotificationPrevention() started.
+✔ Test forEachIdentityStability() passed after 0.071 seconds.
+◇ Test optionalScoping() started.
+✔ Test bidirectionalSync() passed after 0.069 seconds.
+◇ Test parentMutationVisibleInChild() started.
+✔ Test appStorageString() passed after 0.070 seconds.
+✔ Test scopeReducer() passed after 0.067 seconds.
 ◇ Test ifLetReducer() started.
+✔ Test testStateMutationSingleUpdate() passed after 0.929 seconds.
+✔ Test testFormMultipleButtonsIndependent() passed after 0.930 seconds.
+◇ Test appStorageData() started.
+✔ Test testFullScreenCoverPresentation() passed after 0.927 seconds.
+✔ Test chainedEffectsSettle() passed after 0.901 seconds.
+✔ Test receiveEffectAction() passed after 0.166 seconds.
 ◇ Test exhaustivityOnDetectsUnassertedChange() started.
-✔ Test appStorageData() passed after 0.051 seconds.
-✔ Test previewContextNotAvailableOnAndroid() passed after 0.051 seconds.
-✔ Test parentMutationVisibleInChild() passed after 0.051 seconds.
-✔ Test optionalScoping() passed after 0.051 seconds.
-✔ Suite SharedObservationTests passed after 4.297 seconds.
-◇ Test appStorageURL() started.
+✔ Test testPopoverFallbackPresentation() passed after 0.931 seconds.
+✔ Suite PresentationTests passed after 0.955 seconds.
+✔ Test testSheetContentInteraction() passed after 0.935 seconds.
+✔ Suite UIPatternTests passed after 0.974 seconds.
+◇ Test cancelInFlightRapidResend() started.
+✔ Test previewContextNotAvailableOnAndroid() passed after 0.050 seconds.
 ◇ Test customDependencyKeyRegistration() started.
+✔ Test optionalScoping() passed after 0.048 seconds.
 ◇ Test enumCaseSwitching() started.
-✔ Test ifLetReducer() passed after 0.058 seconds.
+✔ Test parentMutationVisibleInChild() passed after 0.050 seconds.
+✔ Suite SharedObservationTests passed after 0.973 seconds.
+✔ Test ifLetReducer() passed after 0.060 seconds.
 ◇ Test forEachReducer() started.
 ✘ Test exhaustivityOnDetectsUnassertedChange() recorded a known issue at TestStoreTests.swift:336:29: Issue recorded
 ↳ A state change does not match expectation.
@@ -583,28 +438,32 @@ Memory: start=86MB end=85MB delta=0MB
         )
   
   (Expected: −, Actual: +)
-✔ Test customDependencyKeyRegistration() passed after 0.040 seconds.
-✔ Test enumCaseSwitching() passed after 0.040 seconds.
-◇ Test withDependenciesSyncScoping() started.
-◇ Test onChange() started.
-✔ Test appStorageURL() passed after 0.040 seconds.
-◇ Test appStorageDate() started.
-✔ Test sendingBinding() passed after 0.095 seconds.
+✔ Test appStorageData() passed after 0.060 seconds.
+◇ Test appStorageURL() started.
+✔ Test sendingBinding() passed after 0.113 seconds.
+✔ Test customDependencyKeyRegistration() passed after 0.065 seconds.
 ◇ Test bindingReducerNoopForNonBindingAction() started.
-✘ Test exhaustivityOnDetectsUnassertedChange() passed after 0.090 seconds with 1 known issue.
-✔ Test forEachReducer() passed after 0.031 seconds.
-◇ Test exhaustivityOff() started.
+◇ Test withDependenciesSyncScoping() started.
+✔ Test enumCaseSwitching() passed after 0.061 seconds.
+◇ Test onChange() started.
+✔ Test forEachReducer() passed after 0.050 seconds.
+✔ Test appStorageURL() passed after 0.048 seconds.
 ◇ Test ifCaseLetReducer() started.
-✔ Test withDependenciesSyncScoping() passed after 0.025 seconds.
-✔ Test appStorageDate() passed after 0.025 seconds.
-✔ Test onChange() passed after 0.026 seconds.
-◇ Test prepareDependencies() started.
-◇ Test appStorageRawRepresentable() started.
-◇ Test printChanges() started.
+✘ Test exhaustivityOnDetectsUnassertedChange() passed after 0.106 seconds with 1 known issue.
+◇ Test exhaustivityOff() started.
+◇ Test appStorageDate() started.
 ✔ Test bindingReducerNoopForNonBindingAction() passed after 0.027 seconds.
+✔ Test onChange() passed after 0.027 seconds.
+◇ Test printChanges() started.
+✔ Test withDependenciesSyncScoping() passed after 0.027 seconds.
+◇ Test prepareDependencies() started.
 ◇ Test sendingCancellation() started.
-✔ Test ifCaseLetReducer() passed after 0.029 seconds.
+✔ Test ifCaseLetReducer() passed after 0.025 seconds.
 ◇ Test combineReducers() started.
+✔ Test effectRunFromBackgroundThread() passed after 0.231 seconds.
+✔ Test appStorageDate() passed after 0.025 seconds.
+◇ Test effectMerge() started.
+◇ Test appStorageRawRepresentable() started.
 received action:
   ObservableFeature.Action.setText("hello")
   ObservableFeature.State(
@@ -623,113 +482,114 @@ received action:
     ignored: 0
   )
 
-✔ Test cancelInFlightRapidResend() passed after 0.149 seconds.
-✔ Test appStorageRawRepresentable() passed after 0.032 seconds.
-✔ Test printChanges() passed after 0.032 seconds.
-✔ Test prepareDependencies() passed after 0.032 seconds.
-◇ Test finishWithSlowEffect() started.
-◇ Test appStorageOptionalNil() started.
+✔ Test printChanges() passed after 0.026 seconds.
 ◇ Test viewAction() started.
+✔ Test prepareDependencies() passed after 0.026 seconds.
 ◇ Test childReducerInheritsDependencies() started.
-✔ Test exhaustivityOff() passed after 0.057 seconds.
-✔ Test combineReducers() passed after 0.027 seconds.
+✔ Test exhaustivityOff() passed after 0.046 seconds.
+✔ Test combineReducers() passed after 0.021 seconds.
 ◇ Test finish() started.
 ◇ Test effectSend() started.
-✔ Test effectSend() passed after 0.013 seconds.
-◇ Test storeWithState() started.
-✔ Test effectMerge() passed after 0.239 seconds.
-◇ Test effectConcatenate() started.
-✔ Test appStorageOptionalNil() passed after 0.057 seconds.
-✔ Test viewAction() passed after 0.057 seconds.
-✔ Test childReducerInheritsDependencies() passed after 0.056 seconds.
-✔ Test sendingCancellation() passed after 0.084 seconds.
-✔ Suite ObservableStateTests passed after 4.449 seconds.
-◇ Test appStorageLargeData() started.
-◇ Test grandchildReducerInheritsDependencies() started.
+✔ Test appStorageRawRepresentable() passed after 0.021 seconds.
+◇ Test appStorageOptionalNil() started.
+✔ Test sendingCancellation() passed after 0.042 seconds.
 ◇ Test bindingDoesNotInfiniteLoop() started.
-✔ Test storeWithState() passed after 0.038 seconds.
-✔ Suite StoreReducerTests passed after 4.454 seconds.
-✔ Test doubleNotificationPrevention() passed after 0.317 seconds.
-✔ Test appStorageLargeData() passed after 0.108 seconds.
-✔ Test grandchildReducerInheritsDependencies() passed after 0.108 seconds.
-✔ Test bindingDoesNotInfiniteLoop() passed after 0.109 seconds.
-◇ Test sharedBindingRapidMutations() started.
-◇ Test appStorageUnicodeString() started.
-✔ Suite BindingTests passed after 4.562 seconds.
+✔ Test effectSend() passed after 0.009 seconds.
+◇ Test storeWithState() started.
+✔ Test cancelInFlightRapidResend() passed after 0.165 seconds.
+✔ Test viewAction() passed after 0.022 seconds.
+◇ Test finishWithSlowEffect() started.
+✔ Test childReducerInheritsDependencies() passed after 0.022 seconds.
+✔ Suite ObservableStateTests passed after 1.103 seconds.
+◇ Test grandchildReducerInheritsDependencies() started.
+✔ Test appStorageOptionalNil() passed after 0.027 seconds.
+◇ Test appStorageLargeData() started.
+✔ Test bindingDoesNotInfiniteLoop() passed after 0.025 seconds.
+✔ Suite BindingTests passed after 1.122 seconds.
+✔ Test storeWithState() passed after 0.027 seconds.
+✔ Suite StoreReducerTests passed after 1.129 seconds.
+✔ Test grandchildReducerInheritsDependencies() passed after 0.025 seconds.
 ◇ Test builtInDependencyResolution() started.
-✔ Test finish() passed after 0.224 seconds.
+✔ Test appStorageLargeData() passed after 0.099 seconds.
+◇ Test appStorageUnicodeString() started.
+✔ Test fetchAllObservation() passed after 1.052 seconds.
+✔ Test doubleNotificationPrevention() passed after 0.307 seconds.
+◇ Test sharedBindingRapidMutations() started.
+◇ Test fetchOneObservation() started.
+✔ Test finish() passed after 0.137 seconds.
 ◇ Test skipReceivedActions() started.
-✔ Test sharedBindingRapidMutations() passed after 0.062 seconds.
-✔ Test appStorageUnicodeString() passed after 0.062 seconds.
-✔ Test builtInDependencyResolution() passed after 0.062 seconds.
-◇ Test bindingTwoWaySync() started.
-◇ Test appStorageConcurrentAccess() started.
+✔ Test builtInDependencyResolution() passed after 0.104 seconds.
 ◇ Test dependencyIsolationBetweenSiblings() started.
-✔ Test appStorageConcurrentAccess() passed after 0.016 seconds.
+✔ Test appStorageUnicodeString() passed after 0.068 seconds.
+◇ Test appStorageConcurrentAccess() started.
+✔ Test effectMerge() passed after 0.218 seconds.
+◇ Test effectConcatenate() started.
+✔ Test sharedBindingRapidMutations() passed after 0.069 seconds.
+◇ Test bindingTwoWaySync() started.
+✔ Test appStorageConcurrentAccess() passed after 0.021 seconds.
 ◇ Test fileStorageRoundTrip() started.
-✔ Test fetchOneObservation() passed after 0.755 seconds.
-◇ Test fetchCompositeObservation() started.
-✔ Test bindingTwoWaySync() passed after 0.031 seconds.
-✔ Test dependencyIsolationBetweenSiblings() passed after 0.031 seconds.
+✔ Test finishWithSlowEffect() passed after 0.210 seconds.
+◇ Test nonExhaustiveReceiveOff() started.
+✔ Test dependencyIsolationBetweenSiblings() passed after 0.080 seconds.
 ◇ Test dependencyClientUnimplementedReportsIssue() started.
-✔ Suite SharedBindingTests passed after 4.656 seconds.
-✔ Test effectConcatenate() passed after 0.213 seconds.
-✔ Test fileStorageRoundTrip() passed after 0.025 seconds.
-◇ Test effectCancellable() started.
-◇ Test inMemorySharing() started.
-✔ Test finishWithSlowEffect() passed after 0.271 seconds.
+✔ Test bindingTwoWaySync() passed after 0.035 seconds.
+✔ Suite SharedBindingTests passed after 1.326 seconds.
 ✘ Test dependencyClientUnimplementedReportsIssue() recorded a known issue at DependencyTests.swift:497:9: Issue recorded
 ↳ Unimplemented: 'NumberClient.fetch'
-◇ Test nonExhaustiveReceiveOff() started.
-✘ Test dependencyClientUnimplementedReportsIssue() passed after 0.016 seconds with 1 known issue.
-◇ Test dependencyClientImplementedEndpoint() started.
-✔ Test skipReceivedActions() passed after 0.054 seconds.
+✔ Test fileStorageRoundTrip() passed after 0.048 seconds.
+◇ Test inMemorySharing() started.
+✔ Test skipReceivedActions() passed after 0.140 seconds.
 ◇ Test dependenciesOverride() started.
-✔ Test inMemorySharing() passed after 0.023 seconds.
+✘ Test dependencyClientUnimplementedReportsIssue() passed after 0.063 seconds with 1 known issue.
+◇ Test dependencyClientImplementedEndpoint() started.
+✔ Test inMemorySharing() passed after 0.029 seconds.
 ◇ Test inMemoryCrossFeature() started.
-✔ Test dependencyClientImplementedEndpoint() passed after 0.020 seconds.
+✔ Test dependencyClientImplementedEndpoint() passed after 0.018 seconds.
 ◇ Test reducerDependencyModifier() started.
-✔ Test inMemoryCrossFeature() passed after 0.009 seconds.
-◇ Test sharedKeyDefaultValue() started.
-✔ Test dependenciesOverride() passed after 0.038 seconds.
-✔ Test reducerDependencyModifier() passed after 0.022 seconds.
+✔ Test nonExhaustiveReceiveOff() passed after 0.083 seconds.
+✔ Suite TestStoreEdgeCaseTests passed after 1.398 seconds.
+✔ Test dependenciesOverride() passed after 0.031 seconds.
+✔ Test inMemoryCrossFeature() passed after 0.013 seconds.
 ◇ Test effectDidSubscribeRun() started.
+◇ Test sharedKeyDefaultValue() started.
+✔ Test reducerDependencyModifier() passed after 0.017 seconds.
 ◇ Test dependencyResolvesInEffectClosure() started.
-✔ Test nonExhaustiveReceiveOff() passed after 0.050 seconds.
-✔ Suite TestStoreEdgeCaseTests passed after 4.718 seconds.
-✔ Test sharedKeyDefaultValue() passed after 0.036 seconds.
+✔ Test sharedKeyDefaultValue() passed after 0.019 seconds.
 ◇ Test customSharedKeyCompiles() started.
-✔ Test customSharedKeyCompiles() passed after 0.009 seconds.
-✔ Suite SharedPersistenceTests passed after 4.751 seconds.
-✔ Test effectDidSubscribeRun() passed after 0.034 seconds.
+✔ Test customSharedKeyCompiles() passed after 0.007 seconds.
+✔ Suite SharedPersistenceTests passed after 1.434 seconds.
+✔ Test effectDidSubscribeRun() passed after 0.032 seconds.
 ◇ Test effectDidSubscribeMerge() started.
-✔ Test effectDidSubscribeMerge() passed after 0.021 seconds.
+✔ Test effectDidSubscribeMerge() passed after 0.022 seconds.
 ◇ Test effectDidSubscribeConcatenate() started.
-✔ Test effectDidSubscribeConcatenate() passed after 0.022 seconds.
+✔ Test effectDidSubscribeConcatenate() passed after 0.024 seconds.
 ◇ Test effectDidSubscribeCancellable() started.
-✔ Test effectDidSubscribeCancellable() passed after 0.021 seconds.
+✔ Test effectConcatenate() passed after 0.210 seconds.
+◇ Test effectCancellable() started.
+✔ Test effectDidSubscribeCancellable() passed after 0.024 seconds.
 ◇ Test effectDidSubscribeCancel() started.
-✔ Test dependencyResolvesInEffectClosure() passed after 0.115 seconds.
+✔ Test dependencyResolvesInEffectClosure() passed after 0.110 seconds.
 ◇ Test dependencyResolvesInMergedEffects() started.
-✔ Test effectDidSubscribeCancel() passed after 0.027 seconds.
-✘ Suite TestStoreTests passed after 4.817 seconds with 1 known issue.
-✔ Test effectCancellable() passed after 0.208 seconds.
-◇ Test effectCancelInFlight() started.
-✔ Test dependencyResolvesInMergedEffects() passed after 0.113 seconds.
+✔ Test effectDidSubscribeCancel() passed after 0.035 seconds.
+✘ Suite TestStoreTests passed after 1.549 seconds with 1 known issue.
+✔ Test dependencyResolvesInMergedEffects() passed after 0.104 seconds.
 ◇ Test navigationIDEnumMetadataTag() started.
-✔ Test navigationIDEnumMetadataTag() passed after 0.002 seconds.
+✔ Test navigationIDEnumMetadataTag() passed after 0.003 seconds.
 ◇ Test taskLocalPropagation() started.
 ✔ Test taskLocalPropagation() passed after 0.001 seconds.
-✘ Suite DependencyTests passed after 4.950 seconds with 1 known issue.
+✘ Suite DependencyTests passed after 1.639 seconds with 1 known issue.
+✔ Test effectCancellable() passed after 0.212 seconds.
+◇ Test effectCancelInFlight() started.
+✔ Test fetchOneObservation() passed after 0.644 seconds.
+◇ Test fetchCompositeObservation() started.
 ✔ Test effectCancelInFlight() passed after 0.207 seconds.
 ◇ Test effectCancel() started.
-✔ Test fetchCompositeObservation() passed after 0.616 seconds.
-◇ Test defaultDatabaseDependency() started.
-✔ Test defaultDatabaseDependency() passed after 0.003 seconds.
-✔ Suite SQLiteDataTests passed after 5.275 seconds.
-✔ Test effectCancel() passed after 0.205 seconds.
+✔ Test effectCancel() passed after 0.207 seconds.
 ◇ Test effectRunWithDependencies() started.
-✔ Test effectRunWithDependencies() passed after 0.206 seconds.
-✔ Suite EffectTests passed after 5.495 seconds.
-✘ Test run with 220 tests in 18 suites failed after 5.506 seconds with 10 issues (including 9 known issues).
-Error: Error terminated(code: 1) running command: /Users/jacob/Library/Android/sdk/platform-tools/adb shell cd '/data/local/tmp/swift-android/fuse-library-55EA9715-D08A-4112-824B-F70A27C79830/' && ./fuse-libraryPackageTests.xctest && ./fuse-libraryPackageTests.xctest --testing-library swift-testing && [ $? -eq 0 ] || [ $? -eq 69 ]
+✔ Test effectRunWithDependencies() passed after 0.207 seconds.
+✔ Suite EffectTests passed after 2.337 seconds.
+✔ Test fetchCompositeObservation() passed after 0.614 seconds.
+◇ Test defaultDatabaseDependency() started.
+✔ Test defaultDatabaseDependency() passed after 0.012 seconds.
+✔ Suite SQLiteDataTests passed after 2.494 seconds.
+✘ Test run with 220 tests in 18 suites passed after 2.619 seconds with 9 known issues.
