@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Foundation
 import Sharing
 import SwiftUI
 
@@ -11,6 +12,7 @@ struct SettingsFeature {
         @Shared(.userName) var userName: String
         @Shared(.appearance) var appearance: String
         @Shared(.notificationsEnabled) var notificationsEnabled: Bool
+        @Shared(.savedTodos) var savedTodos: [Todo] = []
         @Shared(.inMemory("sessionActionCount")) var sessionActionCount: Int = 0
         @ObservationStateIgnored var debugInfo: String = ""
     }
@@ -90,8 +92,9 @@ struct SettingsView: View {
                 ))
             }
 
-            Section("Session") {
-                LabeledContent("Actions This Session", value: "\(store.sessionActionCount)")
+            Section("Storage Demo") {
+                HStack { Text("Saved Todos (fileStorage)"); Spacer(); Text("\(store.savedTodos.count)").foregroundStyle(.secondary) }
+                HStack { Text("Actions (inMemory)"); Spacer(); Text("\(store.sessionActionCount)").foregroundStyle(.secondary) }
             }
 
             Section {
@@ -103,7 +106,7 @@ struct SettingsView: View {
             Section("About") {
                 if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String,
                    let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String {
-                    LabeledContent("Version", value: "\(version) (\(buildNumber))")
+                    HStack { Text("Version"); Spacer(); Text("\(version) (\(buildNumber))").foregroundStyle(.secondary) }
                 }
                 Text("Powered by [Skip](https://skip.dev) and [TCA](https://github.com/pointfreeco/swift-composable-architecture)")
             }

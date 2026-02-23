@@ -2,6 +2,7 @@ import ComposableArchitecture
 import Dependencies
 import GRDB
 import SQLiteData
+import StructuredQueries
 import StructuredQueriesSQLite
 import SwiftUI
 
@@ -88,19 +89,10 @@ struct DatabaseFeature {
                 state.isLoading = true
                 return .run { send in
                     let notes = try await database.read { db in
-                        try Row.fetchAll(db, sql: "SELECT * FROM note ORDER BY createdAt DESC")
-                            .map { row -> Note in
-                                Note(
-                                    id: row["id"],
-                                    title: row["title"],
-                                    body: row["body"],
-                                    category: row["category"],
-                                    createdAt: row["createdAt"]
-                                )
-                            }
+                        try Note.all.order { $0.createdAt.desc() }.fetchAll(db)
                     }
                     let count = try await database.read { db in
-                        try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM note") ?? 0
+                        try Note.all.fetchCount(db)
                     }
                     await send(.notesLoaded(notes))
                     await send(.noteCountLoaded(count))
@@ -110,10 +102,9 @@ struct DatabaseFeature {
                 let now = date.now.timeIntervalSince1970
                 return .run { send in
                     let note = try await database.write { db in
-                        try db.execute(
-                            sql: "INSERT INTO note (title, body, category, createdAt) VALUES (?, ?, ?, ?)",
-                            arguments: ["New Note", "", "general", now]
-                        )
+                        try Note.insert {
+                            Note.Draft(title: "New Note", body: "", category: "general", createdAt: now)
+                        }.execute(db)
                         let id = db.lastInsertedRowID
                         return Note(
                             id: id,
@@ -129,7 +120,7 @@ struct DatabaseFeature {
             case let .deleteNote(id):
                 return .run { send in
                     try await database.write { db in
-                        try db.execute(sql: "DELETE FROM note WHERE id = ?", arguments: [id])
+                        try Note.find(id).delete().execute(db)
                     }
                     await send(.noteDeleted(id))
                 }
@@ -190,28 +181,30 @@ struct DatabaseView: View {
                         .foregroundStyle(.secondary)
                 } else {
                     ForEach(filteredNotes) { note in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(note.title)
-                                .font(.headline)
-                            HStack {
-                                Text(note.category)
-                                    .font(.caption)
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(.secondary.opacity(0.2))
-                                    .clipShape(Capsule())
-                                Spacer()
-                                Text(Date(timeIntervalSince1970: note.createdAt), style: .date)
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(note.title)
+                                    .font(.headline)
+                                HStack {
+                                    Text(note.category)
+                                        .font(.caption)
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(.secondary.opacity(0.2))
+                                        .clipShape(Capsule())
+                                    Spacer()
+                                    Text(Date(timeIntervalSince1970: note.createdAt), style: .date)
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
+                                }
                             }
-                        }
-                        .swipeActions {
-                            Button(role: .destructive) {
+                            Button {
                                 store.send(.deleteNote(note.id))
                             } label: {
-                                Label("Delete", systemImage: "trash")
+                                Image(systemName: "trash")
+                                    .foregroundStyle(.red)
                             }
+                            .buttonStyle(.borderless)
                         }
                     }
                 }

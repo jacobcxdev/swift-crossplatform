@@ -61,6 +61,12 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
     static var notificationsEnabled: Self { Self[.appStorage("notificationsEnabled"), default: true] }
 }
 
+extension SharedKey where Self == FileStorageKey<[Todo]>.Default {
+    static var savedTodos: Self {
+        Self[.fileStorage(URL.documentsDirectory.appendingPathComponent("todos.json")), default: []]
+    }
+}
+
 extension SharedKey where Self == InMemoryKey<Int>.Default {
     static var sessionActionCount: Self { Self[.inMemory("sessionActionCount"), default: 0] }
 }
