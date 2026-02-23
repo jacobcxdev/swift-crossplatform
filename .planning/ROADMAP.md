@@ -197,16 +197,18 @@ Plans:
 - [x] 09-04-PLAN.md (wave 4) — Gap closure: wrap 3 Android-failing tests with withKnownIssue, correct inaccurate SUMMARY, re-verify 0 real failures ✓ 2026-02-23
 
 ### Phase 10: NavigationStack Path Binding on Android
-**Goal:** Implement `NavigationStack(path:root:destination:)` in skip-ui fork so TCA path-driven navigation works on Android — closing the M1-ANDROID-NAV-STACK integration gap and Contacts deep navigation flow gap
+**Goal:** Enable TCA's `NavigationStack(path:root:destination:)` extension on Android by removing `#if !os(Android)` guards in the swift-composable-architecture fork and verifying compatibility with skip-ui's existing NavigationStack + `.navigationDestination(for:)` support — closing M1-ANDROID-NAV-STACK and the Contacts deep navigation flow gap
 **Depends on:** Phase 9
 **Requirements:** NAV-01, NAV-02, NAV-03, TCA-32, TCA-33 (strengthening existing Complete status from iOS-only to cross-platform)
 **Gap Closure:** Closes M1-ANDROID-NAV-STACK (integration) + Contacts deep navigation flow (E2E flow)
 **Canonical pattern references:** `/pfw-composable-architecture` (NavigationStack path binding), `/pfw-swift-navigation` (path-driven navigation)
+**Key insight:** skip-ui already supports `NavigationStack(path:root:)`, `.navigationDestination(for:destination:)`, and `NavigationPath` ([skip.dev docs](https://skip.dev/docs/modules/skip-ui/#navigation) — high support). The blocker is three `#if !os(Android)` guards in TCA's `NavigationStack+Observation.swift` (lines 74-89, 111-129, 150-219) that disable TCA's store-powered NavigationStack extension on Android. The critical guard (150-219) wraps `NavigationStack.init(path:root:destination:)` which internally calls skip-ui's existing `NavigationStack(path:root:)` + registers `.navigationDestination(for: StackState.Component.self)`.
 **Success Criteria** (what must be TRUE):
-  1. `NavigationStack(path:root:destination:)` initializer compiles and renders on Android in skip-ui fork
-  2. Path append pushes destination via Compose NavHost; path removeLast pops destination on Android
-  3. ContactsFeature.swift `#if os(Android)` workaround removed — single code path for both platforms
-  4. `skip android test` passes with NavigationStack path tests covering push/pop on Android
+  1. TCA's `NavigationStack(path:root:destination:)` extension compiles on Android after guard removal
+  2. `StackState.PathView` (RandomAccessCollection of Hashable Components) works with skip-ui's `NavigationStack(path: Any, root:)` init
+  3. `.navigationDestination(for: StackState.Component.self)` resolves destinations correctly on Android
+  4. ContactsFeature.swift `#if os(Android)` workaround removed — single code path for both platforms
+  5. `skip android test` passes with NavigationStack path push/pop working on Android
 **Plans:** TBD
 
 Plans:
