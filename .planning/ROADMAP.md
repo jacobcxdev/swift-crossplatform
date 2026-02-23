@@ -153,7 +153,7 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 | 6. Database & Queries | 2/2 | Complete | 2026-02-22 |
 | 7. Integration Testing & Documentation | 4/4 | Complete    | 2026-02-23 |
 | 8. PFW Skill Alignment | 5/5 | Complete | 2026-02-23 |
-| 9. Post-Audit Cleanup | 3/4 | In Progress | — |
+| 9. Post-Audit Cleanup | 4/4 | Complete | 2026-02-23 |
 
 ### Phase 8: PFW Skill Alignment
 
@@ -192,4 +192,4 @@ Plans:
 - [x] 09-01-PLAN.md (wave 1) — Test fixes: xctest-dynamic-overlay Android imports (`/pfw-issue-reporting`), DatabaseFeature schema bootstrap (`/pfw-sqlite-data`), SQL-09/SQL-11 coverage (`/pfw-structured-queries`), empty test cleanup (`/pfw-testing`) ✓ 2026-02-23
 - [x] 09-02-PLAN.md (wave 2) — Documentation sync: REQUIREMENTS.md 127 stale checkboxes, Perception bypass documentation ✓ 2026-02-23
 - [x] 09-03-PLAN.md (wave 3) — Android verification: run `skip android test` after wave 1 fix, capture results, update STATE.md ✓ 2026-02-23
-- [ ] 09-04-PLAN.md (wave 4) — Gap closure: wrap 3 Android-failing tests with withKnownIssue, correct inaccurate SUMMARY, re-verify 0 real failures
+- [x] 09-04-PLAN.md (wave 4) — Gap closure: wrap 3 Android-failing tests with withKnownIssue, correct inaccurate SUMMARY, re-verify 0 real failures ✓ 2026-02-23
