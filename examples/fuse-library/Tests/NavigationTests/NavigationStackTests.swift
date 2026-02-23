@@ -5,25 +5,26 @@ import Testing
 // MARK: - Reducers
 
 @Reducer
+enum AppFeaturePath {
+    case detail(DetailFeature)
+}
+
+@Reducer
 struct AppFeature {
     @ObservableState
     struct State {
-        var path = StackState<Path.State>()
+        var path = StackState<AppFeaturePath.State>()
     }
     enum Action {
-        case path(StackActionOf<Path>)
+        case path(StackActionOf<AppFeaturePath>)
         case pushDetail(String)
         case popAll
-    }
-    @Reducer
-    enum Path {
-        case detail(DetailFeature)
     }
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case let .pushDetail(title):
-                state.path.append(Path.State.detail(DetailFeature.State(title: title)))
+                state.path.append(AppFeaturePath.State.detail(DetailFeature.State(title: title)))
                 return .none
             case .popAll:
                 state.path.removeAll()
@@ -129,7 +130,7 @@ struct NavigationStackTests {
 
         // Create a @Bindable wrapper and verify scope produces correct type
         @Bindable var bindableStore = store
-        let _: Binding<Store<StackState<AppFeature.Path.State>, StackAction<AppFeature.Path.State, AppFeature.Path.Action>>> = $bindableStore.scope(state: \.path, action: \.path)
+        let _: Binding<Store<StackState<AppFeaturePath.State>, StackAction<AppFeaturePath.State, AppFeaturePath.Action>>> = $bindableStore.scope(state: \.path, action: \.path)
 
         // Verify the binding reflects state changes through the parent store
         #expect(store.state.path.count == 0)
@@ -168,7 +169,7 @@ struct NavigationStackTests {
 
         // NavigationStack(path:root:destination:) pattern compiles (not NavigationStackStore)
         // This is a type-level assertion — the extension on NavigationStack exists and compiles
-        let _: Binding<Store<StackState<AppFeature.Path.State>, StackAction<AppFeature.Path.State, AppFeature.Path.Action>>> = $bindableStore.scope(state: \.path, action: \.path)
+        let _: Binding<Store<StackState<AppFeaturePath.State>, StackAction<AppFeaturePath.State, AppFeaturePath.Action>>> = $bindableStore.scope(state: \.path, action: \.path)
 
         // Verify the modern pattern types resolve correctly
         #expect(Bool(true), "Modern NavigationStack(path:) API compiles successfully")

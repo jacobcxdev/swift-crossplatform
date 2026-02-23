@@ -1,6 +1,13 @@
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - ContactsFeaturePath
+
+@Reducer
+enum ContactsFeaturePath {
+    case detail(ContactDetailFeature)
+}
+
 // MARK: - ContactsFeature Reducer (NavigationStack showcase)
 
 @Reducer
@@ -10,22 +17,17 @@ struct ContactsFeature {
         case addContact(AddContactFeature)
     }
 
-    @Reducer
-    enum Path {
-        case detail(ContactDetailFeature)
-    }
-
     @ObservableState
     struct State: Equatable {
         var contacts: IdentifiedArrayOf<Contact> = []
-        var path = StackState<Path.State>()
+        var path = StackState<ContactsFeaturePath.State>()
         @Presents var destination: Destination.State?
     }
 
     @CasePathable
     enum Action {
         case addButtonTapped
-        case path(StackActionOf<Path>)
+        case path(StackActionOf<ContactsFeaturePath>)
         case destination(PresentationAction<Destination.Action>)
         case contactTapped(Contact)
         case onAppear
@@ -415,5 +417,5 @@ struct AddContactView: View {
 // MARK: - Equatable conformances for @Reducer enum generated State types
 
 extension ContactsFeature.Destination.State: Equatable {}
-extension ContactsFeature.Path.State: Equatable {}
+extension ContactsFeaturePath.State: Equatable {}
 extension ContactDetailFeature.Destination.State: Equatable {}

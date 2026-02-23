@@ -5,17 +5,18 @@ import Testing
 // MARK: - Reducers
 
 @Reducer
+enum StackFeaturePath {
+    case detail(DetailRow)
+}
+
+@Reducer
 struct StackFeature {
     @ObservableState
     struct State {
-        var path = StackState<Path.State>()
+        var path = StackState<StackFeaturePath.State>()
     }
     enum Action {
-        case path(StackActionOf<Path>)
-    }
-    @Reducer
-    enum Path {
-        case detail(DetailRow)
+        case path(StackActionOf<StackFeaturePath>)
     }
     var body: some ReducerOf<Self> {
         Reduce { state, action in .none }
@@ -404,7 +405,7 @@ struct NavigationTests {
 
     @Test
     func testCaseKeyPathExtraction() {
-        let path: StackFeature.Path.State = .detail(DetailRow.State(id: UUID(0), title: "Initial"))
+        let path: StackFeaturePath.State = .detail(DetailRow.State(id: UUID(0), title: "Initial"))
 
         #expect(path.is(\.detail))
 
@@ -415,7 +416,7 @@ struct NavigationTests {
 
     @Test
     func testCaseKeyPathSetterSubscript() {
-        var path: StackFeature.Path.State = .detail(DetailRow.State(id: UUID(0), title: "Init"))
+        var path: StackFeaturePath.State = .detail(DetailRow.State(id: UUID(0), title: "Init"))
 
         path[case: \.detail] = DetailRow.State(id: UUID(0), title: "Set")
         #expect(path[case: \.detail]?.title == "Set")
