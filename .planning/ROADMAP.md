@@ -154,7 +154,7 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 | 7. Integration Testing & Documentation | 4/4 | Complete    | 2026-02-23 |
 | 8. PFW Skill Alignment | 5/5 | Complete | 2026-02-23 |
 | 9. Post-Audit Cleanup | 4/4 | Complete | 2026-02-23 |
-| 10. NavigationStack Path (Android) | 1/2 | In Progress | - |
+| 10. NavigationStack Path (Android) | 2/2 | Complete   | 2026-02-23 |
 | 11. Presentation Dismiss (Android) | 0/? | Planned | - |
 
 ### Phase 8: PFW Skill Alignment
@@ -209,7 +209,7 @@ Plans:
   3. `.navigationDestination(for: StackState.Component.self)` resolves destinations correctly on Android
   4. ContactsFeature.swift `#if os(Android)` workaround removed — single code path for both platforms
   5. `skip android test` passes with NavigationStack path push/pop working on Android
-**Plans:** 2 plans in 2 waves
+**Plans:** 2/2 plans complete
 
 Plans:
 - [x] 10-01-PLAN.md — Android NavigationStack adapter: _TCANavigationStack View struct + free function + _NavigationDestinationViewModifier enablement (NAV-01..NAV-03, TCA-32, TCA-33) ✓ 2026-02-23
