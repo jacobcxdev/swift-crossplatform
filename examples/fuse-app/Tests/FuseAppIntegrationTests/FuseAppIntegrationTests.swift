@@ -327,7 +327,7 @@ struct DatabaseFeatureTests {
         try db.write { db in
             try #sql(
                 """
-                CREATE TABLE "note" (
+                CREATE TABLE "notes" (
                     "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                     "title" TEXT NOT NULL DEFAULT '',
                     "body" TEXT NOT NULL DEFAULT '',
@@ -362,7 +362,7 @@ struct DatabaseFeatureTests {
         try await db.write { db in
             try #sql(
                     """
-                    INSERT INTO "note" ("id", "title", "body", "category", "createdAt")
+                    INSERT INTO "notes" ("id", "title", "body", "category", "createdAt")
                     VALUES (\(bind: 42), \(bind: "Test"), \(bind: ""), \(bind: "general"), \(bind: 0.0))
                     """
                 ).execute(db)

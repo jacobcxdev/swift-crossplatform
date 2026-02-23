@@ -17,7 +17,7 @@ extension DependencyValues {
         migrator.registerMigration("v1") { db in
             try #sql(
                 """
-                CREATE TABLE "note" (
+                CREATE TABLE "notes" (
                     "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                     "title" TEXT NOT NULL DEFAULT '',
                     "body" TEXT NOT NULL DEFAULT '',
