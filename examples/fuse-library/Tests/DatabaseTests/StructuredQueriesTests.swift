@@ -7,7 +7,7 @@ import StructuredQueries
 @Table
 struct Item: Identifiable, Equatable, Sendable {
     @Column(primaryKey: true)
-    var id: Int
+    let id: Int
     var name: String
     var value: Int
     var isActive: Bool
@@ -17,7 +17,7 @@ struct Item: Identifiable, Equatable, Sendable {
 @Table
 struct Category: Identifiable, Equatable, Sendable {
     @Column(primaryKey: true)
-    var id: Int
+    let id: Int
     var name: String
 }
 
@@ -26,7 +26,6 @@ struct Category: Identifiable, Equatable, Sendable {
 @Selection
 struct ItemSummary: Equatable {
     var isActive: Bool
-    @Column("itemCount")
     var itemCount: Int
 }
 
@@ -195,7 +194,7 @@ final class StructuredQueriesTests: XCTestCase {
         try dbQueue.write { db in
             try seedAll(db)
 
-            let results = try Item.where { $0.value > 10 && $0.isActive }
+            let results = try Item.where { $0.value.gt(10) && $0.isActive }
                 .order(by: \.id)
                 .fetchAll(db)
 
@@ -245,7 +244,7 @@ final class StructuredQueriesTests: XCTestCase {
 
             // Inner join -- only items with matching categories
             let innerResults = try Item
-                .order { $0.id.asc() }
+                .order(by: \.id)
                 .join(Category.all) { $0.categoryId.eq($1.id) }
                 .select { ($0.name, $1.name) }
                 .fetchAll(db)
@@ -258,7 +257,7 @@ final class StructuredQueriesTests: XCTestCase {
 
             // Left join -- all items, categories nullable
             let leftResults = try Item
-                .order { $0.id.asc() }
+                .order(by: \.id)
                 .leftJoin(Category.all) { $0.categoryId.eq($1.id) }
                 .select { ($0.name, $1.name) }
                 .fetchAll(db)
@@ -299,7 +298,7 @@ final class StructuredQueriesTests: XCTestCase {
 
             // Ascending order by name
             let ascResults = try Item.select(\.name)
-                .order { $0.name.asc() }
+                .order(by: \.name)
                 .fetchAll(db)
             XCTAssertEqual(ascResults, ["alpha", "beta", "delta", "epsilon", "gamma"])
 
@@ -322,7 +321,7 @@ final class StructuredQueriesTests: XCTestCase {
             }.execute(db)
 
             let collateResults = try Item.select(\.name)
-                .order { $0.name.collate(.nocase).asc() }
+                .order { $0.name.collate(.nocase) }
                 .fetchAll(db)
             XCTAssertEqual(collateResults, ["apple", "Banana", "Cherry"])
         }
@@ -339,7 +338,7 @@ final class StructuredQueriesTests: XCTestCase {
             let countResults = try Item
                 .select { ($0.isActive, $0.id.count()) }
                 .group(by: \.isActive)
-                .order { $0.isActive.asc() }
+                .order(by: \.isActive)
                 .fetchAll(db)
 
             XCTAssertEqual(countResults.count, 2)
@@ -352,7 +351,7 @@ final class StructuredQueriesTests: XCTestCase {
             let sumResults = try Item
                 .select { ($0.isActive, $0.value.sum()) }
                 .group(by: \.isActive)
-                .order { $0.isActive.asc() }
+                .order(by: \.isActive)
                 .fetchAll(db)
 
             XCTAssertEqual(sumResults[0].1, 55)  // gamma(25) + epsilon(30)
@@ -362,7 +361,7 @@ final class StructuredQueriesTests: XCTestCase {
             let avgResults = try Item
                 .select { ($0.isActive, $0.value.avg()) }
                 .group(by: \.isActive)
-                .order { $0.isActive.asc() }
+                .order(by: \.isActive)
                 .fetchAll(db)
 
             XCTAssertEqual(avgResults[0].1, 27.5) // (25+30)/2
@@ -441,11 +440,11 @@ final class StructuredQueriesTests: XCTestCase {
             try seedAll(db)
 
             // Update: set value = 999 for items where value > 20
-            try Item.where { $0.value > 20 }
+            try Item.where { $0.value.gt(20) }
                 .update { $0.value = 999 }
                 .execute(db)
 
-            let highValue = try Item.where { $0.value == 999 }
+            let highValue = try Item.where { $0.value.eq(999) }
                 .order(by: \.id)
                 .fetchAll(db)
             XCTAssertEqual(highValue.count, 2) // gamma(25), epsilon(30) -> both 999

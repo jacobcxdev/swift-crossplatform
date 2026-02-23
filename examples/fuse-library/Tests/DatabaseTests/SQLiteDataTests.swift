@@ -216,7 +216,7 @@ final class SQLiteDataTests: XCTestCase {
 
         // fetchOne returns nil for no match
         let missing = try dbQueue.read { db in
-            try DataItem.where { $0.name == "nonexistent" }.limit(1).fetchOne(db)
+            try DataItem.where { $0.name.eq("nonexistent") }.limit(1).fetchOne(db)
         }
         XCTAssertNil(missing)
     }
