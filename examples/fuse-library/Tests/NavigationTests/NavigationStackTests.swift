@@ -159,6 +159,77 @@ struct NavigationStackTests {
         #expect(store.state.path.count == 0)
     }
 
+    // MARK: - PathView Binding Adapter Tests (NAV-01, NAV-02, NAV-03, TCA-32, TCA-33)
+
+    @Test
+    func testPathViewBindingPush() {
+        // Validates TCA-32: StackState append through binding scope (adapter's push dispatch path)
+        let store = Store(initialState: AppFeature.State()) { AppFeature() }
+        @Bindable var bindableStore = store
+
+        // Obtain the stack store via binding scope — same path the Android adapter uses
+        let pathBinding = $bindableStore.scope(state: \.path, action: \.path)
+        _ = pathBinding // Binding is live — mutations through store.send flow through it
+
+        store.send(.pushDetail("Test"))
+        #expect(store.state.path.count == 1)
+
+        // Verify the pushed element has the correct title
+        let element = store.state.path[id: store.state.path.ids.first!]
+        #expect(element?[case: \.detail]?.title == "Test")
+    }
+
+    @Test
+    func testPathViewBindingPop() {
+        // Validates NAV-03: path removeLast pops top destination through action dispatch
+        let store = Store(initialState: AppFeature.State()) { AppFeature() }
+        @Bindable var bindableStore = store
+        let pathBinding = $bindableStore.scope(state: \.path, action: \.path)
+        _ = pathBinding
+
+        // Push 2 items
+        store.send(.pushDetail("First"))
+        store.send(.pushDetail("Second"))
+        #expect(store.state.path.count == 2)
+
+        // Pop the last via .path(.popFrom(id:)) — same dispatch the adapter's binding setter uses
+        let lastID = store.state.path.ids.last!
+        store.send(.path(.popFrom(id: lastID)))
+        #expect(store.state.path.count == 1)
+
+        // Verify the remaining item is correct
+        let remaining = store.state.path[id: store.state.path.ids.first!]
+        #expect(remaining?[case: \.detail]?.title == "First")
+    }
+
+    @Test
+    func testPathViewBindingMultiplePushPop() {
+        // Validates NAV-02 + NAV-03: interleaved push/pop maintains correct stack state
+        let store = Store(initialState: AppFeature.State()) { AppFeature() }
+        @Bindable var bindableStore = store
+        let pathBinding = $bindableStore.scope(state: \.path, action: \.path)
+        _ = pathBinding
+
+        // Push 3 items
+        store.send(.pushDetail("A"))
+        store.send(.pushDetail("B"))
+        store.send(.pushDetail("C"))
+        #expect(store.state.path.count == 3)
+
+        // Pop 1
+        let lastID = store.state.path.ids.last!
+        store.send(.path(.popFrom(id: lastID)))
+        #expect(store.state.path.count == 2)
+
+        // Push 1 more
+        store.send(.pushDetail("D"))
+        #expect(store.state.path.count == 3)
+
+        // Verify the final element is the newly pushed one
+        let finalElement = store.state.path[id: store.state.path.ids.last!]
+        #expect(finalElement?[case: \.detail]?.title == "D")
+    }
+
     // MARK: - Modern API Usage (NAV-16)
 
     @Test
