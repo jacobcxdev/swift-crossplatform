@@ -132,20 +132,12 @@ struct Combined {
     }
     enum Action { case increment }
     var body: some ReducerOf<Self> {
-        CombineReducers {
-            Reduce { state, action in
-                switch action {
-                case .increment:
-                    state.count += 1
-                    return .none
-                }
-            }
-            Reduce { state, action in
-                switch action {
-                case .increment:
-                    state.log.append("logged")
-                    return .none
-                }
+        Reduce { state, action in
+            switch action {
+            case .increment:
+                state.count += 1
+                state.log.append("logged")
+                return .none
             }
         }
     }
