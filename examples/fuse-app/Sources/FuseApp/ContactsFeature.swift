@@ -20,10 +20,6 @@ struct ContactsFeature {
     @ObservableState
     struct State: Equatable {
         var contacts: IdentifiedArrayOf<Contact> = []
-        // TODO: ANDROID - StackState path binding is silently unused on Android.
-        // NavigationStack does not bind the path on this platform (see ContactsView
-        // #if os(Android) branch which uses plain NavigationStack without path:).
-        // Implement path binding in skip-ui or use a platform-appropriate navigation pattern.
         var path = StackState<ContactsFeaturePath.State>()
         @Presents var destination: Destination.State?
     }
@@ -273,18 +269,6 @@ struct ContactsView: View {
     @Bindable var store: StoreOf<ContactsFeature>
 
     var body: some View {
-        #if os(Android)
-        NavigationStack {
-            contactsList
-        }
-        .sheet(
-            item: $store.scope(state: \.destination?.addContact, action: \.destination.addContact)
-        ) { addStore in
-            NavigationStack {
-                AddContactView(store: addStore)
-            }
-        }
-        #else
         NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
             contactsList
         } destination: { store in
@@ -300,7 +284,6 @@ struct ContactsView: View {
                 AddContactView(store: addStore)
             }
         }
-        #endif
     }
 
     private var contactsList: some View {
