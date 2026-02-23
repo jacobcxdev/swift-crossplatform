@@ -59,14 +59,16 @@ The original Phase 10 scope (NavigationStack path binding on Android) is subsume
 - **Both fuse-app and fuse-library** must work; lite examples deferred
 
 ### SPM Dependency Resolution
-- **Fork anything that depends on a forked package** — otherwise SPM conflicts between fork and remote. Fork pointfreeco + skip packages. GRDB.swift already handled
+- **Fork anything that depends on a forked package** — otherwise SPM conflicts between fork and remote. Fork pointfreeco + skip packages. GRDB.swift already forked (SPM resolution only, no code audit)
 - **Researcher traces full transitive dependency graph** to produce exhaustive list of packages needing forks
 - **Convert to local sibling paths** (../package-name) — no version range normalisation needed (local paths use HEAD)
+- **Include skip-fuse in SPM path conversion** — skip-fuse is stable (no code audit) but if it depends on any forked package, its Package.swift still needs local paths
 - **Keep Android conditionals** (`android ? [deps] : []`) — no need to pull Skip packages on macOS/iOS builds
 - **Leave skip-ui's SKIP_BRIDGE conditional** in its Package.swift as-is (different semantic purpose)
-- **New forks follow established pattern**: dev/swift-crossplatform branch, added as submodules in forks/
+- **New forks follow established pattern**: dev/swift-crossplatform branch, added as submodules in forks/, .gitmodules updated
 - **Package.resolved**: follow upstream example per package; commit for apps, gitignore for libraries
-- **Remove unused dependency declarations** from fuse-app Package.swift — they cause warnings and will become errors in future SwiftPM
+- **Remove unused dependency declarations** from both fuse-app and fuse-library Package.swift — they cause warnings and will become errors in future SwiftPM
+- **Update fuse-library Package.swift** if the audit moves APIs from skip-ui to skip-fuse-ui, add skip-fuse-ui dependency as needed
 - **Verify**: `swift package resolve` with zero warnings + full builds (macOS + Android) on both fuse-library and fuse-app
 
 ### SkipSwiftUI Adaptation Strategy
