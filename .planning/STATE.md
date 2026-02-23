@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 8 complete. All 8 phases delivered.
+**Current focus:** Phase 9 — Post-Audit Cleanup (close gaps from milestone audit).
 
 ## Current Position
 
-Phase: 8 of 8 (PFW Skill Alignment) -- COMPLETE
-Plan: 5 of 5 in current phase (all complete)
-Status: All 191 PFW audit findings addressed. Bridge namespace renamed to BridgeObservation, os_unfair_lock replacing DispatchSemaphore, Android NavigationStack gap documented. 225 fuse-library tests + 30 fuse-app tests passing. Phase 8 and full project complete.
-Last activity: 2026-02-23 -- 08-05 Wave 5 complete. Phase 8 complete.
+Phase: 9 of 9 (Post-Audit Cleanup) -- IN PROGRESS
+Plan: 1 of 3 in current phase
+Status: 09-01 complete (test fixes). 254 tests passing (224 fuse-library + 30 fuse-app). Ready for 09-02 (documentation sync).
+Last activity: 2026-02-23 -- Completed 09-01 (test fixes). DatabaseFeature table name bug fixed, empty test removed.
 
-Progress: [██████████] 100%
+Progress: [█████████░] 93%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18
+- Total plans completed: 19
 - Average duration: ~10min
-- Total execution time: ~3.0 hours
+- Total execution time: ~3.1 hours
 
 **By Phase:**
 
@@ -33,9 +33,10 @@ Progress: [██████████] 100%
 | 6 - Database & Queries | 2 | 13min | 6.5min |
 | 7 - Integration Testing | 4 | 29min | 7min |
 | 8 - PFW Skill Alignment | 5 | 65min | 13min |
+| 9 - Post-Audit Cleanup | 1 | 4min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 08-01, 08-02, 08-03, 08-04, 08-05
+- Last 5 plans: 08-02, 08-03, 08-04, 08-05, 09-01
 - Trend: stable, fast execution
 
 *Updated after each plan completion*
@@ -96,6 +97,8 @@ Recent decisions affecting current work:
 - [Phase 08]: BridgeObservation namespace rename confirmed safe -- all @_cdecl JNI exports are free functions with string literal names
 - [Phase 08]: os_unfair_lock replaces DispatchSemaphore in bridge -- available on Android via Swift Android SDK compatibility layer
 - [Phase 08]: Android NavigationStack path binding silently unused -- documented with TODO in ContactsFeature.swift (M13)
+- [Phase 09]: Production migration DDL must use plural table name ("notes") to match @Table struct Note macro output
+- [Phase 09]: Empty testOpenSettingsDependencyNoCrash deleted (openSettings is SwiftUI @Environment, not TCA @Dependency)
 
 ### Pending Todos
 
@@ -113,6 +116,7 @@ Recent decisions affecting current work:
 ### Roadmap Evolution
 
 - Phase 8 added: PFW skill alignment
+- Phase 9 added: Post-audit cleanup (test fixes, documentation sync, Android verification)
 
 ### Blockers/Concerns
 
@@ -123,5 +127,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Completed 08-05-PLAN.md (Wave 5 fork cleanup + assertion sweep). Phase 8 complete. All 18 plans across 8 phases delivered.
-Resume file: N/A -- project complete
+Stopped at: Completed 09-01-PLAN.md (test fixes). 254 tests passing. Ready for 09-02 (documentation sync).
+Resume file: .planning/phases/09-post-audit-cleanup/09-02-PLAN.md

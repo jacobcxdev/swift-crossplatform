@@ -153,6 +153,7 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 | 6. Database & Queries | 2/2 | Complete | 2026-02-22 |
 | 7. Integration Testing & Documentation | 4/4 | Complete    | 2026-02-23 |
 | 8. PFW Skill Alignment | 5/5 | Complete | 2026-02-23 |
+| 9. Post-Audit Cleanup | 1/3 | In Progress | — |
 
 ### Phase 8: PFW Skill Alignment
 
@@ -173,3 +174,21 @@ Plans:
 - [x] 08-03-PLAN.md (wave 3) — Database & import cleanup: import SQLiteData only, defaultDatabase(), @FetchAll/@FetchOne, #sql macro, .dependencies trait ✓ 2026-02-23
 - [x] 08-04-PLAN.md (wave 4) — Test modernisation: 12 XCTestCase files to Swift Testing, expectNoDifference, confirmation() replacing XCTestExpectation ✓ 2026-02-23
 - [x] 08-05-PLAN.md (wave 5) — Fork cleanup + assertion sweep: bridge namespace rename, os_unfair_lock, final verification of all 191 findings ✓ 2026-02-23
+
+### Phase 9: Post-Audit Cleanup
+**Goal:** Close all gaps identified by the milestone audit — fix failing tests, fill test coverage holes, sync documentation, and verify Android test execution. All fixes must align with `/pfw-*` skills as canonical usage patterns.
+**Depends on:** Phase 8
+**Requirements:** Derived from MILESTONE-AUDIT.md gaps (no formal REQ-IDs — scope defined by audit findings)
+**Canonical pattern references:** `/pfw-structured-queries` (SQL test patterns), `/pfw-sqlite-data` (database lifecycle & migrations), `/pfw-testing` (Swift Testing conventions), `/pfw-composable-architecture` (TCA test patterns), `/pfw-issue-reporting` (isTesting detection on Android)
+**Success Criteria** (what must be TRUE):
+  1. All 255 tests pass (0 failures) — DatabaseFeature test schema bootstrap fixed per `/pfw-sqlite-data` migration patterns, xctest-dynamic-overlay Android imports added per `/pfw-issue-reporting` platform guards
+  2. SQL-09 (rightJoin/fullJoin) and SQL-11 (avg aggregation) have dedicated test assertions following `/pfw-structured-queries` query builder patterns
+  3. REQUIREMENTS.md traceability table has all 184 requirements marked `[x]` with accurate status
+  4. `skip android test` executes successfully after xctest-dynamic-overlay fork fix
+  5. Empty `testOpenSettingsDependencyNoCrash` test removed or replaced with meaningful assertion following `/pfw-testing` @Test conventions
+**Plans:** 3 plans in 3 waves
+
+Plans:
+- [x] 09-01-PLAN.md (wave 1) — Test fixes: xctest-dynamic-overlay Android imports (`/pfw-issue-reporting`), DatabaseFeature schema bootstrap (`/pfw-sqlite-data`), SQL-09/SQL-11 coverage (`/pfw-structured-queries`), empty test cleanup (`/pfw-testing`) ✓ 2026-02-23
+- [ ] 09-02-PLAN.md (wave 2) — Documentation sync: REQUIREMENTS.md 127 stale checkboxes, Perception bypass documentation
+- [ ] 09-03-PLAN.md (wave 3) — Android verification: run `skip android test` after wave 1 fix, capture results, update STATE.md
