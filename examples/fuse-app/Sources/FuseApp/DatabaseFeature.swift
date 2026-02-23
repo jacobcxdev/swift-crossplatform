@@ -55,8 +55,8 @@ struct DatabaseFeature {
 
     @CasePathable
     enum Action {
-        case onAppear
-        case addNoteTapped
+        case viewAppeared
+        case addButtonTapped
         case deleteNote(Int64)
         case categoryFilterChanged(String)
         case notesLoaded(IdentifiedArrayOf<Note>)
@@ -71,7 +71,7 @@ struct DatabaseFeature {
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .onAppear:
+            case .viewAppeared:
                 state.isLoading = true
                 return .run { send in
                     do {
@@ -88,7 +88,7 @@ struct DatabaseFeature {
                     }
                 }
 
-            case .addNoteTapped:
+            case .addButtonTapped:
                 let now = date.now.timeIntervalSince1970
                 return .run { send in
                     do {
@@ -211,12 +211,12 @@ struct DatabaseView: View {
         .navigationTitle("Database")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button { store.send(.addNoteTapped) } label: {
+                Button { store.send(.addButtonTapped) } label: {
                     Label("Add", systemImage: "plus")
                 }
             }
         }
-        .task { store.send(.onAppear) }
+        .task { store.send(.viewAppeared) }
     }
 
     private var filteredNotes: IdentifiedArrayOf<Note> {

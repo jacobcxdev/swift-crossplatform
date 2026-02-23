@@ -183,7 +183,7 @@ final class ContactsFeatureTests: XCTestCase {
                 return testUUIDs[i]
             }
         }
-        await store.send(.onAppear) {
+        await store.send(.viewAppeared) {
             $0.contacts = [
                 Contact(id: testUUIDs[0], name: "Alice", email: "alice@example.com"),
                 Contact(id: testUUIDs[1], name: "Bob", email: "bob@example.com"),
@@ -341,7 +341,7 @@ final class DatabaseFeatureTests: XCTestCase {
             $0.date = .constant(testDate)
         }
         store.exhaustivity = .off
-        await store.send(.addNoteTapped)
+        await store.send(.addButtonTapped)
         await store.receive(\.noteAdded) {
             $0.notes = [Note(id: 1, title: "New Note", body: "", category: "general", createdAt: testDate.timeIntervalSince1970)]
             $0.noteCount = 1

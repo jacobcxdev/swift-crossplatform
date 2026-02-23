@@ -25,7 +25,7 @@ struct SettingsFeature {
         case appearanceChanged(String)
         case notificationsToggled(Bool)
         case resetButtonTapped
-        case onAppear
+        case viewAppeared
     }
 
     var body: some ReducerOf<Self> {
@@ -57,7 +57,7 @@ struct SettingsFeature {
                 state.$sessionActionCount.withLock { $0 += 1 }
                 return .none
 
-            case .onAppear:
+            case .viewAppeared:
                 return .none
             }
         }
@@ -114,6 +114,6 @@ struct SettingsView: View {
             }
         }
         .navigationTitle("Settings")
-        .task { store.send(.onAppear) }
+        .task { store.send(.viewAppeared) }
     }
 }

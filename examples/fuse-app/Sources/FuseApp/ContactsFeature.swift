@@ -30,7 +30,7 @@ struct ContactsFeature {
         case path(StackActionOf<ContactsFeaturePath>)
         case destination(PresentationAction<Destination.Action>)
         case contactTapped(Contact)
-        case onAppear
+        case viewAppeared
     }
 
     @Dependency(\.uuid) var uuid
@@ -61,7 +61,7 @@ struct ContactsFeature {
             case .destination:
                 return .none
 
-            case .onAppear:
+            case .viewAppeared:
                 if state.contacts.isEmpty {
                     state.contacts = [
                         Contact(id: uuid(), name: "Alice", email: "alice@example.com"),
@@ -325,7 +325,7 @@ struct ContactsView: View {
                 }
             }
         }
-        .task { store.send(.onAppear) }
+        .task { store.send(.viewAppeared) }
     }
 }
 
