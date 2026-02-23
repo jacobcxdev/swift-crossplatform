@@ -15,15 +15,17 @@ extension DependencyValues {
         migrator.eraseDatabaseOnSchemaChange = true
         #endif
         migrator.registerMigration("v1") { db in
-            try db.execute(sql: """
-                CREATE TABLE IF NOT EXISTS note (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    title TEXT NOT NULL DEFAULT '',
-                    body TEXT NOT NULL DEFAULT '',
-                    category TEXT NOT NULL DEFAULT 'general',
-                    createdAt REAL NOT NULL DEFAULT 0
-                )
-                """)
+            try #sql(
+                """
+                CREATE TABLE "note" (
+                    "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    "title" TEXT NOT NULL DEFAULT '',
+                    "body" TEXT NOT NULL DEFAULT '',
+                    "category" TEXT NOT NULL DEFAULT 'general',
+                    "createdAt" REAL NOT NULL DEFAULT 0
+                ) STRICT
+                """
+            ).execute(db)
         }
         try migrator.migrate(database)
         self.defaultDatabase = database

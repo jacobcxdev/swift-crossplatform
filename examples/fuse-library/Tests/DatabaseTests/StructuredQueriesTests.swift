@@ -37,21 +37,25 @@ final class StructuredQueriesTests: XCTestCase {
     private func makeDatabase() throws -> DatabaseQueue {
         let dbQueue = try DatabaseQueue()
         try dbQueue.write { db in
-            try db.execute(sql: """
+            try #sql(
+                """
                 CREATE TABLE "categories" (
                     "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                     "name" TEXT NOT NULL DEFAULT ''
-                )
-                """)
-            try db.execute(sql: """
+                ) STRICT
+                """
+            ).execute(db)
+            try #sql(
+                """
                 CREATE TABLE "items" (
                     "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                     "name" TEXT NOT NULL DEFAULT '',
                     "value" INTEGER NOT NULL DEFAULT 0,
-                    "isActive" BOOLEAN NOT NULL DEFAULT 1,
+                    "isActive" INTEGER NOT NULL DEFAULT 1,
                     "categoryId" INTEGER REFERENCES "categories"("id")
-                )
-                """)
+                ) STRICT
+                """
+            ).execute(db)
         }
         return dbQueue
     }

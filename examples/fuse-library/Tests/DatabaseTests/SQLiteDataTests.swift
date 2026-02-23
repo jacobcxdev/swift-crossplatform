@@ -20,14 +20,16 @@ final class SQLiteDataTests: XCTestCase {
     // MARK: - Helpers
 
     private func setupSchema(_ db: Database) throws {
-        try db.execute(sql: """
+        try #sql(
+            """
             CREATE TABLE "items" (
                 "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "name" TEXT NOT NULL DEFAULT '',
                 "value" INTEGER NOT NULL DEFAULT 0,
-                "isActive" BOOLEAN NOT NULL DEFAULT 1
-            )
-            """)
+                "isActive" INTEGER NOT NULL DEFAULT 1
+            ) STRICT
+            """
+        ).execute(db)
     }
 
     private func makeDatabase() throws -> DatabaseQueue {
@@ -63,9 +65,11 @@ final class SQLiteDataTests: XCTestCase {
             @Dependency(\.defaultDatabase) var database
             // Verify the database is usable
             try database.write { db in
-                try db.execute(sql: """
-                    CREATE TABLE "test" ("id" INTEGER PRIMARY KEY)
-                    """)
+                try #sql(
+                    """
+                    CREATE TABLE "test" ("id" INTEGER PRIMARY KEY NOT NULL) STRICT
+                    """
+                ).execute(db)
             }
             let count = try database.read { db in
                 try Int.fetchOne(db, sql: "SELECT count(*) FROM test")
@@ -76,9 +80,11 @@ final class SQLiteDataTests: XCTestCase {
         // Test DatabaseQueue() in-memory fallback
         let inMemory = try DatabaseQueue()
         try inMemory.write { db in
-            try db.execute(sql: """
-                CREATE TABLE "test2" ("id" INTEGER PRIMARY KEY)
-                """)
+            try #sql(
+                """
+                CREATE TABLE "test2" ("id" INTEGER PRIMARY KEY NOT NULL) STRICT
+                """
+            ).execute(db)
         }
         let count2 = try inMemory.read { db in
             try Int.fetchOne(db, sql: "SELECT count(*) FROM test2")
@@ -92,14 +98,16 @@ final class SQLiteDataTests: XCTestCase {
         let dbQueue = try DatabaseQueue()
         var migrator = DatabaseMigrator()
         migrator.registerMigration("v1") { db in
-            try db.execute(sql: """
+            try #sql(
+                """
                 CREATE TABLE "items" (
                     "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                     "name" TEXT NOT NULL DEFAULT '',
                     "value" INTEGER NOT NULL DEFAULT 0,
-                    "isActive" BOOLEAN NOT NULL DEFAULT 1
-                )
-                """)
+                    "isActive" INTEGER NOT NULL DEFAULT 1
+                ) STRICT
+                """
+            ).execute(db)
         }
         try migrator.migrate(dbQueue)
 

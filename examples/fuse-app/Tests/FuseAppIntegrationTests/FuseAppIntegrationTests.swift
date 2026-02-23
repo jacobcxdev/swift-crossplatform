@@ -318,15 +318,17 @@ final class DatabaseFeatureTests: XCTestCase {
     private func createMigratedDatabase() throws -> DatabaseQueue {
         let db = try DatabaseQueue()
         try db.write { db in
-            try db.execute(sql: """
-                CREATE TABLE IF NOT EXISTS note (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    title TEXT NOT NULL DEFAULT '',
-                    body TEXT NOT NULL DEFAULT '',
-                    category TEXT NOT NULL DEFAULT 'general',
-                    createdAt REAL NOT NULL DEFAULT 0
-                )
-                """)
+            try #sql(
+                """
+                CREATE TABLE "note" (
+                    "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    "title" TEXT NOT NULL DEFAULT '',
+                    "body" TEXT NOT NULL DEFAULT '',
+                    "category" TEXT NOT NULL DEFAULT 'general',
+                    "createdAt" REAL NOT NULL DEFAULT 0
+                ) STRICT
+                """
+            ).execute(db)
         }
         return db
     }
@@ -351,7 +353,12 @@ final class DatabaseFeatureTests: XCTestCase {
     @MainActor func testDeleteNote() async {
         let db = try! createMigratedDatabase()
         try! await db.write { db in
-            try db.execute(sql: "INSERT INTO note (id, title, body, category, createdAt) VALUES (42, 'Test', '', 'general', 0)")
+            try #sql(
+                    """
+                    INSERT INTO "note" ("id", "title", "body", "category", "createdAt")
+                    VALUES (\(bind: 42), \(bind: "Test"), \(bind: ""), \(bind: "general"), \(bind: 0.0))
+                    """
+                ).execute(db)
         }
         let note = Note(id: 42, title: "Test", body: "", category: "general", createdAt: 0)
         let store = TestStore(
