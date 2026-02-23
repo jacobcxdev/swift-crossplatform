@@ -1,6 +1,5 @@
 import XCTest
 import SQLiteData
-import StructuredQueries
 
 // MARK: - @Table models (must be file-scope for macro expansion)
 

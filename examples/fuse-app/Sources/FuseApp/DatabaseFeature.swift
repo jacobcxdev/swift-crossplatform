@@ -1,16 +1,10 @@
 import ComposableArchitecture
-import Dependencies
-import GRDB
 import IdentifiedCollections
 import IssueReporting
 import SQLiteData
-import StructuredQueries
-import StructuredQueriesSQLite
 import SwiftUI
 
 // MARK: - Database Setup
-
-extension DatabaseQueue: @unchecked @retroactive Sendable {}
 
 extension DependencyValues {
     mutating func bootstrapDatabase() throws {

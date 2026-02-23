@@ -3,7 +3,6 @@ import Foundation
 import IdentifiedCollections
 import Sharing
 import SQLiteData
-import StructuredQueriesSQLite
 
 // MARK: - Todo Model
 
