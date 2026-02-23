@@ -55,8 +55,6 @@ let package = Package(
         // TCA core tests (Phase 3 + 4 state/bindings + Phase 7 TestStore)
         .testTarget(name: "TCATests", dependencies: [
             .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-            .product(name: "Dependencies", package: "swift-dependencies"),
-            .product(name: "DependenciesMacros", package: "swift-dependencies"),
             .product(name: "DependenciesTestSupport", package: "swift-dependencies"),
         ]),
         // Sharing tests (Phase 4)

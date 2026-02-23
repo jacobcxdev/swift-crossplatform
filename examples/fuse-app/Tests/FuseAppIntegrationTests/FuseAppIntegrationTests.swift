@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import SQLiteData
 import XCTest
 @testable import FuseApp
 
