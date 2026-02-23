@@ -8,12 +8,7 @@ import SwiftUI
 
 extension DependencyValues {
     mutating func bootstrapDatabase() throws {
-        let path = URL.applicationSupportDirectory.appending(component: "fuse-app.sqlite").path
-        try FileManager.default.createDirectory(
-            at: URL.applicationSupportDirectory,
-            withIntermediateDirectories: true
-        )
-        let database = try DatabaseQueue(path: path)
+        let database = try SQLiteData.defaultDatabase(path: URL.applicationSupportDirectory.appending(component: "fuse-app.sqlite").path)
 
         var migrator = DatabaseMigrator()
         #if DEBUG
@@ -31,7 +26,7 @@ extension DependencyValues {
                 """)
         }
         try migrator.migrate(database)
-        defaultDatabase = database
+        self.defaultDatabase = database
     }
 }
 
