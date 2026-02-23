@@ -154,6 +154,8 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 | 7. Integration Testing & Documentation | 4/4 | Complete    | 2026-02-23 |
 | 8. PFW Skill Alignment | 5/5 | Complete | 2026-02-23 |
 | 9. Post-Audit Cleanup | 4/4 | Complete | 2026-02-23 |
+| 10. NavigationStack Path (Android) | 0/? | Planned | - |
+| 11. Presentation Dismiss (Android) | 0/? | Planned | - |
 
 ### Phase 8: PFW Skill Alignment
 
@@ -193,3 +195,35 @@ Plans:
 - [x] 09-02-PLAN.md (wave 2) — Documentation sync: REQUIREMENTS.md 127 stale checkboxes, Perception bypass documentation ✓ 2026-02-23
 - [x] 09-03-PLAN.md (wave 3) — Android verification: run `skip android test` after wave 1 fix, capture results, update STATE.md ✓ 2026-02-23
 - [x] 09-04-PLAN.md (wave 4) — Gap closure: wrap 3 Android-failing tests with withKnownIssue, correct inaccurate SUMMARY, re-verify 0 real failures ✓ 2026-02-23
+
+### Phase 10: NavigationStack Path Binding on Android
+**Goal:** Implement `NavigationStack(path:root:destination:)` in skip-ui fork so TCA path-driven navigation works on Android — closing the M1-ANDROID-NAV-STACK integration gap and Contacts deep navigation flow gap
+**Depends on:** Phase 9
+**Requirements:** NAV-01, NAV-02, NAV-03, TCA-32, TCA-33 (strengthening existing Complete status from iOS-only to cross-platform)
+**Gap Closure:** Closes M1-ANDROID-NAV-STACK (integration) + Contacts deep navigation flow (E2E flow)
+**Canonical pattern references:** `/pfw-composable-architecture` (NavigationStack path binding), `/pfw-swift-navigation` (path-driven navigation)
+**Success Criteria** (what must be TRUE):
+  1. `NavigationStack(path:root:destination:)` initializer compiles and renders on Android in skip-ui fork
+  2. Path append pushes destination via Compose NavHost; path removeLast pops destination on Android
+  3. ContactsFeature.swift `#if os(Android)` workaround removed — single code path for both platforms
+  4. `skip android test` passes with NavigationStack path tests covering push/pop on Android
+**Plans:** TBD
+
+Plans:
+- [ ] 10-01-PLAN.md — TBD
+
+### Phase 11: Presentation Dismiss on Android
+**Goal:** Enable TCA's `@Dependency(\.dismiss)` on Android by implementing programmatic dismiss support in skip-ui fork and removing the `#if !os(Android)` gate in swift-composable-architecture fork
+**Depends on:** Phase 10
+**Requirements:** TCA-26, TCA-28, NAV-14 (strengthening existing Complete status from iOS-only to cross-platform)
+**Gap Closure:** Closes M2-ANDROID-DISMISS (integration)
+**Canonical pattern references:** `/pfw-composable-architecture` (PresentationAction.dismiss pattern), `/pfw-swift-navigation` (dismiss dependency)
+**Success Criteria** (what must be TRUE):
+  1. `@Dependency(\.dismiss)` resolves a functional dismiss implementation on Android (not EmptyReducer no-op)
+  2. Programmatic dismiss from TCA reducer triggers Compose presentation close (sheet dismiss / navigation pop)
+  3. `withKnownIssue` wrappers removed from FuseAppIntegrationTests dismiss assertions — tests pass natively on Android
+  4. `skip android test` passes with 0 real failures and fewer known issues than current 13
+**Plans:** TBD
+
+Plans:
+- [ ] 11-01-PLAN.md — TBD
