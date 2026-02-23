@@ -17,7 +17,7 @@ The original Phase 10 scope (NavigationStack path binding on Android) is subsume
 
 ### Audit Scope
 - **Full diff audit** of every modified file in skip-ui against skip-fuse-ui — not just NavigationStack
-- **Bidirectional**: check for missing counterparts in skip-fuse-ui AND evaluate whether some skip-ui code should live in skip-fuse-ui instead
+- **Bidirectional**: check for missing counterparts in skip-fuse-ui AND evaluate whether some skip-ui code should live in skip-fuse-ui instead — if the audit determines code belongs in skip-fuse-ui, **execute the move** (not just document as recommendation)
 - **Compare fork vs upstream** skip-fuse-ui to understand what upstream already provides vs what we've added vs what's still missing
 - **Include `#if !SKIP_BRIDGE`-gated files** (~50+ files in skip-ui) — some may provide APIs that Fuse apps need but skip-fuse-ui doesn't yet expose
 - **Include other fork guards** — audit `#if os(Android)` guards in TCA, swift-navigation, swift-sharing, swift-perception for correctness with skip-fuse-ui layer
@@ -30,6 +30,7 @@ The original Phase 10 scope (NavigationStack path binding on Android) is subsume
 - **Verify Kotlin-generated code alignment** — check that `#if SKIP` markers (SKIP DECLARE, SKIP INSERT) align with what skip-fuse-ui's Swift wrappers expect
 - **Evaluate new dependency edges** — check if any fork that touches UI or observation on Android needs skip-fuse-ui as a dependency but currently lacks it
 - **Validate dependency graph** for cycles after SPM changes
+- **Investigate JVM type erasure risk** — prior verification flagged `StackState<State>.Component` in `navigationDestination(for:)` as a runtime risk on Android. Gap report must specifically investigate and propose a solution before fixes
 
 ### Audit Output
 - **Research produces a formal gap report** before any code changes; plans fix gaps
@@ -53,13 +54,15 @@ The original Phase 10 scope (NavigationStack path binding on Android) is subsume
 - **`#if os(Android)` used sparingly** — only when genuinely required
 
 ### Phase Administration
-- **Phase 11 removed** — absorbed into Phase 10
+- **Phase 11 ("Presentation Dismiss on Android") absorbed into Phase 10** — the full audit will cover dismiss/presentation gaps alongside navigation and other gaps
 - **Phase renamed** to reflect full scope (no longer just "NavigationStack Path Binding on Android")
-- **Roadmap goal updated** to reflect SPM resolution + skip-fuse-ui audit + cross-fork verification
+- **Roadmap goal updated** to reflect SPM resolution + skip-fuse-ui audit + cross-fork verification; Phase 11 entry removed from ROADMAP
 - **Both fuse-app and fuse-library** must work; lite examples deferred
+- **New plans numbered 10-03, 10-04, etc.** — continuing Phase 10 sequence (existing 10-01, 10-02 are superseded by replan)
+- **fuse-app should depend on fuse-library** — TCA modularised pattern; code lives in fuse-library, fuse-app packages it as an app. Investigate/validate this as part of SPM resolution
 
 ### SPM Dependency Resolution
-- **Fork anything that depends on a forked package** — otherwise SPM conflicts between fork and remote. Fork pointfreeco + skip packages. GRDB.swift already forked (SPM resolution only, no code audit)
+- **Fork anything that depends on a forked package** — otherwise SPM conflicts between fork and remote. Fork pointfreeco + skip packages. GRDB.swift already forked (SPM resolution only, no code audit). Skip toolchain (`skip.git`, `skip-model`, `skip-unit`) should stay remote if possible — researcher determines whether they're leaf dependencies or need forking
 - **Researcher traces full transitive dependency graph** to produce exhaustive list of packages needing forks
 - **Convert to local sibling paths** (../package-name) — no version range normalisation needed (local paths use HEAD)
 - **Include skip-fuse in SPM path conversion** — skip-fuse is stable (no code audit) but if it depends on any forked package, its Package.swift still needs local paths
@@ -93,12 +96,13 @@ The original Phase 10 scope (NavigationStack path binding on Android) is subsume
 - **macOS tests sufficient for iOS compatibility** (exercises SwiftUI code paths)
 - **Swift 6 concurrency**: handle reactively as build errors, not proactive audit
 - **One commit per logical fix** within fork submodules — easier to review, revert, and upstream individually
+- **SPM plan commit strategy**: one commit per fork submodule for its Package.swift change; parent repo updates all submodule pointers in a single commit
 
 ### CLAUDE.md & Makefile Updates
 - **Add new gotchas**: Android builds can pass even when running fails; test execution is the real verification gate; clean builds required after dependency changes
 - **Document all Makefile commands** so Claude knows how to work with the project
 - **Document environment variables**: map TARGET_OS_ANDROID, SKIP_BRIDGE, os(Android) to their effects
-- **Update Makefile** for smart defaults: `make build` = both platforms, `make test` = both platforms
+- **Update Makefile** for smart defaults: `make build` = both examples (fuse-library + fuse-app) on both platforms (macOS + Android), `make test` = same. EXAMPLE= override still works for targeting a single example
 
 ### Phase Completion Criteria
 - Zero SPM identity conflict warnings on `swift package resolve`
@@ -107,7 +111,8 @@ The original Phase 10 scope (NavigationStack path binding on Android) is subsume
 - No workarounds — proper implementations with `#if os(Android)` only where required
 - CLAUDE.md updated with gotchas, Makefile commands, env var documentation
 - Makefile updated with smart defaults
-- Roadmap updated with new phase name, goal, and success criteria
+- Presentation dismiss (`@Dependency(\.dismiss)`) working on Android (absorbed from Phase 11)
+- Roadmap updated with new phase name, goal, and success criteria; Phase 11 entry removed
 
 ### Claude's Discretion
 - Whether to modify skip-ui's Compose layer for missing bridge constructors (evaluate per case)
