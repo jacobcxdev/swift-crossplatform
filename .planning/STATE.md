@@ -40,6 +40,7 @@ Progress: [██████████] 100%
 - Trend: stable, fast execution
 
 *Updated after each plan completion*
+| Phase 09 P03 | 13min | 4 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -104,6 +105,8 @@ Recent decisions affecting current work:
 - [Phase 09]: loadPeerLibrary guard changed from #if os(Android) to #if SKIP (function only available in transpiled Kotlin context)
 - [Phase 09]: Combine-dependent tests gated with #if canImport(Combine) for Android compatibility
 - [Phase 09]: TestStore receive timeouts increased to 5s for Android (effects take longer due to JNI overhead)
+- [Phase 09]: PlatformLock wraps os_unfair_lock (Darwin) / pthread_mutex_t (Android) for cross-platform bridge locking
+- [Phase 09]: loadPeerLibrary guard must use #if SKIP not #if os(Android) -- function only in transpiled Kotlin
 
 ### Pending Todos
 
