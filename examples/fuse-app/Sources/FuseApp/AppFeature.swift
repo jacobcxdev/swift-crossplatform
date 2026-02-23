@@ -19,6 +19,7 @@ struct AppFeature {
         }
     }
 
+    @CasePathable
     enum Action {
         case counter(CounterFeature.Action)
         case todos(TodosFeature.Action)

@@ -22,6 +22,7 @@ struct ContactsFeature {
         @Presents var destination: Destination.State?
     }
 
+    @CasePathable
     enum Action {
         case addButtonTapped
         case path(StackActionOf<Path>)
@@ -103,6 +104,7 @@ struct ContactDetailFeature {
         @Presents var destination: Destination.State?
     }
 
+    @CasePathable
     enum Action {
         case editButtonTapped
         case deleteButtonTapped
@@ -185,6 +187,7 @@ struct EditContactFeature {
         var contact: Contact
     }
 
+    @CasePathable
     enum Action: BindableAction {
         case binding(BindingAction<State>)
         case saveButtonTapped
@@ -226,6 +229,7 @@ struct AddContactFeature {
         var email = ""
     }
 
+    @CasePathable
     enum Action: BindableAction {
         case binding(BindingAction<State>)
         case saveButtonTapped
@@ -265,33 +269,20 @@ struct ContactsView: View {
     @Bindable var store: StoreOf<ContactsFeature>
 
     var body: some View {
+        #if os(Android)
+        NavigationStack {
+            contactsList
+        }
+        .sheet(
+            item: $store.scope(state: \.destination?.addContact, action: \.destination.addContact)
+        ) { addStore in
+            NavigationStack {
+                AddContactView(store: addStore)
+            }
+        }
+        #else
         NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
-            List {
-                ForEach(store.contacts) { contact in
-                    Button { store.send(.contactTapped(contact)) } label: {
-                        HStack {
-                            Image(systemName: "person.circle.fill")
-                                .foregroundStyle(.blue)
-                            VStack(alignment: .leading) {
-                                Text(contact.name)
-                                    .font(.headline)
-                                Text(contact.email)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                    }
-                }
-            }
-            .navigationTitle("Contacts")
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button { store.send(.addButtonTapped) } label: {
-                        Label("Add", systemImage: "plus")
-                    }
-                }
-            }
-            .task { store.send(.onAppear) }
+            contactsList
         } destination: { store in
             switch store.case {
             case let .detail(detailStore):
@@ -305,6 +296,36 @@ struct ContactsView: View {
                 AddContactView(store: addStore)
             }
         }
+        #endif
+    }
+
+    private var contactsList: some View {
+        List {
+            ForEach(store.contacts) { contact in
+                Button { store.send(.contactTapped(contact)) } label: {
+                    HStack {
+                        Image(systemName: "person.circle.fill")
+                            .foregroundStyle(.blue)
+                        VStack(alignment: .leading) {
+                            Text(contact.name)
+                                .font(.headline)
+                            Text(contact.email)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+            }
+        }
+        .navigationTitle("Contacts")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button { store.send(.addButtonTapped) } label: {
+                    Label("Add", systemImage: "plus")
+                }
+            }
+        }
+        .task { store.send(.onAppear) }
     }
 }
 
@@ -316,8 +337,8 @@ struct ContactDetailView: View {
     var body: some View {
         List {
             Section("Info") {
-                LabeledContent("Name", value: store.contact.name)
-                LabeledContent("Email", value: store.contact.email)
+                HStack { Text("Name"); Spacer(); Text(store.contact.name).foregroundStyle(.secondary) }
+                HStack { Text("Email"); Spacer(); Text(store.contact.email).foregroundStyle(.secondary) }
             }
 
             Section {

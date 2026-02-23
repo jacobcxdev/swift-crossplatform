@@ -13,6 +13,7 @@ struct CounterFeature {
         var totalChanges = 0
     }
 
+    @CasePathable
     enum Action: ViewAction {
         case view(View)
         case factResponse(Result<String, Error>)
@@ -131,7 +132,12 @@ struct CounterView: View {
             }
 
             Section("Stats") {
-                LabeledContent("Total Changes", value: "\(store.totalChanges)")
+                HStack {
+                    Text("Total Changes")
+                    Spacer()
+                    Text("\(store.totalChanges)")
+                        .foregroundStyle(.secondary)
+                }
             }
         }
         .navigationTitle("Counter")

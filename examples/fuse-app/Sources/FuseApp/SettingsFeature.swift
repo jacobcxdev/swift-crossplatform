@@ -17,6 +17,7 @@ struct SettingsFeature {
         @ObservationStateIgnored var debugInfo: String = ""
     }
 
+    @CasePathable
     enum Action: BindableAction {
         case binding(BindingAction<State>)
         case userNameChanged(String)

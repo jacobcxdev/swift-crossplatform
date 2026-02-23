@@ -32,6 +32,7 @@ struct TodosFeature {
         }
     }
 
+    @CasePathable
     enum Action {
         case addButtonTapped
         case toggleTodo(Todo.ID)
@@ -142,10 +143,17 @@ struct TodosFeature {
 struct TodosView: View {
     @Bindable var store: StoreOf<TodosFeature>
 
+    private var filterBinding: Binding<TodosFeature.State.Filter> {
+        Binding(
+            get: { store.filter },
+            set: { store.send(.filterChanged($0)) }
+        )
+    }
+
     var body: some View {
         List {
             Section {
-                Picker("Filter", selection: $store.filter.sending(\.filterChanged)) {
+                Picker("Filter", selection: filterBinding) {
                     ForEach(TodosFeature.State.Filter.allCases, id: \.self) { filter in
                         Text(filter.rawValue.capitalized).tag(filter)
                     }
@@ -155,21 +163,24 @@ struct TodosView: View {
 
             Section {
                 ForEach(store.filteredTodos) { todo in
-                    TodoRowView(todo: todo) {
-                        store.send(.toggleTodo(todo.id))
-                    }
-                    .swipeActions {
-                        Button(role: .destructive) {
+                    HStack {
+                        TodoRowView(todo: todo) {
+                            store.send(.toggleTodo(todo.id))
+                        }
+                        Spacer()
+                        Button {
                             store.send(.deleteTapped(todo.id))
                         } label: {
-                            Label("Delete", systemImage: "trash")
+                            Image(systemName: "trash")
+                                .foregroundStyle(.red)
                         }
+                        .buttonStyle(.borderless)
                     }
                 }
             }
 
             Section {
-                LabeledContent("Completed", value: "\(store.completedCount)/\(store.todos.count)")
+                HStack { Text("Completed"); Spacer(); Text("\(store.completedCount)/\(store.todos.count)").foregroundStyle(.secondary) }
             }
         }
         .navigationTitle("Todos")

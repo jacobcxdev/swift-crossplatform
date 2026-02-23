@@ -52,6 +52,7 @@ struct DatabaseFeature {
         var isLoading = false
     }
 
+    @CasePathable
     enum Action {
         case onAppear
         case addNoteTapped
