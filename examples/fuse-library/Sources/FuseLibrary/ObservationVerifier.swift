@@ -270,10 +270,12 @@ public struct ObservationVerifier {
     }
 }
 
-/// Thread-safe flag box for use in @Sendable onChange closures.
-/// Note: withObservationTracking dispatches onChange synchronously before
-/// willSet returns in the current Swift Observation implementation, so
-/// no additional synchronization is needed for this test helper.
+/// Single-write flag for use in @Sendable onChange closures.
+/// `@unchecked Sendable` is safe because `withObservationTracking` dispatches
+/// onChange synchronously on the mutating thread before `willSet` returns in
+/// the current Swift Observation implementation. The flag is written exactly
+/// once (false -> true) with no concurrent readers until after the synchronous
+/// call completes, so no additional synchronization is needed.
 private final class FlagBox: @unchecked Sendable {
     var value = false
 }

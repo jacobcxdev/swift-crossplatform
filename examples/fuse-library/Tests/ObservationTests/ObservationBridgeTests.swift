@@ -5,6 +5,9 @@ import Testing
 import Foundation
 
 // MARK: - Test Models
+// `@unchecked Sendable` on @Observable classes below is safe because
+// ObservationRegistrar provides thread-safe access tracking, and mutations
+// in tests are sequenced (single-threaded or via structured concurrency).
 
 @Observable
 final class BridgeModel: @unchecked Sendable {
