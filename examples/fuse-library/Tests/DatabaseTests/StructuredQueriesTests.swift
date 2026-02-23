@@ -30,6 +30,8 @@ struct ItemSummary: Equatable {
 
 // MARK: - Test Suite
 
+// TODO: Wave 4 — Migrate to Swift Testing @Suite with .dependencies { try $0.bootstrapDatabase() } trait
+// This will replace the manual makeDatabase() helper with consistent bootstrap.
 final class StructuredQueriesTests: XCTestCase {
 
     // MARK: - Helpers

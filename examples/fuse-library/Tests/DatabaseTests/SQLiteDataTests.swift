@@ -15,6 +15,8 @@ struct DataItem: Identifiable, Equatable, Sendable {
 
 // MARK: - Test Suite
 
+// TODO: Wave 4 — Migrate to Swift Testing @Suite with .dependencies { try $0.bootstrapDatabase() } trait
+// This will replace the manual makeDatabase()/setupSchema() helpers with consistent bootstrap.
 final class SQLiteDataTests: XCTestCase {
 
     // MARK: - Helpers

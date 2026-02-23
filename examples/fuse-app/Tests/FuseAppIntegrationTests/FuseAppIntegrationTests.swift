@@ -313,6 +313,8 @@ final class ContactDetailFeatureTests: XCTestCase {
 
 // MARK: - DatabaseFeature Integration Tests
 
+// TODO: Wave 4 — Migrate to Swift Testing @Suite with .dependencies { try $0.bootstrapDatabase() } trait
+// This will replace createMigratedDatabase() with consistent bootstrap and fix pre-existing test failures.
 final class DatabaseFeatureTests: XCTestCase {
 
     private func createMigratedDatabase() throws -> DatabaseQueue {
