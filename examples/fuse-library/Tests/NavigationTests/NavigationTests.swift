@@ -443,13 +443,4 @@ struct NavigationTests {
         let state: EphemeralParent.Destination.State = .ignored
         #expect(state.is(\.ignored))
     }
-
-    // MARK: - openSettings dependency (D4)
-
-    @Test
-    func testOpenSettingsDependencyNoCrash() {
-        // D4: openSettings is not a TCA @Dependency — it's a SwiftUI @Environment(\.openSettings) value.
-        // TCA's DependencyValues does not include openSettings.
-        // No-crash validation deferred to Phase 7 integration testing with view hierarchy.
-    }
 }
