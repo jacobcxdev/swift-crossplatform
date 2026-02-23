@@ -40,11 +40,11 @@ struct Contact: Equatable, Identifiable, Codable, Hashable, Sendable {
 @Table
 struct Note: Equatable, Identifiable, Sendable {
     @Column(primaryKey: true)
-    var id: Int64 = 0
+    let id: Int64
     var title: String = ""
     var body: String = ""
     var category: String = "general"
-    var createdAt: Double = Date().timeIntervalSince1970
+    var createdAt: Double = 0
 }
 
 // MARK: - SharedKey Extensions
@@ -63,7 +63,7 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
 
 extension SharedKey where Self == FileStorageKey<[Todo]>.Default {
     static var savedTodos: Self {
-        Self[.fileStorage(URL.documentsDirectory.appendingPathComponent("todos.json")), default: []]
+        Self[.fileStorage(URL.applicationSupportDirectory.appending(component: "todos.json")), default: []]
     }
 }
 

@@ -13,7 +13,7 @@ struct SettingsFeature {
         @Shared(.appearance) var appearance: String
         @Shared(.notificationsEnabled) var notificationsEnabled: Bool
         @Shared(.savedTodos) var savedTodos: [Todo] = []
-        @Shared(.inMemory("sessionActionCount")) var sessionActionCount: Int = 0
+        @Shared(.sessionActionCount) var sessionActionCount: Int
         @ObservationStateIgnored var debugInfo: String = ""
     }
 

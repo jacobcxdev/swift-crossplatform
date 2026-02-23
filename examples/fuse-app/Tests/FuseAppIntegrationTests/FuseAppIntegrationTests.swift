@@ -333,7 +333,7 @@ final class DatabaseFeatureTests: XCTestCase {
         let store = TestStore(initialState: DatabaseFeature.State()) {
             DatabaseFeature()
         } withDependencies: {
-            $0.appDatabase = db
+            $0.defaultDatabase = db
             $0.date = .constant(testDate)
         }
         store.exhaustivity = .off
@@ -355,7 +355,7 @@ final class DatabaseFeatureTests: XCTestCase {
         ) {
             DatabaseFeature()
         } withDependencies: {
-            $0.appDatabase = db
+            $0.defaultDatabase = db
         }
         store.exhaustivity = .off
         await store.send(.deleteNote(42))

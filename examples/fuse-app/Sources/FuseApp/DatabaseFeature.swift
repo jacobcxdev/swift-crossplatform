@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import Dependencies
 import GRDB
+import IssueReporting
 import SQLiteData
 import StructuredQueries
 import StructuredQueriesSQLite
@@ -10,49 +11,32 @@ import SwiftUI
 
 extension DatabaseQueue: @unchecked @retroactive Sendable {}
 
-private func createAppDatabase() throws -> DatabaseQueue {
-    let path = URL.applicationSupportDirectory.appendingPathComponent("fuse-app.sqlite").path
-    try FileManager.default.createDirectory(
-        at: URL.applicationSupportDirectory,
-        withIntermediateDirectories: true
-    )
-    let db = try DatabaseQueue(path: path)
-
-    var migrator = DatabaseMigrator()
-    migrator.registerMigration("v1") { db in
-        try db.execute(sql: """
-            CREATE TABLE IF NOT EXISTS note (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                title TEXT NOT NULL DEFAULT '',
-                body TEXT NOT NULL DEFAULT '',
-                category TEXT NOT NULL DEFAULT 'general',
-                createdAt REAL NOT NULL DEFAULT 0
-            )
-            """)
-    }
-    try migrator.migrate(db)
-    return db
-}
-
-// MARK: - Database Dependency
-
-private enum AppDatabaseKey: DependencyKey {
-    static let liveValue: DatabaseQueue = {
-        do {
-            return try createAppDatabase()
-        } catch {
-            fatalError("Failed to create database: \(error)")
-        }
-    }()
-    static var testValue: DatabaseQueue {
-        try! DatabaseQueue()
-    }
-}
-
 extension DependencyValues {
-    var appDatabase: DatabaseQueue {
-        get { self[AppDatabaseKey.self] }
-        set { self[AppDatabaseKey.self] = newValue }
+    mutating func bootstrapDatabase() throws {
+        let path = URL.applicationSupportDirectory.appending(component: "fuse-app.sqlite").path
+        try FileManager.default.createDirectory(
+            at: URL.applicationSupportDirectory,
+            withIntermediateDirectories: true
+        )
+        let database = try DatabaseQueue(path: path)
+
+        var migrator = DatabaseMigrator()
+        #if DEBUG
+        migrator.eraseDatabaseOnSchemaChange = true
+        #endif
+        migrator.registerMigration("v1") { db in
+            try db.execute(sql: """
+                CREATE TABLE IF NOT EXISTS note (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    title TEXT NOT NULL DEFAULT '',
+                    body TEXT NOT NULL DEFAULT '',
+                    category TEXT NOT NULL DEFAULT 'general',
+                    createdAt REAL NOT NULL DEFAULT 0
+                )
+                """)
+        }
+        try migrator.migrate(database)
+        defaultDatabase = database
     }
 }
 
@@ -72,14 +56,14 @@ struct DatabaseFeature {
         case onAppear
         case addNoteTapped
         case deleteNote(Int64)
-        case toggleCategory(String)
+        case categoryFilterChanged(String)
         case notesLoaded([Note])
         case noteCountLoaded(Int)
         case noteAdded(Note)
         case noteDeleted(Int64)
     }
 
-    @Dependency(\.appDatabase) var database
+    @Dependency(\.defaultDatabase) var database
     @Dependency(\.date) var date
 
     var body: some ReducerOf<Self> {
@@ -125,7 +109,7 @@ struct DatabaseFeature {
                     await send(.noteDeleted(id))
                 }
 
-            case let .toggleCategory(category):
+            case let .categoryFilterChanged(category):
                 state.selectedCategory = category
                 return .none
 
@@ -164,7 +148,7 @@ struct DatabaseView: View {
             Section("Filter") {
                 Picker("Category", selection: Binding(
                     get: { store.selectedCategory },
-                    set: { store.send(.toggleCategory($0)) }
+                    set: { store.send(.categoryFilterChanged($0)) }
                 )) {
                     ForEach(categories, id: \.self) { cat in
                         Text(cat.capitalized).tag(cat)

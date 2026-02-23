@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import ComposableArchitecture
+import Dependencies
 import Foundation
 import SkipFuse
 import SwiftUI
@@ -19,6 +20,9 @@ let logger: Logger = Logger(subsystem: "dev.jacobcx.fuseApp", category: "FuseApp
     }
 
     /* SKIP @bridge */public init() {
+        prepareDependencies {
+            try! $0.bootstrapDatabase()
+        }
     }
 
     public var body: some View {

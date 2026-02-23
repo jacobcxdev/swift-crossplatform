@@ -10,7 +10,7 @@ import StructuredQueries
 @Table("items")
 struct DataItem: Identifiable, Equatable, Sendable {
     @Column(primaryKey: true)
-    var id: Int
+    let id: Int
     var name: String
     var value: Int
     var isActive: Bool
