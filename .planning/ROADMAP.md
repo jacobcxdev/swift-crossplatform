@@ -154,7 +154,7 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 | 7. Integration Testing & Documentation | 4/4 | Complete    | 2026-02-23 |
 | 8. PFW Skill Alignment | 5/5 | Complete | 2026-02-23 |
 | 9. Post-Audit Cleanup | 4/4 | Complete | 2026-02-23 |
-| 10. NavigationStack Path (Android) | 0/? | Planned | - |
+| 10. NavigationStack Path (Android) | 1/2 | In Progress | - |
 | 11. Presentation Dismiss (Android) | 0/? | Planned | - |
 
 ### Phase 8: PFW Skill Alignment
@@ -212,7 +212,7 @@ Plans:
 **Plans:** 2 plans in 2 waves
 
 Plans:
-- [ ] 10-01-PLAN.md — Android NavigationStack adapter: _TCANavigationStack View struct + free function + _NavigationDestinationViewModifier enablement (NAV-01..NAV-03, TCA-32, TCA-33)
+- [x] 10-01-PLAN.md — Android NavigationStack adapter: _TCANavigationStack View struct + free function + _NavigationDestinationViewModifier enablement (NAV-01..NAV-03, TCA-32, TCA-33) ✓ 2026-02-23
 - [ ] 10-02-PLAN.md — ContactsFeature unification + adapter binding tests + Android build verification (NAV-01..NAV-03, TCA-32, TCA-33)
 
 ### Phase 11: Presentation Dismiss on Android

@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 9 — Post-Audit Cleanup (close gaps from milestone audit).
+**Current focus:** Phase 10 — NavigationStack Path Binding on Android.
 
 ## Current Position
 
-Phase: 9 of 9 (Post-Audit Cleanup) -- COMPLETE
-Plan: 4 of 4 in current phase
-Status: 09-04 complete (gap closure). All 250 tests pass on Android (220 fuse-library + 30 fuse-app). 13 known issues (9 fuse-library + 4 fuse-app), 0 real failures after withKnownIssue wrappers.
-Last activity: 2026-02-23 -- Completed 09-04 (withKnownIssue wrappers for 3 Android timing failures). All phases complete.
+Phase: 10 of 11 (NavigationStack Path Android)
+Plan: 1 of 2 in current phase
+Status: 10-01 complete (Android NavigationStack adapter). _TCANavigationStack View struct + free function created, _NavigationDestinationViewModifier enabled on all platforms.
+Last activity: 2026-02-23 -- Completed 10-01 (Android NavigationStack adapter with PathView-to-[Any] bridge).
 
-Progress: [██████████] 100%
+Progress: [████████░░] 85%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 21
+- Total plans completed: 22
 - Average duration: ~10min
-- Total execution time: ~3.3 hours
+- Total execution time: ~3.4 hours
 
 **By Phase:**
 
@@ -34,14 +34,16 @@ Progress: [██████████] 100%
 | 7 - Integration Testing | 4 | 29min | 7min |
 | 8 - PFW Skill Alignment | 5 | 65min | 13min |
 | 9 - Post-Audit Cleanup | 4 | 25min | 6min |
+| 10 - NavigationStack Path Android | 1 | 2min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 08-04, 08-05, 09-01, 09-02, 09-03
+- Last 5 plans: 09-01, 09-02, 09-03, 09-04, 10-01
 - Trend: stable, fast execution
 
 *Updated after each plan completion*
 | Phase 09 P03 | 13min | 4 tasks | 9 files |
 | Phase 09 P04 | 7min | 3 tasks | 5 files |
+| Phase 10 P01 | 2min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -109,6 +111,9 @@ Recent decisions affecting current work:
 - [Phase 09]: PlatformLock wraps os_unfair_lock (Darwin) / pthread_mutex_t (Android) for cross-platform bridge locking
 - [Phase 09]: loadPeerLibrary guard must use #if SKIP not #if os(Android) -- function only in transpiled Kotlin
 - [Phase 09]: withKnownIssue wrappers for 3 Android-only timing failures (testMultipleAsyncEffects with isIntermittent, addContactSaveAndDismiss dismiss, editSavesContact dismiss)
+- [Phase 10]: Free function NavigationStack(path:root:destination:) on Android instead of extension (skip-ui NavigationStack is non-generic)
+- [Phase 10]: _NavigationDestinationViewModifier moved outside #if !os(Android) -- no platform-specific code in it
+- [Phase 10]: Plain store.send() for push/pop (not store.send(_:animation:) -- withTransaction is fatalError on Android)
 
 ### Pending Todos
 
@@ -137,5 +142,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Completed 09-04-PLAN.md (gap closure). All phases complete. 250 Android tests passing (13 known issues, 0 real failures). Project milestone achieved.
-Resume file: N/A — all plans complete
+Stopped at: Completed 10-01-PLAN.md (Android NavigationStack adapter). Next: 10-02 (ContactsFeature unification + adapter tests).
+Resume file: .planning/phases/10-navigationstack-path-android/10-02-PLAN.md
