@@ -362,19 +362,11 @@ final class ObservableStateTests: XCTestCase {
 
         // Show case A
         store.send(.showA)
-        if case .featureA = store.withState(\.destination) {
-            // success
-        } else {
-            XCTFail("Expected .featureA case")
-        }
+        XCTAssertTrue(store.withState(\.destination)?.is(\.featureA) == true)
 
         // Switch to case B (tears down A)
         store.send(.showB)
-        if case .featureB = store.withState(\.destination) {
-            // success
-        } else {
-            XCTFail("Expected .featureB case after switching")
-        }
+        XCTAssertTrue(store.withState(\.destination)?.is(\.featureB) == true)
 
         // Dismiss (tears down B)
         store.send(.dismiss)

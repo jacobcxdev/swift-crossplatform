@@ -112,7 +112,7 @@ struct Logging {
         var count = 0
         var log: [String] = []
     }
-    enum Action: Equatable { case increment }
+    enum Action { case increment }
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
@@ -130,7 +130,7 @@ struct Combined {
         var count = 0
         var log: [String] = []
     }
-    enum Action: Equatable { case increment }
+    enum Action { case increment }
     var body: some ReducerOf<Self> {
         CombineReducers {
             Reduce { state, action in
@@ -175,7 +175,7 @@ struct SyncEffectFeature {
         var count = 0
         var doubled = false
     }
-    enum Action: Equatable {
+    enum Action {
         case tap
         case doubled
     }
@@ -313,19 +313,11 @@ final class StoreReducerTests: XCTestCase {
             EnumFeature()
         }
         store.send(.loaded(.increment))
-        let count: Int? = store.withState { state -> Int? in
-            if case let .loaded(counter) = state { return counter.count }
-            return nil
-        }
-        XCTAssertEqual(count, 6)
+        XCTAssertEqual(store.withState(\.[case: \.loaded]?.count), 6)
 
         // Verify the loaded case is still active
         store.send(.loaded(.decrement))
-        let count2: Int? = store.withState { state -> Int? in
-            if case let .loaded(counter) = state { return counter.count }
-            return nil
-        }
-        XCTAssertEqual(count2, 5)
+        XCTAssertEqual(store.withState(\.[case: \.loaded]?.count), 5)
     }
 
     // MARK: TCA-09: CombineReducers composition

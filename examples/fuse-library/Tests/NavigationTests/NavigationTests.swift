@@ -397,11 +397,7 @@ struct NavigationTests {
         store.send(.presentChild)
         #expect(store.state.destination != nil)
 
-        if case .child = store.state.destination {
-            // Destination is .child — correct
-        } else {
-            Issue.record("Expected .child destination")
-        }
+        #expect(store.state.destination?.is(\.child) == true)
     }
 
     // MARK: - CaseKeyPath (NAV-15)
@@ -414,11 +410,7 @@ struct NavigationTests {
 
         var mutablePath = path
         mutablePath.modify(\.detail) { $0.title = "Updated" }
-        if case let .detail(state) = mutablePath {
-            #expect(state.title == "Updated")
-        } else {
-            Issue.record("Expected .detail case after modify")
-        }
+        #expect(mutablePath[case: \.detail]?.title == "Updated")
     }
 
     @Test
@@ -426,11 +418,7 @@ struct NavigationTests {
         var path: StackFeature.Path.State = .detail(DetailRow.State(id: UUID(0), title: "Init"))
 
         path[case: \.detail] = DetailRow.State(id: UUID(0), title: "Set")
-        if case let .detail(state) = path {
-            #expect(state.title == "Set")
-        } else {
-            Issue.record("Expected .detail case after subscript set")
-        }
+        #expect(path[case: \.detail]?.title == "Set")
     }
 
     // MARK: - @ReducerCaseEphemeral / @ReducerCaseIgnored (TCA-34, TCA-35)
@@ -452,11 +440,7 @@ struct NavigationTests {
     func testReducerCaseIgnored() {
         // @ReducerCaseIgnored compiles and the case is excluded from body synthesis
         let state: EphemeralParent.Destination.State = .ignored
-        if case .ignored = state {
-            // Pass — case is constructible
-        } else {
-            Issue.record("Expected .ignored case")
-        }
+        #expect(state.is(\.ignored))
     }
 
     // MARK: - openSettings dependency (D4)

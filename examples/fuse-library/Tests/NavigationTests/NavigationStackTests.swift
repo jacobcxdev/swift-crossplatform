@@ -90,11 +90,7 @@ struct NavigationStackTests {
         #expect(store.state.path.count == 2)
 
         // Verify correct item remains
-        if case let .detail(state) = store.state.path[id: store.state.path.ids.last!] {
-            #expect(state.title == "B")
-        } else {
-            Issue.record("Expected .detail case for remaining top item")
-        }
+        #expect(store.state.path[id: store.state.path.ids.last!]?[case: \.detail]?.title == "B")
     }
 
     @Test
@@ -120,11 +116,7 @@ struct NavigationStackTests {
 
         store.send(.path(.element(id: id, action: .detail(.titleChanged("Mutated")))))
 
-        if case let .detail(state) = store.state.path[id: id] {
-            #expect(state.title == "Mutated")
-        } else {
-            Issue.record("Expected .detail case after mutation")
-        }
+        #expect(store.state.path[id: id]?[case: \.detail]?.title == "Mutated")
     }
 
     // MARK: - Stack Path Scope Binding (NAV-01)
