@@ -72,41 +72,53 @@ struct DatabaseFeature {
             case .onAppear:
                 state.isLoading = true
                 return .run { send in
-                    let notes = try await database.read { db in
-                        try Note.all.order { $0.createdAt.desc() }.fetchAll(db)
+                    do {
+                        let notes = try await database.read { db in
+                            try Note.all.order { $0.createdAt.desc() }.fetchAll(db)
+                        }
+                        let count = try await database.read { db in
+                            try Note.all.fetchCount(db)
+                        }
+                        await send(.notesLoaded(notes))
+                        await send(.noteCountLoaded(count))
+                    } catch {
+                        reportIssue(error)
                     }
-                    let count = try await database.read { db in
-                        try Note.all.fetchCount(db)
-                    }
-                    await send(.notesLoaded(notes))
-                    await send(.noteCountLoaded(count))
                 }
 
             case .addNoteTapped:
                 let now = date.now.timeIntervalSince1970
                 return .run { send in
-                    let note = try await database.write { db in
-                        try Note.insert {
-                            Note.Draft(title: "New Note", body: "", category: "general", createdAt: now)
-                        }.execute(db)
-                        let id = db.lastInsertedRowID
-                        return Note(
-                            id: id,
-                            title: "New Note",
-                            body: "",
-                            category: "general",
-                            createdAt: now
-                        )
+                    do {
+                        let note = try await database.write { db in
+                            try Note.insert {
+                                Note.Draft(title: "New Note", body: "", category: "general", createdAt: now)
+                            }.execute(db)
+                            let id = db.lastInsertedRowID
+                            return Note(
+                                id: id,
+                                title: "New Note",
+                                body: "",
+                                category: "general",
+                                createdAt: now
+                            )
+                        }
+                        await send(.noteAdded(note))
+                    } catch {
+                        reportIssue(error)
                     }
-                    await send(.noteAdded(note))
                 }
 
             case let .deleteNote(id):
                 return .run { send in
-                    try await database.write { db in
-                        try Note.find(id).delete().execute(db)
+                    do {
+                        try await database.write { db in
+                            try Note.find(id).delete().execute(db)
+                        }
+                        await send(.noteDeleted(id))
+                    } catch {
+                        reportIssue(error)
                     }
-                    await send(.noteDeleted(id))
                 }
 
             case let .categoryFilterChanged(category):
