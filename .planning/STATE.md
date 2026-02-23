@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 8 — PFW skill alignment (context gathered, ready for planning).
+**Current focus:** Phase 8 — PFW skill alignment (Wave 1 complete, 4 plans remaining).
 
 ## Current Position
 
-Phase: 7 of 7 (Integration Testing & Documentation) -- COMPLETE
-Plan: 4 of 4 in current phase (07-01, 07-02, 07-03, 07-04 complete)
-Status: All 4 plans complete. 17 forks documented in FORKS.md. 22 test targets reorganised into 6 feature-aligned groups. 247 tests pass. TEST-01..TEST-12 + DOC-01 all covered.
-Last activity: 2026-02-23 -- Verifier gaps closed, Phase 7 marked complete.
+Phase: 8 of 8 (PFW Skill Alignment)
+Plan: 2 of 5 in current phase (08-01 complete)
+Status: Wave 1 atomic fixes applied. Named query functions, Effect.run error handling, @available annotations. 91 fuse-library tests pass.
+Last activity: 2026-02-23 -- 08-01 Wave 1 complete.
 
-Progress: [██████████] 100%
+Progress: [██--------] 20%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
+- Total plans completed: 14
 - Average duration: ~9min
-- Total execution time: ~2.0 hours
+- Total execution time: ~2.1 hours
 
 **By Phase:**
 
@@ -32,9 +32,10 @@ Progress: [██████████] 100%
 | 5 - Navigation & Presentation | 3 | 20min | 7min |
 | 6 - Database & Queries | 2 | 13min | 6.5min |
 | 7 - Integration Testing | 4 | 29min | 7min |
+| 8 - PFW Skill Alignment | 1 | 8min | 8min |
 
 **Recent Trend:**
-- Last 5 plans: 06-02, 07-01, 07-02, 07-03, 07-04
+- Last 5 plans: 07-02, 07-03, 07-04, 08-01
 - Trend: stable, fast execution
 
 *Updated after each plan completion*
@@ -78,6 +79,8 @@ Recent decisions affecting current work:
 - [Phase 07]: Phase 7 tests included in test reorganisation (plan table predated Wave 1-2 execution)
 - [Phase 07]: #if !SKIP guards for TCA-dependent files in Skip-enabled test target
 - [Phase 07]: Type renames (DumpUser, DataItem, EdgeCaseCancelInFlightFeature) to resolve target-merge name collisions
+- [Phase 08]: No @Observable classes in fuse-app -- only @ObservableState structs; @available annotations applied to fuse-library ObservationModels.swift
+- [Phase 08]: DatabaseFeature test failures (testAddNote, testDeleteNote) pre-existing due to missing schema bootstrap in test setup
 
 ### Pending Todos
 
@@ -105,5 +108,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Phase 8 context gathered — all 191 PFW audit findings in scope, no exceptions.
-Resume file: .planning/phases/08-pfw-skill-alignment/08-CONTEXT.md
+Stopped at: Completed 08-01-PLAN.md (Wave 1 atomic fixes). Next: 08-02-PLAN.md (Wave 2 structural alignment).
+Resume file: .planning/phases/08-pfw-skill-alignment/08-02-PLAN.md
