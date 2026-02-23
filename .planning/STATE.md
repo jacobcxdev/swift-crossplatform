@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 7: Integration Testing & Documentation (executing)
+**Current focus:** Phase 8 — PFW skill alignment (context gathered, ready for planning).
 
 ## Current Position
 
 Phase: 7 of 7 (Integration Testing & Documentation) -- COMPLETE
 Plan: 4 of 4 in current phase (07-01, 07-02, 07-03, 07-04 complete)
 Status: All 4 plans complete. 17 forks documented in FORKS.md. 22 test targets reorganised into 6 feature-aligned groups. 247 tests pass. TEST-01..TEST-12 + DOC-01 all covered.
-Last activity: 2026-02-22 -- All phases complete.
+Last activity: 2026-02-23 -- Verifier gaps closed, Phase 7 marked complete.
 
 Progress: [██████████] 100%
 
@@ -92,6 +92,10 @@ Recent decisions affecting current work:
 - **Database Android build verification (Phase 7):** Phase 6 Codex verifier flagged missing `skip test` / `make android-build` in plan verification. macOS-only testing is consistent with Phases 3-5. Android build validation deferred to Phase 7. (Source: Codex verifier, Phase 6)
 - **xctest-dynamic-overlay Android test build (Phase 7):** Fork needs `#if os(Android) import Android #endif` for `dlopen`/`dlsym` in `SwiftTesting.swift:643` and `IsTesting.swift:39`. Blocks `skip android test` for all test targets. Non-test Android build works fine. (Source: 07-02 Task 3)
 
+### Roadmap Evolution
+
+- Phase 8 added: PFW skill alignment
+
 ### Blockers/Concerns
 
 - ~~Navigation on Android: `NavigationStack.init(path:root:destination:)` is fully guarded out on Android~~ RESOLVED — Guards minimised in Phase 5 Wave 1. Modern extensions unguarded, only deprecated Perception.Bindable stays guarded.
@@ -100,6 +104,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-02-22
-Stopped at: Completed 07-04-PLAN.md -- All 7 phases complete. 17 forks documented, 247 tests in 6 feature-aligned targets.
-Resume file: Project complete. All phases executed.
+Last session: 2026-02-23
+Stopped at: Phase 8 context gathered — all 191 PFW audit findings in scope, no exceptions.
+Resume file: .planning/phases/08-pfw-skill-alignment/08-CONTEXT.md
