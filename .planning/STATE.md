@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 
 ## Current Position
 
-Phase: 9 of 9 (Post-Audit Cleanup) -- IN PROGRESS
-Plan: 2 of 3 in current phase
-Status: 09-02 complete (documentation sync). All 184 requirements marked complete. Perception bypass documented. Ready for 09-03 (Android verification).
-Last activity: 2026-02-23 -- Completed 09-02 (documentation sync). REQUIREMENTS.md fully synced, Perception bypass limitation documented.
+Phase: 9 of 9 (Post-Audit Cleanup) -- COMPLETE
+Plan: 3 of 3 in current phase
+Status: 09-03 complete (Android verification). All 250 tests pass on Android (220 fuse-library + 30 fuse-app). 9 known issues, 0 real failures after fixes.
+Last activity: 2026-02-23 -- Completed 09-03 (Android verification). All phases complete.
 
-Progress: [██████████] 96%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 19
+- Total plans completed: 20
 - Average duration: ~10min
-- Total execution time: ~3.1 hours
+- Total execution time: ~3.3 hours
 
 **By Phase:**
 
@@ -33,10 +33,10 @@ Progress: [██████████] 96%
 | 6 - Database & Queries | 2 | 13min | 6.5min |
 | 7 - Integration Testing | 4 | 29min | 7min |
 | 8 - PFW Skill Alignment | 5 | 65min | 13min |
-| 9 - Post-Audit Cleanup | 2 | 6min | 3min |
+| 9 - Post-Audit Cleanup | 3 | 18min | 6min |
 
 **Recent Trend:**
-- Last 5 plans: 08-02, 08-03, 08-04, 08-05, 09-01
+- Last 5 plans: 08-04, 08-05, 09-01, 09-02, 09-03
 - Trend: stable, fast execution
 
 *Updated after each plan completion*
@@ -95,23 +95,28 @@ Recent decisions affecting current work:
 - [Phase 08]: Combine publishers kept in SharedObservationTests -- Observations {} async sequence not available in swift-sharing
 - [Phase 08]: nonisolated(unsafe) var for onChange counters in SharedBindingTests -- LockIsolated not in SharingTests target
 - [Phase 08]: BridgeObservation namespace rename confirmed safe -- all @_cdecl JNI exports are free functions with string literal names
-- [Phase 08]: os_unfair_lock replaces DispatchSemaphore in bridge -- available on Android via Swift Android SDK compatibility layer
+- [Phase 08]: os_unfair_lock replaces DispatchSemaphore in bridge -- CORRECTED in Phase 09: `os` module unavailable on Android, replaced with PlatformLock (os_unfair_lock on Darwin, pthread_mutex_t on Android)
 - [Phase 08]: Android NavigationStack path binding silently unused -- documented with TODO in ContactsFeature.swift (M13)
 - [Phase 09]: Production migration DDL must use plural table name ("notes") to match @Table struct Note macro output
 - [Phase 09]: Empty testOpenSettingsDependencyNoCrash deleted (openSettings is SwiftUI @Environment, not TCA @Dependency)
+- [Phase 09]: PlatformLock abstraction wraps os_unfair_lock (Darwin) / pthread_mutex_t (Android) for cross-platform locking
+- [Phase 09]: BridgeObservation type path in Store.swift updated to match Phase 08 rename (was stale SkipAndroidBridge.Observation reference)
+- [Phase 09]: loadPeerLibrary guard changed from #if os(Android) to #if SKIP (function only available in transpiled Kotlin context)
+- [Phase 09]: Combine-dependent tests gated with #if canImport(Combine) for Android compatibility
+- [Phase 09]: TestStore receive timeouts increased to 5s for Android (effects take longer due to JNI overhead)
 
 ### Pending Todos
 
 - **~~Perception bypass on Android (Phase 3+):~~** DOCUMENTED — `PerceptionRegistrar` delegates to native `ObservationRegistrar`, bypassing bridge `recordAccess` hooks. Raw `@Perceptible` views (without TCA) won't trigger Compose updates. Safe for TCA (uses bridge registrar directly). Documented in fuse-app README.md Known Limitations (P8). (Source: Gemini verifier)
-- **Android runtime verification (Phase 7):** 5 human tests deferred — single recomposition, nested independence, ViewModifier observation, fatal error on bridge failure, full 14-fork compilation. All require running emulator. (Source: all 3 verifiers)
+- **~~Android runtime verification (Phase 7):~~** PARTIALLY RESOLVED — `skip android test` now runs 250 tests across both example projects (220 fuse-library + 30 fuse-app). 9 known issues, 0 real failures. UI rendering tests (single recomposition, ViewModifier observation, bridge failure) still require running emulator with Compose. (Source: 09-03 Android verification)
 - **~~Android runtime test execution (Phase 7):~~** RESOLVED — `skip test` now passes 21/21 (Swift + Kotlin) after removing unused fork deps that broke Skip's sandbox. All future phases should run `skip test` as part of validation.
 - **MainSerialExecutor Android fallback validation (Phase 7):** Context suggested porting MainSerialExecutor; research determined existing `effectDidSubscribe` AsyncStream fallback is the intended Android path. Validate fallback under all effect types during Phase 7 TestStore testing. (Source: Codex verifier, Phase 3 plan check)
 - **DEP-05 previewValue on Android (clarification):** DEP-05 requirement says "previewValue is used in preview context on Android" but previews don't exist on Android. Phase 3 test validates preview context is never active. If Android ever gains preview support, revisit. (Source: Codex verifier, Phase 3 plan check)
 - **dismiss/openSettings dependency validation (Phase 7):** dismiss dependency validated at data layer in Phase 5 (DismissEffect + LockIsolated pattern). openSettings deferred to Phase 7 — requires active view hierarchy. (Source: Codex verifier gap #2, Phase 3 reconciliation)
 - **Android UI rendering validation (Phase 7):** Phase 5 Codex verifier flagged that NavigationStack, sheet, alert, dialog, .task tests validate data layer only, not Android Compose rendering. All UI rendering assertions deferred to Phase 7 integration testing with emulator. (Source: Codex verifier, Phase 5)
 - **Database observation wrapper-level testing (Phase 7):** Phase 6 Codex verifier flagged SD-09/SD-10/SD-11 tests use ValueObservation.start() directly, not @FetchAll/@FetchOne DynamicProperty wrappers. DynamicProperty.update() requires SwiftUI runtime (guarded out on Android). Wrapper-level integration testing deferred to Phase 7 with emulator. (Source: Codex verifier, Phase 6)
-- **Database Android build verification (Phase 7):** Phase 6 Codex verifier flagged missing `skip test` / `make android-build` in plan verification. macOS-only testing is consistent with Phases 3-5. Android build validation deferred to Phase 7. (Source: Codex verifier, Phase 6)
-- **xctest-dynamic-overlay Android test build (Phase 7):** Fork needs `#if os(Android) import Android #endif` for `dlopen`/`dlsym` in `SwiftTesting.swift:643` and `IsTesting.swift:39`. Blocks `skip android test` for all test targets. Non-test Android build works fine. (Source: 07-02 Task 3)
+- **~~Database Android build verification (Phase 7):~~** RESOLVED — DatabaseTests (StructuredQueries + SQLiteData) build and pass on Android via `skip android test`. SQLiteDataTests suite passed after 5.275s. (Source: 09-03 Android verification)
+- **~~xctest-dynamic-overlay Android test build (Phase 7):~~** RESOLVED — 09-01 fixed the dlopen/dlsym imports. `skip android test` now runs successfully for both fuse-library (220 tests) and fuse-app (30 tests). (Source: 09-03 Android verification)
 
 ### Roadmap Evolution
 
@@ -127,5 +132,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Completed 09-02-PLAN.md (documentation sync). All 184 requirements marked complete. Ready for 09-03 (Android verification).
-Resume file: .planning/phases/09-post-audit-cleanup/09-03-PLAN.md
+Stopped at: Completed 09-03-PLAN.md (Android verification). All phases complete. 250 Android tests passing. Project milestone achieved.
+Resume file: N/A — all plans complete
