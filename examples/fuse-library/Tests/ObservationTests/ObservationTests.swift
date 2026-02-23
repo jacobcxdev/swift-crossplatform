@@ -18,7 +18,7 @@ import SkipBridge
 final class ObservationTests: XCTestCase {
 
     override func setUp() {
-        #if os(Android)
+        #if SKIP
         loadPeerLibrary(packageName: "fuse-library", moduleName: "FuseLibrary")
         #endif
     }

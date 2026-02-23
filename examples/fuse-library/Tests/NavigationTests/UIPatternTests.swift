@@ -188,8 +188,8 @@ struct UIPatternTests {
         store.send(.startLoading)
         store.send(.startLoading)
 
-        // Allow effects to complete
-        try await Task.sleep(for: .milliseconds(100))
+        // Allow effects to complete (Android needs more time due to JNI overhead)
+        try await Task.sleep(for: .milliseconds(500))
 
         #expect(store.loadingComplete == true)
     }

@@ -16,7 +16,7 @@ let logger: Logger = Logger(subsystem: "FuseLibrary", category: "Tests")
 @available(macOS 13, *)
 final class FuseLibraryTests: XCTestCase {
     override func setUp() {
-        #if os(Android)
+        #if SKIP
         // needed to load the compiled bridge from the transpiled tests
         loadPeerLibrary(packageName: "fuse-library", moduleName: "FuseLibrary")
         #endif

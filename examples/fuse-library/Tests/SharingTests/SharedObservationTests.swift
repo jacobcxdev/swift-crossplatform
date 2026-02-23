@@ -1,4 +1,6 @@
+#if canImport(Combine)
 import Combine
+#endif
 import Foundation
 import Sharing
 import Testing
@@ -16,6 +18,7 @@ struct SharedObservationTests {
 
     // MARK: SHR-10 — Publisher emits on mutation
 
+    #if canImport(Combine)
     @Test func sharedPublisher() async throws {
         @Shared(.inMemory("pubTest")) var count = 0
         var received: [Int] = []
@@ -60,6 +63,7 @@ struct SharedObservationTests {
         }
         #expect(received == [1, 2, 3])
     }
+    #endif
 
     // MARK: SHR-12 — Multiple @Shared same key synchronize
 
@@ -97,6 +101,7 @@ struct SharedObservationTests {
 
     // MARK: SHR-09 — Async publisher values sequence
 
+    #if canImport(Combine)
     @Test func publisherValuesAsyncSequence() async throws {
         @Shared(.inMemory("asyncPub")) var count = 0
         var received: [Int] = []
@@ -144,6 +149,7 @@ struct SharedObservationTests {
         #expect(publisherReceived)
         #expect(count == 7)
     }
+    #endif
 
     // MARK: SHR-12 — Bidirectional sync between shared refs
 

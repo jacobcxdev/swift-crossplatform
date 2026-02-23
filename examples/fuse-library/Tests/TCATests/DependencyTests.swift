@@ -289,13 +289,15 @@ struct DependencyTests {
             @Dependency(\.withRandomNumberGenerator) var rng
             #expect(rng != nil)
 
-            // MainQueue (DispatchQueue.main via combine-schedulers)
+            // MainQueue (DispatchQueue.main via combine-schedulers) — Darwin only
+            #if canImport(Combine)
             @Dependency(\.mainQueue) var mainQueue
             #expect(mainQueue != nil)
 
-            // MainRunLoop (RunLoop.main via combine-schedulers)
+            // MainRunLoop (RunLoop.main via combine-schedulers) — Darwin only
             @Dependency(\.mainRunLoop) var mainRunLoop
             #expect(mainRunLoop != nil)
+            #endif
 
             // NotificationCenter
             @Dependency(\.notificationCenter) var notificationCenter
