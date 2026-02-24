@@ -154,8 +154,7 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 | 7. Integration Testing & Documentation | 4/4 | Complete    | 2026-02-23 |
 | 8. PFW Skill Alignment | 5/5 | Complete | 2026-02-23 |
 | 9. Post-Audit Cleanup | 4/4 | Complete | 2026-02-23 |
-| 10. NavigationStack Path (Android) | 2/2 | Complete   | 2026-02-23 |
-| 11. Presentation Dismiss (Android) | 0/? | Planned | - |
+| 10. skip-fuse-ui Integration & Audit | 0/5 | Planned | - |
 
 ### Phase 8: PFW Skill Alignment
 
@@ -196,38 +195,25 @@ Plans:
 - [x] 09-03-PLAN.md (wave 3) — Android verification: run `skip android test` after wave 1 fix, capture results, update STATE.md ✓ 2026-02-23
 - [x] 09-04-PLAN.md (wave 4) — Gap closure: wrap 3 Android-failing tests with withKnownIssue, correct inaccurate SUMMARY, re-verify 0 real failures ✓ 2026-02-23
 
-### Phase 10: NavigationStack Path Binding on Android
-**Goal:** Enable TCA's `NavigationStack(path:root:destination:)` extension on Android by removing `#if !os(Android)` guards in the swift-composable-architecture fork and verifying compatibility with skip-ui's existing NavigationStack + `.navigationDestination(for:)` support — closing M1-ANDROID-NAV-STACK and the Contacts deep navigation flow gap
+### Phase 10: skip-fuse-ui Fork Integration & Cross-Fork Audit
+**Goal:** Resolve SPM dependency identity conflicts, perform comprehensive audit of all fork modifications against skip-fuse-ui counterparts, fix all gaps found, verify cross-platform parity, and update project documentation. Absorbs originally-proposed Phase 11 (Presentation Dismiss on Android).
 **Depends on:** Phase 9
 **Requirements:** NAV-01, NAV-02, NAV-03, TCA-32, TCA-33 (strengthening existing Complete status from iOS-only to cross-platform)
-**Gap Closure:** Closes M1-ANDROID-NAV-STACK (integration) + Contacts deep navigation flow (E2E flow)
-**Canonical pattern references:** `/pfw-composable-architecture` (NavigationStack path binding), `/pfw-swift-navigation` (path-driven navigation)
-**Key insight:** skip-ui already supports `NavigationStack(path:root:)`, `.navigationDestination(for:destination:)`, and `NavigationPath` ([skip.dev docs](https://skip.dev/docs/modules/skip-ui/#navigation) — high support). The blocker is three `#if !os(Android)` guards in TCA's `NavigationStack+Observation.swift` (lines 74-89, 111-129, 150-219) that disable TCA's store-powered NavigationStack extension on Android. The critical guard (150-219) wraps `NavigationStack.init(path:root:destination:)` which internally calls skip-ui's existing `NavigationStack(path:root:)` + registers `.navigationDestination(for: StackState.Component.self)`.
+**Gap Closure:** Closes M1-ANDROID-NAV-STACK (integration), M2-ANDROID-DISMISS (integration), Contacts deep navigation flow (E2E)
+**Canonical pattern references:** `/pfw-composable-architecture` (NavigationStack path binding, PresentationAction.dismiss), `/pfw-swift-navigation` (path-driven navigation, dismiss dependency)
 **Success Criteria** (what must be TRUE):
-  1. TCA's `NavigationStack(path:root:destination:)` extension compiles on Android after guard removal
-  2. `StackState.PathView` (RandomAccessCollection of Hashable Components) works with skip-ui's `NavigationStack(path: Any, root:)` init
-  3. `.navigationDestination(for: StackState.Component.self)` resolves destinations correctly on Android
-  4. ContactsFeature.swift `#if os(Android)` workaround removed — single code path for both platforms
-  5. `skip android test` passes with NavigationStack path push/pop working on Android
-**Plans:** 2/2 plans complete
+  1. Zero SPM identity conflict warnings on `swift package resolve` for both fuse-app and fuse-library
+  2. All audit gaps addressed (counterparts created or documented as known limitation)
+  3. Full test suite green on macOS for both fuse-app and fuse-library
+  4. CLAUDE.md updated with gotchas, Makefile commands, env var documentation
+  5. Makefile updated with smart defaults (both examples, both platforms)
+  6. Presentation dismiss (`@Dependency(\.dismiss)`) status resolved on Android
+  7. Roadmap updated with rescoped phase; Phase 11 removed
+**Plans:** 5 plans in 4 waves
 
 Plans:
-- [x] 10-01-PLAN.md — Android NavigationStack adapter: _TCANavigationStack View struct + free function + _NavigationDestinationViewModifier enablement (NAV-01..NAV-03, TCA-32, TCA-33) ✓ 2026-02-23
-- [ ] 10-02-PLAN.md — ContactsFeature unification + adapter binding tests + Android build verification (NAV-01..NAV-03, TCA-32, TCA-33)
-
-### Phase 11: Presentation Dismiss on Android
-**Goal:** Enable TCA's `@Dependency(\.dismiss)` on Android by removing `#if !os(Android)` guards in the swift-composable-architecture fork's `Dismiss.swift` and `PresentationReducer` — skip-ui already supports `@Environment(\.dismiss)` ([skip.dev docs](https://skip.dev/docs/modules/skip-ui/#environment-keys))
-**Depends on:** Phase 10
-**Requirements:** TCA-26, TCA-28, NAV-14 (strengthening existing Complete status from iOS-only to cross-platform)
-**Gap Closure:** Closes M2-ANDROID-DISMISS (integration)
-**Canonical pattern references:** `/pfw-composable-architecture` (PresentationAction.dismiss pattern), `/pfw-swift-navigation` (dismiss dependency)
-**Key insight:** skip-ui supports `@Environment(\.dismiss)` (confirmed in skip-ui environment keys docs). TCA's `Dismiss.swift` has `#if canImport(SwiftUI) && !os(Android)` guards (lines 90, 122) that make the dismiss dependency a no-op `EmptyReducer()` on Android. The underlying SwiftUI dismiss mechanism is available — the guards may simply need removal + verification.
-**Success Criteria** (what must be TRUE):
-  1. `@Dependency(\.dismiss)` resolves a functional dismiss implementation on Android (not EmptyReducer no-op)
-  2. Programmatic dismiss from TCA reducer triggers Compose presentation close (sheet dismiss / navigation pop)
-  3. `withKnownIssue` wrappers removed from FuseAppIntegrationTests dismiss assertions — tests pass natively on Android
-  4. `skip android test` passes with 0 real failures and fewer known issues than current 13
-**Plans:** TBD
-
-Plans:
-- [ ] 11-01-PLAN.md — TBD
+- [ ] 10-01-PLAN.md (wave 1) — CLAUDE.md + Makefile updates: gotchas, env vars, smart defaults
+- [ ] 10-02-PLAN.md (wave 1) — SPM dependency resolution: convert remote URLs to local paths, remove unused deps
+- [ ] 10-03-PLAN.md (wave 2) — Gap audit: skip-fuse-ui counterparts, TCA guards, dismiss, JVM type erasure
+- [ ] 10-04-PLAN.md (wave 3) — Gap fixes + tests: implement fixes from gap report, verify dismiss, Android build
+- [ ] 10-05-PLAN.md (wave 4) — Roadmap update + cleanup: update ROADMAP, STATE, REQUIREMENTS
