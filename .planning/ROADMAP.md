@@ -140,7 +140,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Phases 2-5 if desired.
 
 | Phase | Plans Complete | Status | Completed |
@@ -154,7 +154,7 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 | 7. Integration Testing & Documentation | 4/4 | Complete    | 2026-02-23 |
 | 8. PFW Skill Alignment | 5/5 | Complete | 2026-02-23 |
 | 9. Post-Audit Cleanup | 4/4 | Complete | 2026-02-23 |
-| 10. skip-fuse-ui Integration & Audit | 4/5 | In Progress|  |
+| 10. skip-fuse-ui Integration & Audit | 5/5 | Complete | 2026-02-24 |
 
 ### Phase 8: PFW Skill Alignment
 
@@ -209,11 +209,11 @@ Plans:
   5. Makefile updated with smart defaults (both examples, both platforms)
   6. Presentation dismiss (`@Dependency(\.dismiss)`) status resolved on Android
   7. Roadmap updated with rescoped phase; Phase 11 removed
-**Plans:** 4/5 plans executed
+**Plans:** 5/5 plans complete
 
 Plans:
-- [ ] 10-01-PLAN.md (wave 1) — CLAUDE.md + Makefile updates: gotchas, env vars, smart defaults
-- [ ] 10-02-PLAN.md (wave 1) — SPM dependency resolution: convert remote URLs to local paths, remove unused deps
-- [ ] 10-03-PLAN.md (wave 2) — Gap audit: skip-fuse-ui counterparts, TCA guards, dismiss, JVM type erasure
-- [ ] 10-04-PLAN.md (wave 3) — Gap fixes + tests: implement fixes from gap report, verify dismiss, Android build
-- [ ] 10-05-PLAN.md (wave 4) — Roadmap update + cleanup: update ROADMAP, STATE, REQUIREMENTS
+- [x] 10-01-PLAN.md (wave 1) — CLAUDE.md + Makefile updates: gotchas, env vars, smart defaults ✓ 2026-02-24
+- [x] 10-02-PLAN.md (wave 1) — SPM dependency resolution: convert remote URLs to local paths, remove unused deps ✓ 2026-02-24
+- [x] 10-03-PLAN.md (wave 2) — Gap audit: skip-fuse-ui counterparts, TCA guards, dismiss, JVM type erasure ✓ 2026-02-24
+- [x] 10-04-PLAN.md (wave 3) — Gap fixes + tests: implement fixes from gap report, verify dismiss, Android build ✓ 2026-02-24
+- [x] 10-05-PLAN.md (wave 4) — Roadmap update + cleanup: update ROADMAP, STATE, REQUIREMENTS ✓ 2026-02-24
