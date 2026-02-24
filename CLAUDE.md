@@ -6,16 +6,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Prerequisites: Swift 6.2+, [Skip](https://skip.tools) (`brew install skiptools/skip/skip`), Xcode. Android builds also need Android SDK/NDK (`skip android sdk install`).
 
-All build/test targets default to `fuse-library`. Override with `EXAMPLE=fuse-app`.
+Build/test targets iterate over both `fuse-library` and `fuse-app` by default. Override with `EXAMPLE=fuse-app` to target a single example.
 
 ```bash
-# From repo root (delegates to examples/fuse-library by default)
-make build                         # swift build (macOS)
-make test                          # swift test (macOS)
-make test-filter FILTER=ObservationTests  # Run a single test suite
-make android-build                 # skip android build
-make skip-test                     # skip test (cross-platform parity)
-make skip-verify                   # skip verify --fix
+# From repo root (iterates both examples by default)
+make build                         # swift build both examples (macOS)
+make test                          # swift test both examples (macOS)
+make android-build                 # skip android build both examples
+make android-test                  # skip android test both examples
+make skip-test                     # skip test both examples
+make skip-verify                   # skip verify --fix both examples
+make clean                         # clean both examples
+make test-filter FILTER=ObservationTests  # Run a single test suite (uses EXAMPLE, default: fuse-library)
 
 # Or run directly from an example directory
 cd examples/fuse-app && swift build
@@ -33,7 +35,7 @@ skip android emulator launch --logcat '*:W'  # Launch emulator with filtered log
 
 ## Submodule Management
 
-17 fork submodules live in `forks/`. Use these from the repo root:
+19 fork submodules live in `forks/`. Use these from the repo root:
 
 ```bash
 # After fresh clone
@@ -48,12 +50,14 @@ make diff-all          # Show uncommitted changes across submodules
 
 ## Working with Forks
 
-- All 17 forks track the `dev/swift-crossplatform` branch
+- All 19 forks track the `dev/swift-crossplatform` branch
 - Example projects reference forks via local path: `.package(path: "../../forks/<name>")`
 - All fork changes must gate behind `#if os(Android)` or `#if SKIP_BRIDGE` to preserve iOS behavior
 - No iOS regressions — every fork must build and test cleanly on both platforms
 
 **Typical workflow:** Edit code in `forks/<name>/`, then build/test from `examples/fuse-library/` (which resolves forks via local path dependencies). Commit within the fork submodule, then update the parent repo's submodule pointer.
+
+**Point-Free fork verification:** When writing tests or making changes to Point-Free forks, verify implementations against the corresponding `/pfw-*` skill (e.g. `/pfw-composable-architecture`, `/pfw-sharing`, `/pfw-case-paths`). These skills contain canonical API patterns and anti-pattern rules that tests must conform to.
 
 ## Key Files
 
@@ -74,12 +78,22 @@ The observation bridge fix spans 3 files across forks:
 #if SKIP_BRIDGE    // Bridge-level observation wrappers (skip-android-bridge)
 ```
 
+## Environment Variables
+
+| Variable / Guard | Scope | Effect |
+|------------------|-------|--------|
+| `TARGET_OS_ANDROID` | SPM `Context.environment` | Enables Android-specific dependencies in Package.swift at resolution time |
+| `SKIP_BRIDGE` | Swift compiler define | Gates bridge-level observation code in skip-android-bridge (`ObservationRecording`, JNI exports) |
+| `#if os(Android)` | Swift conditional compilation | Standard platform check for Android-specific runtime code paths |
+| `#if canImport(SwiftUI)` | Swift conditional compilation | False on Android -- SkipFuseUI re-exports SkipSwiftUI, not Apple's SwiftUI module |
+| `#if SKIP` | Swift conditional compilation | True only in Skip-transpiled Kotlin context (e.g., `loadPeerLibrary`) |
+
 ## Project Planning
 
 Planning state lives in `.planning/`:
 
 - `STATE.md` — current phase and progress
-- `ROADMAP.md` — 7 phases with requirements and success criteria
+- `ROADMAP.md` — 10 phases with requirements and success criteria
 - `REQUIREMENTS.md` — 184 atomic API-level specifications
 - `PROJECT.md` — project context, decisions, constraints
 - `config.json` — GSD workflow configuration
@@ -92,3 +106,7 @@ Planning state lives in `.planning/`:
 - **JNI naming**: Exports must match `Java_skip_ui_ViewObservation_<method>` exactly — package dots become underscores
 - **Fuse mode only**: Lite mode's counter-based observation is fundamentally incompatible with TCA. Don't attempt Lite mode for TCA apps
 - **No `swift-perception` on Android**: Use native `libswiftObservation.so` (ships with Swift Android SDK)
+- **`withTransaction` unavailable on Android**: `withTransaction` is `@available(*, unavailable)` with `fatalError()` in skip-fuse-ui. Use plain `store.send()` for state mutations -- never use animated navigation or dismiss paths on Android.
+- **Android builds can pass when running fails**: `skip android build` succeeding does NOT mean the app works. Always verify with `skip android test` or emulator testing -- runtime JNI/bridge failures only surface at execution time.
+- **Clean builds after dependency changes**: After modifying any fork's `Package.swift` or changing submodule pointers, run `swift package clean` or `make clean` before rebuilding. Incremental builds can use stale dependency artifacts.
+- **skip-fuse-ui NavigationStack is generic**: Unlike skip-ui's non-generic `NavigationStack`, skip-fuse-ui provides `NavigationStack<Data, Root>` matching SwiftUI's generic signature. TCA extensions constrain `Data` to `StackState<State>.PathView` -- this compiles on Android via skip-fuse-ui.
