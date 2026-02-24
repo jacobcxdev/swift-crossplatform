@@ -247,7 +247,7 @@ Test infrastructure and project deliverables.
 - [ ] **TEST-09**: `.dependencies { }` test trait overrides dependencies for a test on Android
 - [ ] **TEST-10**: Integration tests verify observation bridge prevents infinite recomposition on Android emulator
 - [ ] **TEST-11**: Stress tests confirm stability under >1000 TCA state mutations/second on Android
-- [ ] **TEST-12**: A fuse-app example demonstrates full TCA app (store, reducer, effects, navigation, persistence) on both iOS and Android
+- [x] **TEST-12**: A fuse-app example demonstrates full TCA app (store, reducer, effects, navigation, persistence) on both iOS and Android
 
 ### SPM: Build & Compilation
 
@@ -488,7 +488,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TEST-09 | Phase 7 | Pending |
 | TEST-10 | Phase 11 | Pending |
 | TEST-11 | Phase 11 | Pending |
-| TEST-12 | Phase 11 | Pending |
+| TEST-12 | Phase 11 | Complete |
 | DOC-01 | Phase 7 | Complete |
 
 **Coverage:**

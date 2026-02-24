@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** All 10 phases complete. Project v1 scope fully delivered.
+**Current focus:** Phase 11 -- Android test infrastructure enablement (gap closure phases 11-14).
 
 ## Current Position
 
-Phase: 10 of 10 (skip-fuse-ui Fork Integration & Cross-Fork Audit) -- COMPLETE
-Plan: 8 of 8 in current phase (all complete)
-Status: Phase 10 complete. SPM conflicts resolved, audit gaps addressed, dismiss verified, CLAUDE.md + Makefile updated (10-06), XCSkipTests JUnit stub fix (10-07), make test changed to skip test for cross-platform parity (10-08).
-Last activity: 2026-02-24 -- Completed 10-07 (XCSkipTests JUnit stub) and 10-08 (Makefile test orchestration + administrative closure).
+Phase: 11 of 14 (Android Test Infrastructure)
+Plan: 1 of 3 in current phase (11-01 complete)
+Status: 11-01 complete. Skipstone plugin + SkipTest added to all 9 test targets, 6 XCSkipTests.swift created, 21 test files gated with #if !SKIP.
+Last activity: 2026-02-24 -- Completed 11-01 (Skip transpilation enablement).
 
-Progress: [██████████] 100%
+Progress: [███░░░░░░░] 33%
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Progress: [██████████] 100%
 | Phase 10 P08 | 3min | 3 tasks | 5 files |
 | Phase 10 P08 | 3min | 3 tasks | 5 files |
 | Phase 10 P07 | 6min | 2 tasks | 1 files |
+| Phase 11 P01 | 6min | 2 tasks | 29 files |
 
 ## Accumulated Context
 
@@ -143,6 +144,7 @@ Recent decisions affecting current work:
 - [Phase 10]: XCSkipTests in fuse-library uses JUnit results stub (same as fuse-app) -- standard XCGradleHarness incompatible with local fork path overrides
 - [Phase 10]: make test changed from swift test to skip test for cross-platform parity -- skip test runs both Swift/macOS and Kotlin/Robolectric tests
 - [Phase 10]: XCSkipTests in fuse-library uses JUnit results stub (same as fuse-app) -- standard XCGradleHarness incompatible with local fork path overrides
+- [Phase 11]: JUnit stub pattern used for all 6 new XCSkipTests.swift files (not XCGradleHarness) -- local fork path overrides break Gradle Swift dependency resolution through skipstone symlinks
 
 ### Pending Todos
 
@@ -178,5 +180,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 10-08-PLAN.md (Makefile test orchestration + administrative closure). All 10 phases complete (8/8 plans in Phase 10). Project v1 scope fully delivered.
-Resume file: N/A -- project complete. Future work tracked in Pending Todos (P2/P3 items).
+Stopped at: Completed 11-01-PLAN.md (Skip transpilation enablement). Phase 11 plan 1 of 3 complete.
+Resume file: .planning/phases/11-android-test-infrastructure/11-02-PLAN.md
