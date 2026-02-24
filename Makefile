@@ -19,7 +19,7 @@ build:
 test:
 	@for ex in $(TARGETS); do \
 		echo "=== Testing $$ex ===" && \
-		cd examples/$$ex && skip test && cd ../.. || exit 1; \
+		cd examples/$$ex && swift test && cd ../.. || exit 1; \
 	done
 
 test-filter:
