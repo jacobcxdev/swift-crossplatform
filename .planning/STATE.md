@@ -9,10 +9,10 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 
 ## Current Position
 
-Phase: 12 of 14 (Swift Perception Android)
-Plan: 1 of 2 in current phase (12-01 complete)
-Status: 12-01 complete. WithPerceptionTracking Android passthrough added. PerceptionRegistrar verified to compile on Android.
-Last activity: 2026-02-24 -- Completed 12-01 (WithPerceptionTracking Android impl + PerceptionRegistrar verification).
+Phase: 12 of 14 (Swift Perception Android) -- COMPLETE
+Plan: 2 of 2 in current phase (all complete)
+Status: Phase 12 complete. PerceptionRegistrar verified, WithPerceptionTracking Android passthrough added, ObservableState Perceptible inheritance enabled on Android.
+Last activity: 2026-02-24 -- Completed 12-02 (ObservableState Perceptible inheritance + full test verification).
 
 Progress: [██████████] 100%
 
@@ -158,6 +158,10 @@ Recent decisions affecting current work:
 - [Phase 11]: XCSkipTests uses pre-emptive XCTSkipIf(hasLocalForkPaths()) before runGradleTests() -- runGradleTests() uses XCTFail internally (not throw), so do/catch pattern was ineffective
 - [Phase 12]: PerceptionRegistrar requires no changes -- already compiles on Android via canImport(Observation) path creating native ObservationRegistrar
 - [Phase 12]: WithPerceptionTracking Android impl uses SkipFuseUI View passthrough with only View conformance (no Scene/ToolbarContent/etc.)
+- [Phase 12]: ObservableState changed from Observable to Perceptible on Android (removed !os(Android) guard)
+- [Phase 12]: ObservationStateRegistrar Perceptible methods stay gated on Android -- BridgeObservationRegistrar only accepts Observable subjects
+- [Phase 12]: Store+Observation.swift excluded on Android (canImport(SwiftUI) is false) -- Store already Perceptible via Store.swift #if !canImport(SwiftUI) block
+- [Phase 12]: Perception.Bindable stays gated on Android (depends on SwiftUI ObservedObject)
 
 ### Pending Todos
 
@@ -193,5 +197,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 12-01-PLAN.md (WithPerceptionTracking Android passthrough + PerceptionRegistrar verification). Next: 12-02 (Store Perceptible conformance + ObservationStateRegistrar guards).
-Resume file: .planning/phases/12-swift-perception-android/12-02-PLAN.md
+Stopped at: Phase 12 complete. Both plans executed and verified (triple verification: Claude + Gemini passed). Next: Phase 13 (API Parity Gaps).
+Resume file: .planning/phases/13-api-parity-gaps/
