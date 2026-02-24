@@ -50,10 +50,13 @@ struct TextStateButtonStateTests {
         #expect(a != b)
     }
 
+    #if !os(Android)
     @Test("TextState with formatting still contains original text")
     func textStateWithFormatting() {
         // On macOS/iOS, bold/italic add modifiers but String(state:) still extracts plain text.
-        // On Android, bold/italic are unavailable -- TextState stores verbatim only.
+        // On Android, bold/italic modifiers are unavailable due to CGFloat ambiguity between
+        // Foundation and SkipSwiftUI -- importing SkipSwiftUI in TextState.swift causes type
+        // conflicts. TextState stores verbatim text only on Android; plain text extraction works.
         let bold = TextState("Bold").bold()
         #expect(String(state: bold) == "Bold")
 
@@ -63,6 +66,7 @@ struct TextStateButtonStateTests {
         let boldItalic = TextState("Both").bold().italic()
         #expect(String(state: boldItalic) == "Both")
     }
+    #endif
 
     @Test("TextState multi-segment concatenation")
     func textStateMultiConcatenation() {

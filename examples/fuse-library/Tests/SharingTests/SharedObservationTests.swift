@@ -1,10 +1,14 @@
-#if !SKIP
 #if canImport(Combine)
 import Combine
+#elseif canImport(OpenCombine)
+import OpenCombineShim
 #endif
 import Foundation
-import Sharing
+#if !SKIP
 import Testing
+#endif
+import Sharing
+import XCTest
 
 // MARK: - File-scope types
 
@@ -12,59 +16,109 @@ struct ObsParent: Codable, Equatable, Sendable {
     var child: String = "initial"
 }
 
-// MARK: - Tests
+// MARK: - XCTest Publisher Tests (Android-transpilable)
 
-@Suite(.serialized) @MainActor
-struct SharedObservationTests {
+#if canImport(Combine) || canImport(OpenCombine)
+final class SharedPublisherTests: XCTestCase, @unchecked Sendable {
 
-    // MARK: SHR-10 — Publisher emits on mutation
-
-    #if canImport(Combine)
-    @Test func sharedPublisher() async throws {
+    @MainActor
+    func testSharedPublisher() async throws {
         @Shared(.inMemory("pubTest")) var count = 0
         var received: [Int] = []
+        let expectation = self.expectation(description: "publisher emits")
 
-        try await confirmation(expectedCount: 1) { confirm in
-            let cancellable = $count.publisher
-                .dropFirst() // skip initial prepend value
-                .sink { value in
-                    received.append(value)
-                    confirm()
-                }
+        let cancellable = $count.publisher
+            .dropFirst()
+            .sink { value in
+                received.append(value)
+                expectation.fulfill()
+            }
 
-            $count.withLock { $0 = 42 }
+        $count.withLock { $0 = 42 }
 
-            // Give publisher time to emit
-            try await Task.sleep(for: .milliseconds(500))
-            _ = cancellable
-        }
-        #expect(received.contains(42), "Publisher should have emitted 42, got: \(received)")
+        await fulfillment(of: [expectation], timeout: 2.0)
+        _ = cancellable
+        XCTAssertTrue(received.contains(42), "Publisher should have emitted 42, got: \(received)")
     }
 
-    // MARK: SHR-10 — Publisher emits multiple values
-
-    @Test func sharedPublisherMultipleValues() async throws {
+    @MainActor
+    func testSharedPublisherMultipleValues() async throws {
         @Shared(.inMemory("pubMulti")) var count = 0
         var received: [Int] = []
+        let expectation = self.expectation(description: "publisher emits 3 values")
+        expectation.expectedFulfillmentCount = 3
 
-        try await confirmation(expectedCount: 3) { confirm in
-            let cancellable = $count.publisher
-                .dropFirst()
-                .sink { value in
-                    received.append(value)
-                    confirm()
-                }
+        let cancellable = $count.publisher
+            .dropFirst()
+            .sink { value in
+                received.append(value)
+                expectation.fulfill()
+            }
 
-            $count.withLock { $0 = 1 }
-            $count.withLock { $0 = 2 }
-            $count.withLock { $0 = 3 }
+        $count.withLock { $0 = 1 }
+        $count.withLock { $0 = 2 }
+        $count.withLock { $0 = 3 }
 
-            try await Task.sleep(for: .milliseconds(500))
-            _ = cancellable
-        }
-        #expect(received == [1, 2, 3])
+        await fulfillment(of: [expectation], timeout: 2.0)
+        _ = cancellable
+        XCTAssertEqual(received, [1, 2, 3])
     }
-    #endif
+
+    @MainActor
+    func testPublisherValuesAsyncSequence() async throws {
+        @Shared(.inMemory("asyncPub")) var count = 0
+        var received: [Int] = []
+        let expectation = self.expectation(description: "publisher emits 3 values")
+        expectation.expectedFulfillmentCount = 3
+
+        let cancellable = $count.publisher
+            .dropFirst()
+            .sink { value in
+                received.append(value)
+                expectation.fulfill()
+            }
+
+        $count.withLock { $0 = 10 }
+        try await Task.sleep(for: .milliseconds(50))
+        $count.withLock { $0 = 20 }
+        try await Task.sleep(for: .milliseconds(50))
+        $count.withLock { $0 = 30 }
+
+        await fulfillment(of: [expectation], timeout: 5.0)
+        _ = cancellable
+        XCTAssertEqual(received, [10, 20, 30])
+    }
+
+    @MainActor
+    func testPublisherAndObservationBothWork() async throws {
+        @Shared(.inMemory("bothChannels")) var count = 0
+        var publisherReceived = false
+        let expectation = self.expectation(description: "publisher receives 7")
+
+        let cancellable = $count.publisher
+            .dropFirst()
+            .sink { value in
+                if value == 7 {
+                    publisherReceived = true
+                    expectation.fulfill()
+                }
+            }
+
+        $count.withLock { $0 = 7 }
+
+        await fulfillment(of: [expectation], timeout: 2.0)
+        _ = cancellable
+        XCTAssertTrue(publisherReceived)
+        XCTAssertEqual(count, 7)
+    }
+}
+#endif
+
+// MARK: - Swift Testing Tests (Darwin-only, non-transpilable)
+
+#if !SKIP
+@Suite(.serialized) @MainActor
+struct SharedObservationTests {
 
     // MARK: SHR-12 — Multiple @Shared same key synchronize
 
@@ -99,58 +153,6 @@ struct SharedObservationTests {
 
         #expect(value == 10)
     }
-
-    // MARK: SHR-09 — Async publisher values sequence
-
-    #if canImport(Combine)
-    @Test func publisherValuesAsyncSequence() async throws {
-        @Shared(.inMemory("asyncPub")) var count = 0
-        var received: [Int] = []
-
-        try await confirmation(expectedCount: 1) { confirm in
-            let cancellable = $count.publisher
-                .dropFirst()
-                .prefix(3)
-                .sink(
-                    receiveCompletion: { _ in confirm() },
-                    receiveValue: { received.append($0) }
-                )
-
-            $count.withLock { $0 = 10 }
-            $count.withLock { $0 = 20 }
-            $count.withLock { $0 = 30 }
-
-            try await Task.sleep(for: .milliseconds(500))
-            _ = cancellable
-        }
-        #expect(received == [10, 20, 30])
-    }
-
-    // MARK: SHR-09 + SHR-10 — Publisher and observation both work
-
-    @Test func publisherAndObservationBothWork() async throws {
-        @Shared(.inMemory("bothChannels")) var count = 0
-        var publisherReceived = false
-
-        try await confirmation(expectedCount: 1) { confirm in
-            let cancellable = $count.publisher
-                .dropFirst()
-                .sink { value in
-                    if value == 7 {
-                        publisherReceived = true
-                        confirm()
-                    }
-                }
-
-            $count.withLock { $0 = 7 }
-
-            try await Task.sleep(for: .milliseconds(500))
-            _ = cancellable
-        }
-        #expect(publisherReceived)
-        #expect(count == 7)
-    }
-    #endif
 
     // MARK: SHR-12 — Bidirectional sync between shared refs
 
