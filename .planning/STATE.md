@@ -48,6 +48,7 @@ Progress: [██████████] 100%
 | Phase 10 P03 | 5min | 1 tasks | 1 files |
 | Phase 10 P04 | 15min | 2 tasks | 7 files |
 | Phase 10 P05 | 5min | 2 tasks | 3 files |
+| Phase 10 P05 | 3min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -132,6 +133,7 @@ Recent decisions affecting current work:
 - [Phase 10]: Makefile smart defaults iterate both examples; EXAMPLE= override for single targeting
 - [Phase 10]: Phase 11 (Presentation Dismiss) absorbed into Phase 10 -- dismiss architecturally complete, timing issue is P2
 - [Phase 10]: 4 known-limitation gaps documented (G6-G9): TCA Binding/Alert/IfLetStore SwiftUI extensions, JVM type erasure for multi-destination
+- [Phase 10]: Phase 11 absorbed into Phase 10 during planning -- no separate ROADMAP removal needed
 
 ### Pending Todos
 
