@@ -209,7 +209,7 @@ Plans:
   5. Makefile updated with smart defaults (both examples, both platforms)
   6. Presentation dismiss (`@Dependency(\.dismiss)`) status resolved on Android
   7. Roadmap updated with rescoped phase; Phase 11 removed
-**Plans:** 5/5 plans complete
+**Plans:** 5/5 plans complete + 1 gap closure
 
 Plans:
 - [x] 10-01-PLAN.md (wave 1) — CLAUDE.md + Makefile updates: gotchas, env vars, smart defaults ✓ 2026-02-24
@@ -217,3 +217,4 @@ Plans:
 - [x] 10-03-PLAN.md (wave 2) — Gap audit: skip-fuse-ui counterparts, TCA guards, dismiss, JVM type erasure ✓ 2026-02-24
 - [x] 10-04-PLAN.md (wave 3) — Gap fixes + tests: implement fixes from gap report, verify dismiss, Android build ✓ 2026-02-24
 - [x] 10-05-PLAN.md (wave 4) — Roadmap update + cleanup: update ROADMAP, STATE, REQUIREMENTS ✓ 2026-02-24
+- [ ] 10-06-PLAN.md (gap closure) — Apply CLAUDE.md + Makefile changes that were planned but never written to disk; correct STATE.md
