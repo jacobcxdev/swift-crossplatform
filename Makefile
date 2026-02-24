@@ -7,7 +7,7 @@ else
 TARGETS := $(EXAMPLES)
 endif
 
-.PHONY: build test test-filter android-build android-test skip-test skip-verify clean status push-all pull-all diff-all branch-all
+.PHONY: build test test-filter android-build android-test skip-verify clean status push-all pull-all diff-all branch-all
 
 # Build & Test (iterates over all TARGETS by default)
 build:
@@ -19,7 +19,7 @@ build:
 test:
 	@for ex in $(TARGETS); do \
 		echo "=== Testing $$ex ===" && \
-		cd examples/$$ex && swift test && cd ../.. || exit 1; \
+		cd examples/$$ex && skip test && cd ../.. || exit 1; \
 	done
 
 test-filter:
@@ -36,12 +36,6 @@ android-test:
 	@for ex in $(TARGETS); do \
 		echo "=== Android testing $$ex ===" && \
 		cd examples/$$ex && skip android test && cd ../.. || exit 1; \
-	done
-
-skip-test:
-	@for ex in $(TARGETS); do \
-		echo "=== Skip testing $$ex ===" && \
-		cd examples/$$ex && skip test && cd ../.. || exit 1; \
 	done
 
 skip-verify:
