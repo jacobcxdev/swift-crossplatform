@@ -417,7 +417,7 @@ Which phases cover which requirements. Updated during roadmap creation. Evidence
 | SHR-13 | Phase 4 | Complete | DIRECT: childMutationVisibleInParent(), parentMutationVisibleInChild() pass on Android |
 | SHR-14 | Phase 4 | Complete | DIRECT: customSharedKeyCompiles() passes on Android |
 | NAV-01 | Phase 5 | Complete | DIRECT: testNavigationStackPush(), testPathViewBindingPush() pass on Android |
-| NAV-02 | Phase 5 | Complete | DIRECT: testNavigationStackPush(), pushContactDetail() pass on Android |
+| NAV-02 | Phase 5, 15 | Complete | DIRECT: testNavigationStackPush(), pushContactDetail() pass on Android (Phase 15: strengthening to binding-driven push) |
 | NAV-03 | Phase 5 | Complete | DIRECT: testNavigationStackPop(), testNavigationStackPopAll(), testStackStateRemoveLast() pass on Android |
 | NAV-04 | Phase 5 | Complete | DIRECT: testNavigationDestinationItemBinding() passes on Android |
 | NAV-05 | Phase 5 | Complete | DIRECT: Phase 13 presentation parity tests |
@@ -434,7 +434,7 @@ Which phases cover which requirements. Updated during roadmap creation. Evidence
 | TCA-26 | Phase 5 | Complete | DIRECT: testDismissDependencyResolvesAndExecutes(), testDismissDependencyWithPresentation(), testDismissViaChildDependency() pass on Android |
 | TCA-27 | Phase 5 | Complete | DIRECT: testPresentsOptionalLifecycle() passes on Android |
 | TCA-28 | Phase 5 | Complete | DIRECT: testPresentationActionDismissNilsState() passes on Android |
-| TCA-32 | Phase 5 | Complete | DIRECT: testStackStateInitAndAppend(), testStackStateRemoveLast() pass on Android |
+| TCA-32 | Phase 5, 15 | Complete | DIRECT: testStackStateInitAndAppend(), testStackStateRemoveLast() pass on Android (Phase 15: strengthening to binding-driven push) |
 | TCA-33 | Phase 5 | Complete | DIRECT: testStackActionForEachRouting() passes on Android |
 | TCA-34 | Phase 5 | Complete | DIRECT: testReducerCaseEphemeral() passes on Android |
 | TCA-35 | Phase 5 | Complete | DIRECT: testReducerCaseIgnored() passes on Android |
@@ -482,8 +482,8 @@ Which phases cover which requirements. Updated during roadmap creation. Evidence
 | TEST-07 | Phase 7 | Complete | DIRECT: skipReceivedActions() passes on Android |
 | TEST-08 | Phase 7 | Complete | INDIRECT: All async effect tests pass on Android; deterministic execution works via task scheduling |
 | TEST-09 | Phase 7 | Complete | DIRECT: builtInDependencyResolution() passes on Android |
-| TEST-10 | Phase 11 | Complete | DIRECT: Android emulator validation (Phase 11) |
-| TEST-11 | Phase 11 | Complete | DIRECT: Android emulator validation (Phase 11) |
+| TEST-10 | Phase 11, 17 | Complete | INDIRECT: Android emulator validation (Phase 11); Phase 17: upgrading to direct un-gated Android test |
+| TEST-11 | Phase 11, 17 | Complete | INDIRECT: Android emulator validation (Phase 11); Phase 17: upgrading to direct un-gated Android test |
 | TEST-12 | Phase 11 | Complete | DIRECT: Android emulator validation (Phase 11) |
 | DOC-01 | Phase 7 | Complete | N/A: Documentation requirement |
 

@@ -23,6 +23,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 12: Swift Perception Android Port** - Fork swift-perception for Android; provide WithPerceptionTracking, Perceptible conformances TCA depends on (completed 2026-02-24)
 - [x] **Phase 13: API Parity Gaps** - Implement Android equivalents for non-deprecated TCA APIs gated out without alternatives (completed 2026-02-24)
 - [x] **Phase 14: Android Verification & Requirements Reset** - Run full Android test suite, re-verify all 169 pending requirements against actual results (completed 2026-02-24)
+- [ ] **Phase 15: NavigationStack Android Robustness** - Fix binding-driven push, JVM type erasure multi-destination, and dismiss JNI timing — all with test coverage
+- [ ] **Phase 16: TCA API Parity Completion** - Enable gated Binding+Observation, Alert/Dialog, IfLetStore extensions on Android; resolve TextState CGFloat ambiguity — all with test coverage
+- [ ] **Phase 17: Test Evidence & Infrastructure Hardening** - Direct TEST-10/TEST-11 evidence, Robolectric pipeline fix, ObjC warning cleanup, swiftThreadingFatal version guard — all with test coverage
 
 ## Phase Details
 
@@ -144,7 +147,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11 -> 12 -> 13 -> 14
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17
 Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Phases 2-5 if desired.
 Note: Phases 12 and 13 could partially overlap once Phase 11 test infra is working; Phase 14 must come last.
 
@@ -164,6 +167,9 @@ Note: Phases 12 and 13 could partially overlap once Phase 11 test infra is worki
 | 12. Swift Perception Android Port | 2/2 | Complete    | 2026-02-24 |
 | 13. API Parity Gaps | 2/2 | Complete    | 2026-02-24 |
 | 14. Android Verification & Requirements Reset | 4/4 | Complete    | 2026-02-24 |
+| 15. NavigationStack Android Robustness | 0/0 | Planned | - |
+| 16. TCA API Parity Completion | 0/0 | Planned | - |
+| 17. Test Evidence & Infrastructure Hardening | 0/0 | Planned | - |
 
 ### Phase 8: PFW Skill Alignment
 
@@ -303,3 +309,44 @@ Plans:
 - [x] 14-02-PLAN.md -- Update REQUIREMENTS.md traceability with evidence-backed statuses and known limitations ✓ 2026-02-24
 - [x] 14-03-PLAN.md -- Final verification, STATE.md/ROADMAP.md closure ✓ 2026-02-24
 - [x] 14-04-PLAN.md -- Gap closure: Android-transpilable Combine publisher tests (SHR-09/SHR-10) + TextState formatting rationale ✓ 2026-02-24
+
+### Phase 15: NavigationStack Android Robustness
+**Goal:** Fix all P2 NavigationStack tech debt — binding-driven push, JVM type erasure for multi-destination, and dismiss JNI timing — with full test coverage replacing existing `withKnownIssue` wrappers
+**Depends on:** Phase 14
+**Requirements:** NAV-02, TCA-32 (strengthening from reducer-driven-only to full binding-driven push)
+**Gap Closure:** Closes integration gap Phase 10 → Phase 5; closes 3 P2 tech debt items from v1.0-MILESTONE-AUDIT.md
+**Canonical pattern references:** `/pfw-composable-architecture` (NavigationStack path binding, PresentationAction.dismiss), `/pfw-swift-navigation` (path-driven navigation, dismiss dependency)
+**Success Criteria** (what must be TRUE):
+  1. `NavigationLink(state:)` user-driven push dispatches `store.send(.push(...))` on Android — binding-driven push works, not just reducer-driven
+  2. Multi-destination `NavigationStack` with multiple `navigationDestination(for:)` types resolves correctly on JVM without type erasure collisions
+  3. `@Dependency(\.dismiss)` completes under full JNI effect pipeline timing on Android — `withKnownIssue` wrappers replaced with passing tests
+  4. All three fixes validated by dedicated Android tests (not indirect evidence)
+**Plans:** 0/0 plans
+
+### Phase 16: TCA API Parity Completion
+**Goal:** Enable all P3 gated TCA extensions on Android and resolve TextState CGFloat ambiguity — with test coverage for each enablement
+**Depends on:** Phase 15
+**Requirements:** Derived from PARITY-GAPS-IN-CURRENT-APIS tech debt (affects TCA-19, TCA-20, NAV-05, NAV-07)
+**Gap Closure:** Closes 4 P3/cosmetic tech debt items from v1.0-MILESTONE-AUDIT.md
+**Canonical pattern references:** `/pfw-composable-architecture` (Binding+Observation, IfLetStore deprecation), `/pfw-swift-navigation` (Alert/ConfirmationDialog observation)
+**Success Criteria** (what must be TRUE):
+  1. TCA `Binding+Observation` extensions (e.g. `$store.scope`, observation-backed bindings) compile and execute on Android without `#if !os(Android)` guard
+  2. TCA `Alert`/`ConfirmationDialog` observation extensions work on Android via conditional SkipFuseUI import
+  3. `IfLetStore` status resolved — either enabled on Android or documented as intentionally excluded (deprecated) with test proving `@Observable` alternative works
+  4. `TextState` formatting modifiers resolve on Android without CGFloat ambiguity — or fallback path tested
+  5. Each enablement validated by a dedicated test
+**Plans:** 0/0 plans
+
+### Phase 17: Test Evidence & Infrastructure Hardening
+**Goal:** Provide direct test evidence for TEST-10/TEST-11, fix Robolectric pipeline, eliminate ObjC warnings, and add swiftThreadingFatal version guard — closing all remaining infra/cosmetic tech debt
+**Depends on:** Phase 16
+**Requirements:** TEST-10, TEST-11 (upgrading from indirect to direct evidence)
+**Gap Closure:** Closes 4 infra/cosmetic tech debt items from v1.0-MILESTONE-AUDIT.md
+**Canonical pattern references:** `/pfw-testing` (Swift Testing conventions), `/pfw-issue-reporting` (isTesting detection, platform guards)
+**Success Criteria** (what must be TRUE):
+  1. TEST-10 (observation bridge prevents infinite recomposition) verified by direct Android test — not gated behind `#if !SKIP`
+  2. TEST-11 (stress stability >1000 mutations/sec) verified by direct Android test — not gated behind `#if !SKIP`
+  3. `skip test` (Robolectric) pipeline runs successfully with skipstone symlink resolution for local fork paths
+  4. ObjC duplicate class warnings eliminated from fuse-app macOS test output
+  5. `swiftThreadingFatal` stub has version-gated test that asserts presence on Swift <6.3 and absence on Swift ≥6.3
+**Plans:** 0/0 plans
