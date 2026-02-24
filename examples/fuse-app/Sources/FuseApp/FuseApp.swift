@@ -4,6 +4,7 @@
 import ComposableArchitecture
 import Dependencies
 import Foundation
+import IssueReporting
 import SkipFuse
 import SwiftUI
 
@@ -21,7 +22,11 @@ let logger: Logger = Logger(subsystem: "dev.jacobcx.fuseApp", category: "FuseApp
 
     /* SKIP @bridge */public init() {
         prepareDependencies {
-            try! $0.bootstrapDatabase()
+            do {
+                try $0.bootstrapDatabase()
+            } catch {
+                reportIssue(error)
+            }
         }
     }
 
