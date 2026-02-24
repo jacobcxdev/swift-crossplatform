@@ -232,7 +232,7 @@ struct ContactsFeatureTests {
         await store.send(.destination(.presented(.addContact(.delegate(.saveContact(newContact)))))) {
             $0.contacts.append(newContact)
         }
-        await store.receive(\.destination.dismiss, timeout: 10_000_000_000) {
+        await store.receive(\.destination.dismiss) {
             $0.destination = nil
         }
     }
@@ -312,7 +312,7 @@ struct ContactDetailFeatureTests {
         await store.send(.destination(.presented(.editSheet(.delegate(.save(updated)))))) {
             $0.contact = updated
         }
-        await store.receive(\.destination.dismiss, timeout: 10_000_000_000) {
+        await store.receive(\.destination.dismiss) {
             $0.destination = nil
         }
     }

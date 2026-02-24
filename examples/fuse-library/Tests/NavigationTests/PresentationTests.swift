@@ -195,6 +195,181 @@ struct PopoverChild {
     }
 }
 
+// MARK: - Delegate+Dismiss Child Reducer (dismiss after delegate action)
+
+@Reducer
+struct DelegateChild {
+    @ObservableState
+    struct State: Equatable {
+        var value: String = ""
+    }
+    @Dependency(\.dismiss) var dismiss
+    @CasePathable
+    enum Action {
+        case saveAndDismiss
+        case delegate(Delegate)
+
+        @CasePathable
+        enum Delegate: Equatable {
+            case didSave(String)
+        }
+    }
+    var body: some ReducerOf<Self> {
+        Reduce { state, action in
+            switch action {
+            case .saveAndDismiss:
+                return .concatenate(
+                    .send(.delegate(.didSave(state.value))),
+                    .run { _ in await self.dismiss() }
+                )
+            case .delegate:
+                return .none
+            }
+        }
+    }
+}
+
+@Reducer
+struct DelegateParent {
+    @ObservableState
+    struct State: Equatable {
+        @Presents var child: DelegateChild.State?
+        var savedValue: String = ""
+    }
+    enum Action {
+        case child(PresentationAction<DelegateChild.Action>)
+        case showChild
+    }
+    var body: some ReducerOf<Self> {
+        Reduce { state, action in
+            switch action {
+            case .showChild:
+                state.child = DelegateChild.State(value: "test-data")
+                return .none
+            case let .child(.presented(.delegate(.didSave(value)))):
+                state.savedValue = value
+                return .none
+            case .child:
+                return .none
+            }
+        }
+        .ifLet(\.$child, action: \.child) {
+            DelegateChild()
+        }
+    }
+}
+
+// MARK: - Stack Dismiss Reducers (stack element dismiss via await dismiss())
+
+@Reducer
+struct StackDismissElement {
+    @ObservableState
+    struct State: Equatable {
+        var label: String = ""
+    }
+    @Dependency(\.dismiss) var dismiss
+    enum Action {
+        case closeTapped
+    }
+    var body: some ReducerOf<Self> {
+        Reduce { state, action in
+            switch action {
+            case .closeTapped:
+                return .run { _ in await self.dismiss() }
+            }
+        }
+    }
+}
+
+@Reducer
+enum StackDismissPath {
+    case element(StackDismissElement)
+}
+
+@Reducer
+struct StackDismissFeature {
+    @ObservableState
+    struct State {
+        var path = StackState<StackDismissPath.State>()
+    }
+    enum Action {
+        case path(StackActionOf<StackDismissPath>)
+        case pushElement(String)
+    }
+    var body: some ReducerOf<Self> {
+        Reduce { state, action in
+            switch action {
+            case let .pushElement(label):
+                state.path.append(.element(StackDismissElement.State(label: label)))
+                return .none
+            case .path:
+                return .none
+            }
+        }
+        .forEach(\.path, action: \.path)
+    }
+}
+
+// MARK: - Parent-Driven Dismiss Reducer (dismiss via .send(.destination(.dismiss)))
+
+@Reducer
+struct ParentDrivenChild {
+    @ObservableState
+    struct State: Equatable {
+        var data: String = ""
+    }
+    @CasePathable
+    enum Action {
+        case delegate(Delegate)
+        case submitTapped
+
+        @CasePathable
+        enum Delegate: Equatable {
+            case didSubmit(String)
+        }
+    }
+    var body: some ReducerOf<Self> {
+        Reduce { state, action in
+            switch action {
+            case .submitTapped:
+                return .send(.delegate(.didSubmit(state.data)))
+            case .delegate:
+                return .none
+            }
+        }
+    }
+}
+
+@Reducer
+struct ParentDrivenParent {
+    @ObservableState
+    struct State: Equatable {
+        @Presents var child: ParentDrivenChild.State?
+        var receivedData: String = ""
+    }
+    enum Action {
+        case child(PresentationAction<ParentDrivenChild.Action>)
+        case showChild
+    }
+    var body: some ReducerOf<Self> {
+        Reduce { state, action in
+            switch action {
+            case .showChild:
+                state.child = ParentDrivenChild.State(data: "submit-me")
+                return .none
+            case let .child(.presented(.delegate(.didSubmit(data)))):
+                state.receivedData = data
+                return .send(.child(.dismiss))
+            case .child:
+                return .none
+            }
+        }
+        .ifLet(\.$child, action: \.child) {
+            ParentDrivenChild()
+        }
+    }
+}
+
 // MARK: - Tests
 
 @MainActor
@@ -348,6 +523,103 @@ struct PresentationTests {
 
         await store.send(.child(.presented(.doneTapped)))
 
+        await store.receive(\.child.dismiss) {
+            $0.child = nil
+        }
+    }
+
+    // MARK: - Dismiss Timing Tests (NAV-02, Phase 15)
+
+    @Test
+    func testDismissFromChildReducer() async {
+        // Minimal @Presents child with await dismiss() in a child action's effect.
+        // Validates PresentationReducer's dismiss pipeline (Empty+Just concatenation)
+        // delivers the dismiss action reliably within default timeout.
+        let store = TestStore(initialState: DismissParent.State()) {
+            DismissParent()
+        }
+
+        // Present child
+        await store.send(.showChild) {
+            $0.child = DismissableChild.State()
+        }
+
+        // Child triggers dismiss via @Dependency(\.dismiss)
+        await store.send(.child(.presented(.doneTapped)))
+
+        // PresentationReducer should deliver .dismiss — no explicit timeout needed
+        await store.receive(\.child.dismiss) {
+            $0.child = nil
+        }
+    }
+
+    @Test
+    func testDismissAfterChildDelegateAction() async {
+        // Pattern matching fuse-app ContactsFeature: child sends delegate action,
+        // parent processes it, then child dismiss fires. Both the delegate action
+        // and the dismiss arrive in sequence.
+        let store = TestStore(initialState: DelegateParent.State(
+            child: DelegateChild.State(value: "important-data")
+        )) {
+            DelegateParent()
+        }
+
+        // Child sends saveAndDismiss which fires delegate then dismiss
+        await store.send(.child(.presented(.saveAndDismiss)))
+
+        // Receive delegate action — parent saves the value
+        await store.receive(\.child.presented.delegate.didSave) {
+            $0.savedValue = "important-data"
+        }
+
+        // Receive dismiss — child state is nilled out
+        await store.receive(\.child.dismiss) {
+            $0.child = nil
+        }
+    }
+
+    @Test
+    func testStackDismissFromElement() async throws {
+        // Stack element calls await dismiss() which triggers
+        // StackReducer's dismiss pipeline (analogous to PresentationReducer).
+        // Use Store (not TestStore) — StackDismissFeature.State is not Equatable
+        // due to @Reducer enum Path.
+        let store = Store(initialState: StackDismissFeature.State()) {
+            StackDismissFeature()
+        }
+
+        // Push an element
+        store.send(.pushElement("item-1"))
+        #expect(store.state.path.count == 1)
+
+        // Element triggers dismiss via @Dependency(\.dismiss)
+        store.send(.path(.element(id: 0, action: .element(.closeTapped))))
+
+        // Give the dismiss pipeline time to deliver .popFrom
+        try await Task.sleep(nanoseconds: 100_000_000) // 100ms
+        #expect(store.state.path.count == 0)
+    }
+
+    @Test
+    func testParentDrivenDismissViaEffect() async {
+        // Parent receives delegate action from child and returns
+        // .send(.child(.dismiss)) — validates that Effect.send dispatches the
+        // dismiss action reliably. This mirrors fuse-app's ContactsFeature pattern.
+        let store = TestStore(initialState: ParentDrivenParent.State(
+            child: ParentDrivenChild.State(data: "submit-me")
+        )) {
+            ParentDrivenParent()
+        }
+
+        // Child submits → parent receives delegate → parent sends .dismiss
+        await store.send(.child(.presented(.submitTapped)))
+
+        // Parent receives the delegate
+        await store.receive(\.child.presented.delegate.didSubmit) {
+            $0.receivedData = "submit-me"
+        }
+
+        // Parent-driven dismiss arrives via Effect.send
         await store.receive(\.child.dismiss) {
             $0.child = nil
         }
