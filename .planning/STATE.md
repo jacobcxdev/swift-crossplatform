@@ -140,12 +140,12 @@ Recent decisions affecting current work:
 - [Phase 10]: Plain store.send() for push/pop (not store.send(_:animation:) -- withTransaction is fatalError on Android)
 - [Phase 10]: canImport(SwiftUI) is false on Android -- SkipFuseUI re-exports SkipSwiftUI, not Apple's SwiftUI module; 10-01 adapter confirmed necessary
 - [Phase 10]: 16 TCA guards referencing Apple SwiftUI types are correct despite skip-fuse-ui availability -- enabling requires conditional SkipFuseUI import (significant refactor, deferred)
-- [Phase 10]: Dismiss architecturally complete on Android (PresentationReducer wires on all platforms); integration timing issue is P2
+- [Phase 10]: Dismiss architecturally complete on Android (PresentationReducer wires on all platforms); timing issue resolved by Merge polyfill fix (7b175e4)
 - [Phase 10]: JVM type erasure safe for single-destination NavigationStack; multi-destination needs future mitigation (P2)
 - [Phase 10]: NavigationStack adapter uses Binding<NavigationPath> not Binding<[Any]> -- skip-fuse-ui expects NavigationPath type
 - [Phase 10]: @MainActor on free function NavigationStack adapter for Swift 6 concurrency sending requirements
 - [Phase 10]: NavigationLink TCA extensions compile unguarded on Android -- skip-fuse-ui provides compatible NavigationLink type
-- [Phase 10]: Dismiss withKnownIssue wrappers kept -- P2 integration timing issue, not architectural gap
+- [Phase 10]: Dismiss withKnownIssue wrappers removed -- timing issue resolved by Merge polyfill fix (7b175e4)
 - [Phase 10]: SPM identity conflicts resolved by converting skip-android-bridge remote URLs to local paths in 3 forks (sqlite-data, swift-composable-architecture, swift-navigation)
 - [Phase 10]: skip-fuse-ui uncommitted changes committed (ModifiedContent generics + local path deps) and fuse-library skip-fuse converted to local path
 - [Phase 10]: CLAUDE.md expanded with environment variable docs, 4 new gotchas, updated Makefile reference (applied in 10-06 gap closure)
@@ -184,8 +184,9 @@ Recent decisions affecting current work:
 - [Phase 14]: OpenCombine .prefix(N) completion doesn't fire on Android (mutation coalescing); use expectedFulfillmentCount pattern instead
 - [Phase 15]: Direct as? StackState<State>.Component cast on NavigationPath elements (SwiftHashable already unwrapped by skip-fuse-ui setData)
 - [Phase 15]: @_spi(Internals) import ComposableArchitecture + StackElementID integer literals for binding-driven push tests
-- [Phase 15]: Keep upstream Empty+Just concatenation in PresentationReducer/StackReducer -- works on Darwin; Android issue is in OpenCombine Concatenate (external dep)
-- [Phase 15]: Effect.run-based dismiss alternative not viable -- cancellableValue throws CancellationError regardless of task result when task is cancelled
+- [Phase 15]: Keep upstream Empty+Just concatenation in PresentationReducer/StackReducer -- works on both platforms; original diagnosis blaming OpenCombine Concatenate was wrong (actual root cause was TCA Merge polyfill, fixed in 7b175e4)
+- [Phase 15]: Effect.run-based dismiss alternative not viable -- cancellableValue throws CancellationError regardless of task result when task is cancelled (moot: Merge polyfill fix resolved the issue)
+- [Phase 15]: UIScheduler bypass on Android was wrong -- DispatchQueue.main IS drained via AndroidLooperExecutor (swift-android-native hooks GCD dispatch port into ALooper). Restored UIScheduler with Thread.isMainThread for main-thread detection (DispatchQueue.getSpecific doesn't work on Android). All 269 tests pass.
 - [Phase 15]: 10-second timeouts removed entirely from fuse-app dismiss tests -- parent-driven dismiss via Effect.send fires synchronously
 - [Phase 15]: _typeName over String(describing:) for destination keys -- String(describing:) on nested types produces short names causing collisions
 - [Phase 15]: NavigationDestinationKeyProviding protocol in skip-fuse-ui with os(Android) conformance in TCA -- deployment target mismatch prevents canImport on Darwin
@@ -200,7 +201,7 @@ Recent decisions affecting current work:
 - **dismiss/openSettings dependency validation (Phase 7):** dismiss dependency validated at data layer in Phase 5 (DismissEffect + LockIsolated pattern). openSettings deferred to Phase 7 — requires active view hierarchy. (Source: Codex verifier gap #2, Phase 3 reconciliation)
 - **Android UI rendering validation (Phase 7):** Phase 5 Codex verifier flagged that NavigationStack, sheet, alert, dialog, .task tests validate data layer only, not Android Compose rendering. All UI rendering assertions deferred to Phase 7 integration testing with emulator. (Source: Codex verifier, Phase 5)
 - **Database observation wrapper-level testing (Phase 7):** Phase 6 Codex verifier flagged SD-09/SD-10/SD-11 tests use ValueObservation.start() directly, not @FetchAll/@FetchOne DynamicProperty wrappers. DynamicProperty.update() requires SwiftUI runtime (guarded out on Android). Wrapper-level integration testing deferred to Phase 7 with emulator. (Source: Codex verifier, Phase 6)
-- **Dismiss JNI timing (P2):** Dismiss mechanism is architecturally complete on Android (PresentationReducer wires on all platforms, DismissEffect has correct fallback). Root cause identified in Phase 15-03: OpenCombine's Concatenate operator (external dependency) may not correctly chain cancellation-completion into suffix subscription across JNI. Effect.run alternative not viable (cancellableValue throws CancellationError regardless). withKnownIssue wrappers removed; 10-second timeouts removed. Fix requires OpenCombine fork or upstream fix. (Source: 10-GAP-REPORT.md section F, 15-03 investigation)
+- **~~Dismiss JNI timing (P2):~~** RESOLVED — Root cause was TCA's custom Publishers.Merge polyfill losing synchronous emissions (fixed in 7b175e4), NOT OpenCombine's Concatenate as Phase 15-03 hypothesised. Empirically confirmed: all 4 child-driven dismiss tests pass on Android (269/269, 0 real failures). Stack dismiss test updated with polling for JNI latency resilience. (Source: dismiss pipeline root cause investigation, Android test run 2026-02-24)
 - **~~JVM type erasure multi-destination risk (P2):~~** RESOLVED -- NavigationDestinationKeyProviding protocol added to skip-fuse-ui. StackState.Component.destinationKey uses _typeName for fully qualified names. Both registration and lookup sides prefer protocol key over String(describing:). Conformance gated on os(Android). (Source: 15-02 execution)
 - **TCA Binding+Observation extensions on Android (P3):** 4 guard blocks in Binding+Observation.swift exclude binding observation extensions on Android. Enabling requires TCA to conditionally import SkipFuseUI types instead of SwiftUI types -- significant refactor. Not blocking TCA core functionality. (Source: 10-GAP-REPORT.md G6)
 - **TCA Alert/ConfirmationDialog observation extensions on Android (P3):** Alert+Observation.swift and ConfirmationDialog.swift observation extensions guarded on Android. Alert/dialog work via PresentationReducer path. (Source: 10-GAP-REPORT.md G7)

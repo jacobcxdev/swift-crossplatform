@@ -595,8 +595,11 @@ struct PresentationTests {
         // Element triggers dismiss via @Dependency(\.dismiss)
         store.send(.path(.element(id: 0, action: .element(.closeTapped))))
 
-        // Give the dismiss pipeline time to deliver .popFrom
-        try await Task.sleep(nanoseconds: 100_000_000) // 100ms
+        // Poll for dismiss completion — Android Looper scheduling adds latency beyond 100ms
+        for _ in 0..<20 {
+            if store.state.path.count == 0 { break }
+            try await Task.sleep(nanoseconds: 50_000_000) // 50ms
+        }
         #expect(store.state.path.count == 0)
     }
 

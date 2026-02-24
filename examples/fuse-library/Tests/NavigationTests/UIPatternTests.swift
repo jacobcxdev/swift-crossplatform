@@ -189,11 +189,11 @@ struct UIPatternTests {
         store.send(.startLoading)
         store.send(.startLoading)
 
-        // Allow effects to complete (Android needs more time due to JNI overhead)
+        // Allow effects to complete (Android Looper scheduling adds latency vs Darwin's run loop)
         try await Task.sleep(for: .milliseconds(500))
 
         #if os(Android)
-        withKnownIssue("Android timing: 500ms sleep insufficient for async effects to complete via JNI", isIntermittent: true) {
+        withKnownIssue("Android timing: 500ms sleep insufficient for async effects to complete via Looper scheduling", isIntermittent: true) {
             #expect(store.loadingComplete == true)
         }
         #else
