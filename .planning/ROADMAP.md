@@ -19,6 +19,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Navigation & Presentation** - TCA navigation patterns and SwiftUI presentation lifecycle work on Android (completed 2026-02-22)
 - [x] **Phase 6: Database & Queries** - StructuredQueries and GRDB/SQLiteData work on Android with observation-driven view updates (completed 2026-02-22)
 - [x] **Phase 7: Integration Testing & Documentation** - End-to-end TCA app runs on both platforms; forks documented (completed 2026-02-22)
+- [ ] **Phase 11: Android Test Infrastructure** - Fix blockers preventing Android test execution: xctest-dynamic-overlay imports, skipstone plugin on all test targets, canonical XCGradleHarness
+- [ ] **Phase 12: Swift Perception Android Port** - Fork swift-perception for Android; provide WithPerceptionTracking, Perceptible conformances TCA depends on
+- [ ] **Phase 13: API Parity Gaps** - Implement Android equivalents for non-deprecated TCA APIs gated out without alternatives
+- [ ] **Phase 14: Android Verification & Requirements Reset** - Run full Android test suite, re-verify all 169 pending requirements against actual results
 
 ## Phase Details
 
@@ -140,8 +144,9 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11 -> 12 -> 13 -> 14
 Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Phases 2-5 if desired.
+Note: Phases 12 and 13 could partially overlap once Phase 11 test infra is working; Phase 14 must come last.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -155,6 +160,10 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 | 8. PFW Skill Alignment | 5/5 | Complete | 2026-02-23 |
 | 9. Post-Audit Cleanup | 4/4 | Complete | 2026-02-23 |
 | 10. skip-fuse-ui Integration & Audit | 8/8 | Complete    | 2026-02-24 |
+| 11. Android Test Infrastructure | 0/0 | Not Started | - |
+| 12. Swift Perception Android Port | 0/0 | Not Started | - |
+| 13. API Parity Gaps | 0/0 | Not Started | - |
+| 14. Android Verification & Requirements Reset | 0/0 | Not Started | - |
 
 ### Phase 8: PFW Skill Alignment
 
@@ -221,3 +230,58 @@ Plans:
 - [x] 10-06-PLAN.md (gap closure) — Apply CLAUDE.md + Makefile changes that were planned but never written to disk; correct STATE.md ✓ 2026-02-24
 - [x] 10-07-PLAN.md (gap closure) — Fix XCSkipTests.testSkipModule failure in fuse-library: replace XCGradleHarness with JUnit results stub ✓ 2026-02-24
 - [x] 10-08-PLAN.md (gap closure) — Administrative closure: 10-07 SUMMARY, STATE.md/ROADMAP corrections, known-limitation documentation ✓ 2026-02-24
+
+### Phase 11: Android Test Infrastructure
+**Goal:** Fix all blockers preventing Android test execution — xctest-dynamic-overlay imports, skipstone plugin coverage, canonical Skip testing pattern, and local package symlink compatibility
+**Depends on:** Phase 10
+**Requirements:** TEST-10, TEST-11, TEST-12
+**Gap Closure:** Closes ANDROID-TESTING-BYPASS, NO-TCA-TESTS-ON-ANDROID, ANDROID-EMULATOR-NEVER-TESTED from v1.0-MILESTONE-AUDIT.md
+**Canonical pattern references:** `/pfw-issue-reporting` (isTesting detection, platform guards), `/pfw-testing` (Swift Testing conventions)
+**Success Criteria** (what must be TRUE):
+  1. `#if os(Android) import Android` guards added to xctest-dynamic-overlay IsTesting.swift and SwiftTesting.swift — `skip android test` no longer blocked by dlopen/dlsym errors
+  2. All test targets (TCATests, NavigationTests, FoundationTests, SharingTests, DatabaseTests, FuseAppIntegrationTests) have `skipstone` plugin in Package.swift
+  3. XCSkipTests uses canonical `XCGradleHarness`/`runGradleTests()` pattern instead of fake JUnit XML stubs
+  4. `skip test` and `skip android test` execute real Kotlin tests (non-zero test count in JUnit results)
+  5. Skipstone local package symlink resolution works with fork path overrides
+**Plans:** 0/0 plans (not yet planned)
+
+### Phase 12: Swift Perception Android Port
+**Goal:** Provide `WithPerceptionTracking`, `_PerceptionLocals`, and `Perceptible` protocol on Android so TCA binding/scoping infrastructure works correctly
+**Depends on:** Phase 11
+**Requirements:** OBS-29, OBS-30
+**Gap Closure:** Closes SWIFT-PERCEPTION-EXCLUDED from v1.0-MILESTONE-AUDIT.md
+**Canonical pattern references:** `/pfw-perception` (Perception API patterns), `/pfw-composable-architecture` (binding/scoping that depends on Perceptible)
+**Success Criteria** (what must be TRUE):
+  1. `WithPerceptionTracking` compiles and executes on Android (not gated by `#if canImport(SwiftUI) && !os(Android)`)
+  2. `Perceptible` protocol conformances in TCA (Store, etc.) resolve on Android
+  3. `_PerceptionLocals` thread-local storage functions correctly on Android
+  4. TCA binding helpers (`$store.property`, `@Bindable`) that depend on perception infrastructure work on Android
+**Plans:** 0/0 plans (not yet planned)
+
+### Phase 13: API Parity Gaps
+**Goal:** Implement Android equivalents for all non-deprecated, current TCA APIs that are currently gated out with `#if !os(Android)` and no alternative
+**Depends on:** Phase 12
+**Requirements:** Derived from PARITY-GAPS-IN-CURRENT-APIS audit gap (affects NAV-05, NAV-07, NAV-08, TCA-25 and others)
+**Gap Closure:** Closes PARITY-GAPS-IN-CURRENT-APIS from v1.0-MILESTONE-AUDIT.md
+**Canonical pattern references:** `/pfw-composable-architecture` (SwitchStore, CaseLet, ViewActionSending), `/pfw-swift-navigation` (fullScreenCover, popover, NavigationStack path binding)
+**Success Criteria** (what must be TRUE):
+  1. `SwitchStore` / `CaseLet` enum-driven navigation renders on Android
+  2. `IfLetStore(then:else:)` else branch renders on Android
+  3. `ViewActionSending.send(_:animation:)` compiles on Android (animation parameter may be no-op)
+  4. `fullScreenCover` and `popover` presentation work on Android (via skip-fuse-ui equivalents)
+  5. `NavigationStack` programmatic push via path binding works bidirectionally on Android
+  6. `TextState`/`ButtonState` rendering preserves bold, italic, color on Android (or documents known limitations)
+**Plans:** 0/0 plans (not yet planned)
+
+### Phase 14: Android Verification & Requirements Reset
+**Goal:** Run the full test suite on Android, re-verify all 169 pending requirements against actual Android test results, and update traceability to reflect evidence-backed status
+**Depends on:** Phase 13
+**Requirements:** All 169 requirements currently in Pending status (re-verification phase)
+**Gap Closure:** Closes REQUIREMENTS-INTEGRITY from v1.0-MILESTONE-AUDIT.md
+**Success Criteria** (what must be TRUE):
+  1. `skip android test` runs successfully for both fuse-library and fuse-app with non-zero Kotlin test counts
+  2. Android emulator validation completed for observation bridge, TCA Store, navigation, and database features
+  3. All requirements with passing Android test evidence re-marked `[x]` with `Complete` status in traceability table
+  4. Requirements that cannot pass on Android documented with rationale and tracked as known limitations
+  5. Re-audit via `/gsd:audit-milestone` passes with no critical gaps
+**Plans:** 0/0 plans (not yet planned)
