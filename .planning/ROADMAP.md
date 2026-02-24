@@ -154,7 +154,7 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 | 7. Integration Testing & Documentation | 4/4 | Complete    | 2026-02-23 |
 | 8. PFW Skill Alignment | 5/5 | Complete | 2026-02-23 |
 | 9. Post-Audit Cleanup | 4/4 | Complete | 2026-02-23 |
-| 10. skip-fuse-ui Integration & Audit | 6/6 | Complete   | 2026-02-24 |
+| 10. skip-fuse-ui Integration & Audit | 8/8 | Complete   | 2026-02-24 |
 
 ### Phase 8: PFW Skill Alignment
 
@@ -210,7 +210,7 @@ Plans:
   5. Makefile updated with smart defaults (both examples, both platforms)
   6. Presentation dismiss (`@Dependency(\.dismiss)`) status resolved on Android
   7. Roadmap updated with rescoped phase; Phase 11 removed
-**Plans:** 7 plans (6 complete, 1 pending)
+**Plans:** 8 plans (all complete)
 
 Plans:
 - [x] 10-01-PLAN.md (wave 1) — CLAUDE.md + Makefile updates: gotchas, env vars, smart defaults ✓ 2026-02-24
@@ -219,4 +219,5 @@ Plans:
 - [x] 10-04-PLAN.md (wave 3) — Gap fixes + tests: implement fixes from gap report, verify dismiss, Android build ✓ 2026-02-24
 - [x] 10-05-PLAN.md (wave 4) — Roadmap update + cleanup: update ROADMAP, STATE, REQUIREMENTS ✓ 2026-02-24
 - [x] 10-06-PLAN.md (gap closure) — Apply CLAUDE.md + Makefile changes that were planned but never written to disk; correct STATE.md ✓ 2026-02-24
-- [ ] 10-07-PLAN.md (gap closure) — Fix XCSkipTests.testSkipModule failure in fuse-library: replace XCGradleHarness with JUnit results stub
+- [x] 10-07-PLAN.md (gap closure) — Fix XCSkipTests.testSkipModule failure in fuse-library: replace XCGradleHarness with JUnit results stub ✓ 2026-02-24
+- [x] 10-08-PLAN.md (gap closure) — Administrative closure: 10-07 SUMMARY, STATE.md/ROADMAP corrections, known-limitation documentation ✓ 2026-02-24
