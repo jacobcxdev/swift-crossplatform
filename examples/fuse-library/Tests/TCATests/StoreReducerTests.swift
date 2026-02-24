@@ -1,4 +1,7 @@
 #if !SKIP
+#if canImport(SwiftUI)
+import SwiftUI
+#endif
 import ComposableArchitecture
 import CustomDump
 import Foundation
@@ -340,5 +343,50 @@ struct StoreReducerTests {
         let result = store.withState { $0.count }
         #expect(result == 99)
     }
+
+    // MARK: - Store.send with animation (Plan 16-02)
+
+    #if canImport(SwiftUI)
+    /// Tests that Store.send(_:animation:) compiles and routes correctly.
+    /// This exercises the withTransaction chain: send(animation:) -> Transaction(animation:) -> withTransaction.
+    @Test func testSendWithAnimation() {
+        let store = Store(initialState: Counter.State()) {
+            Counter()
+        }
+        // send with animation — verify state changes correctly
+        store.send(.increment, animation: .default)
+        #expect(store.withState(\.count) == 1)
+
+        // send with nil animation
+        store.send(.increment, animation: nil)
+        #expect(store.withState(\.count) == 2)
+
+        // send with transaction
+        store.send(.increment, transaction: Transaction(animation: .easeIn))
+        #expect(store.withState(\.count) == 3)
+    }
+
+    /// Tests that Effect.animation() compiles and executes.
+    @Test func testEffectAnimation() async {
+        let store = Store<SyncEffectFeature.State, SyncEffectFeature.Action>(
+            initialState: SyncEffectFeature.State()
+        ) {
+            Reduce<SyncEffectFeature.State, SyncEffectFeature.Action> { state, action in
+                switch action {
+                case .tap:
+                    state.count += 1
+                    return Effect<SyncEffectFeature.Action>.send(.doubled).animation(.default)
+                case .doubled:
+                    state.doubled = true
+                    return .none
+                }
+            }
+        }
+        let task = store.send(.tap)
+        await task.finish()
+        #expect(store.withState(\.count) == 1)
+        #expect(store.withState(\.doubled) == true)
+    }
+    #endif
 }
 #endif

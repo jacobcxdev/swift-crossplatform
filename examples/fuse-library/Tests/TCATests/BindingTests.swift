@@ -6,6 +6,56 @@ import Testing
 // MARK: - Test Reducers (file scope — macros can't attach to local types)
 
 @Reducer
+struct IfLetChild {
+    @ObservableState
+    struct State: Equatable {
+        var value: Int = 0
+    }
+    enum Action {
+        case increment
+    }
+    var body: some ReducerOf<Self> {
+        Reduce { state, action in
+            switch action {
+            case .increment:
+                state.value += 1
+                return .none
+            }
+        }
+    }
+}
+
+@Reducer
+struct IfLetParent {
+    @ObservableState
+    struct State: Equatable {
+        @Presents var child: IfLetChild.State?
+    }
+    enum Action {
+        case showChild
+        case hideChild
+        case child(PresentationAction<IfLetChild.Action>)
+    }
+    var body: some ReducerOf<Self> {
+        Reduce { state, action in
+            switch action {
+            case .showChild:
+                state.child = IfLetChild.State()
+                return .none
+            case .hideChild:
+                state.child = nil
+                return .none
+            case .child:
+                return .none
+            }
+        }
+        .ifLet(\.$child, action: \.child) {
+            IfLetChild()
+        }
+    }
+}
+
+@Reducer
 struct BindingFeature {
     @ObservableState
     struct State: Equatable {
@@ -171,6 +221,37 @@ struct BindingTests {
             store.count = i
         }
         #expect(store.withState(\.count) == 99)
+    }
+
+    // MARK: - IfLetStore alternative pattern (@Observable + @Presents)
+
+    /// Tests the modern @Observable alternative to the deprecated IfLetStore pattern.
+    /// IfLetStore is deprecated and this test proves the recommended replacement
+    /// (@Presents + .ifLet) works on both platforms.
+    @Test func testIfLetStoreAlternativePattern() async {
+        let store = TestStore(initialState: IfLetParent.State()) {
+            IfLetParent()
+        }
+
+        // Child starts nil
+        store.assert { state in
+            #expect(state.child == nil)
+        }
+
+        // Show child — sets child non-nil
+        await store.send(.showChild) { state in
+            state.child = IfLetChild.State()
+        }
+
+        // Interact with child via presented action
+        await store.send(.child(.presented(.increment))) { state in
+            state.child?.value = 1
+        }
+
+        // Hide child — sets child nil
+        await store.send(.hideChild) { state in
+            state.child = nil
+        }
     }
 }
 #endif
