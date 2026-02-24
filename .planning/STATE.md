@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 15 complete — all 3 plans done (binding-driven push, JVM type erasure, dismiss timing).
+**Current focus:** Phase 16 in progress — API parity completion (withTransaction, guard removal, animation paths).
 
 ## Current Position
 
-Phase: 15 of 17 (NavigationStack Android Robustness) -- COMPLETE
-Plan: 3 of 3 in current phase -- all plans complete
-Status: Phase 15 complete. Plan 15-02 added type-discriminating destination key for multi-destination NavigationStack (NavigationDestinationKeyProviding protocol + _typeName). 267 Darwin tests pass.
-Last activity: 2026-02-24 -- Completed 15-02 (JVM type erasure fix)
+Phase: 16 of 17 (API Parity Completion)
+Plan: 1 of 3 in current phase -- 16-01 complete
+Status: Plan 16-01 complete. withTransaction delegates to withAnimation on Android. ButtonState.animatedSend and TextState rich text modifiers fully enabled.
+Last activity: 2026-02-24 -- Completed 16-01 (withTransaction and swift-navigation guard removal)
 
-Progress: [########--] 80%
+Progress: [########=-] 85%
 
 ## Performance Metrics
 
@@ -68,6 +68,7 @@ Progress: [########--] 80%
 | Phase 15 P01 | 5min | 1 tasks | 2 files |
 | Phase 15 P02 | 12min | 1 tasks | 3 files |
 | Phase 15 P03 | 15min | 1 tasks | 2 files |
+| Phase 16 P01 | 1min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -190,6 +191,8 @@ Recent decisions affecting current work:
 - [Phase 15]: 10-second timeouts removed entirely from fuse-app dismiss tests -- parent-driven dismiss via Effect.send fires synchronously
 - [Phase 15]: _typeName over String(describing:) for destination keys -- String(describing:) on nested types produces short names causing collisions
 - [Phase 15]: NavigationDestinationKeyProviding protocol in skip-fuse-ui with os(Android) conformance in TCA -- deployment target mismatch prevents canImport on Darwin
+- [Phase 16]: AlertState.swift and ConfirmationDialogState.swift had no Android guards to remove -- pure data types with no platform-conditional code
+- [Phase 16]: All #if canImport(SwiftUI) && !os(Android) guards in ButtonState and TextState changed uniformly to #if canImport(SwiftUI) -- no targeted inner guards needed
 
 ### Pending Todos
 
@@ -225,5 +228,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 15-02-PLAN.md (JVM type erasure fix -- phase 15 all plans complete)
-Resume file: .planning/phases/15-navigationstack-robustness/
+Stopped at: Completed 16-01-PLAN.md (withTransaction and swift-navigation guard removal)
+Resume file: .planning/phases/16-api-parity-completion/
