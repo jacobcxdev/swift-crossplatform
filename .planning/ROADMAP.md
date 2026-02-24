@@ -296,4 +296,9 @@ Plans:
   3. All requirements with passing Android test evidence re-marked `[x]` with `Complete` status in traceability table
   4. Requirements that cannot pass on Android documented with rationale and tracked as known limitations
   5. Re-audit via `/gsd:audit-milestone` passes with no critical gaps
-**Plans:** 0/0 plans (not yet planned)
+**Plans:** 3 plans in 3 waves
+
+Plans:
+- [ ] 14-01-PLAN.md -- Run Android + Darwin test suites, capture output, create requirement evidence map
+- [ ] 14-02-PLAN.md -- Update REQUIREMENTS.md traceability with evidence-backed statuses and known limitations
+- [ ] 14-03-PLAN.md -- Final verification, resolve remaining gaps, STATE.md/ROADMAP.md closure
