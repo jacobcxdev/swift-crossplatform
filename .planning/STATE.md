@@ -57,6 +57,7 @@ Progress: [██████████] 100%
 | Phase 11 P01 | 6min | 2 tasks | 29 files |
 | Phase 11 P02 | 12min | 2 tasks | 14 files |
 | Phase 11 P03 | 8min | 2 tasks | 3 files |
+| Phase 11 P03 | 8min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -152,6 +153,8 @@ Recent decisions affecting current work:
 - [Phase 11]: Skipstone symlink root cause: local fork paths (../../forks/) resolve relative to skipstone output dir, not source tree -- unfixable without upstream skipstone changes
 - [Phase 11]: TEST-10/TEST-11 verified via indirect evidence -- 253 Android emulator tests exercise observation bridge through TCA Store; dedicated stress/bridge tests are #if !SKIP gated
 - [Phase 11]: skip android test is the canonical Android test pipeline (223 fuse-library + 30 fuse-app tests); skip test (Robolectric) blocked by skipstone symlink issue
+- [Phase 11]: TestUtilities shared target created in both fuse-library and fuse-app -- deduplicates helpers (hasLocalForkPaths, isJava, isAndroid, isRobolectric) across test targets
+- [Phase 11]: XCSkipTests uses pre-emptive XCTSkipIf(hasLocalForkPaths()) before runGradleTests() -- runGradleTests() uses XCTFail internally (not throw), so do/catch pattern was ineffective
 
 ### Pending Todos
 
@@ -187,5 +190,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 11-03-PLAN.md (Android verification). Phase 11 complete (3/3 plans).
+Stopped at: Phase 11 complete (3/3 plans + post-execution TestUtilities fix). All 257 tests pass (227 fuse-library + 30 fuse-app). Next: Phase 12 (Swift Perception Android Port).
 Resume file: .planning/phases/12-*/12-01-PLAN.md (next phase)
