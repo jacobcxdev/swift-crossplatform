@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 15 of 17 (NavigationStack Android Robustness)
-Plan: 1 of 3 in current phase (15-01 binding-driven push fix complete)
-Status: Plan 15-01 complete. Binding-driven push fixed in _TCANavigationStack adapter. 3 new tests added. 260 Darwin tests pass.
-Last activity: 2026-02-24 -- Completed 15-01 (binding-driven push fix + tests)
+Plan: 3 of 3 in current phase (15-03 dismiss timing tests + timeout cleanup)
+Status: Plan 15-03 complete. 4 new dismiss timing tests added. 10-second timeout workarounds removed from fuse-app. Android root cause identified as OpenCombine Concatenate. 264+30 tests pass.
+Last activity: 2026-02-24 -- Completed 15-03 (dismiss timing tests + timeout cleanup)
 
 Progress: [########--] 80%
 
@@ -66,6 +66,7 @@ Progress: [########--] 80%
 | Phase 14 P03 | 3min | 2 tasks | 2 files |
 | Phase 14 P04 | 12min | 2 tasks | 4 files |
 | Phase 15 P01 | 5min | 1 tasks | 2 files |
+| Phase 15 P03 | 15min | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -182,6 +183,9 @@ Recent decisions affecting current work:
 - [Phase 14]: OpenCombine .prefix(N) completion doesn't fire on Android (mutation coalescing); use expectedFulfillmentCount pattern instead
 - [Phase 15]: Direct as? StackState<State>.Component cast on NavigationPath elements (SwiftHashable already unwrapped by skip-fuse-ui setData)
 - [Phase 15]: @_spi(Internals) import ComposableArchitecture + StackElementID integer literals for binding-driven push tests
+- [Phase 15]: Keep upstream Empty+Just concatenation in PresentationReducer/StackReducer -- works on Darwin; Android issue is in OpenCombine Concatenate (external dep)
+- [Phase 15]: Effect.run-based dismiss alternative not viable -- cancellableValue throws CancellationError regardless of task result when task is cancelled
+- [Phase 15]: 10-second timeouts removed entirely from fuse-app dismiss tests -- parent-driven dismiss via Effect.send fires synchronously
 
 ### Pending Todos
 
@@ -193,7 +197,7 @@ Recent decisions affecting current work:
 - **dismiss/openSettings dependency validation (Phase 7):** dismiss dependency validated at data layer in Phase 5 (DismissEffect + LockIsolated pattern). openSettings deferred to Phase 7 — requires active view hierarchy. (Source: Codex verifier gap #2, Phase 3 reconciliation)
 - **Android UI rendering validation (Phase 7):** Phase 5 Codex verifier flagged that NavigationStack, sheet, alert, dialog, .task tests validate data layer only, not Android Compose rendering. All UI rendering assertions deferred to Phase 7 integration testing with emulator. (Source: Codex verifier, Phase 5)
 - **Database observation wrapper-level testing (Phase 7):** Phase 6 Codex verifier flagged SD-09/SD-10/SD-11 tests use ValueObservation.start() directly, not @FetchAll/@FetchOne DynamicProperty wrappers. DynamicProperty.update() requires SwiftUI runtime (guarded out on Android). Wrapper-level integration testing deferred to Phase 7 with emulator. (Source: Codex verifier, Phase 6)
-- **Dismiss JNI timing (P2):** Dismiss mechanism is architecturally complete on Android (PresentationReducer wires on all platforms, DismissEffect has correct fallback). Integration tests show dismiss action delivery fails under full JNI effect pipeline timing. withKnownIssue wrappers in place. May require increased timeouts or explicit async bridging. (Source: 10-GAP-REPORT.md section F)
+- **Dismiss JNI timing (P2):** Dismiss mechanism is architecturally complete on Android (PresentationReducer wires on all platforms, DismissEffect has correct fallback). Root cause identified in Phase 15-03: OpenCombine's Concatenate operator (external dependency) may not correctly chain cancellation-completion into suffix subscription across JNI. Effect.run alternative not viable (cancellableValue throws CancellationError regardless). withKnownIssue wrappers removed; 10-second timeouts removed. Fix requires OpenCombine fork or upstream fix. (Source: 10-GAP-REPORT.md section F, 15-03 investigation)
 - **JVM type erasure multi-destination risk (P2):** Single-destination NavigationStack is safe. Multi-destination apps where multiple navigationDestination(for:) calls register different StackState<X>.Component types would collide on JVM due to generic type erasure producing identical String(describing:) keys. Mitigation: type-discriminating destinationKey. Not blocking current apps. (Source: 10-GAP-REPORT.md section G)
 - **TCA Binding+Observation extensions on Android (P3):** 4 guard blocks in Binding+Observation.swift exclude binding observation extensions on Android. Enabling requires TCA to conditionally import SkipFuseUI types instead of SwiftUI types -- significant refactor. Not blocking TCA core functionality. (Source: 10-GAP-REPORT.md G6)
 - **TCA Alert/ConfirmationDialog observation extensions on Android (P3):** Alert+Observation.swift and ConfirmationDialog.swift observation extensions guarded on Android. Alert/dialog work via PresentationReducer path. (Source: 10-GAP-REPORT.md G7)
@@ -217,5 +221,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 15-01-PLAN.md (binding-driven push fix + 3 new tests)
+Stopped at: Completed 15-03-PLAN.md (dismiss timing tests + timeout cleanup)
 Resume file: .planning/phases/15-navigationstack-robustness/

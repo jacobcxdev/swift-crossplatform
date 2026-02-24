@@ -167,7 +167,7 @@ Note: Phases 12 and 13 could partially overlap once Phase 11 test infra is worki
 | 12. Swift Perception Android Port | 2/2 | Complete    | 2026-02-24 |
 | 13. API Parity Gaps | 2/2 | Complete    | 2026-02-24 |
 | 14. Android Verification & Requirements Reset | 4/4 | Complete    | 2026-02-24 |
-| 15. NavigationStack Android Robustness | 1/3 | In Progress|  |
+| 15. NavigationStack Android Robustness | 2/3 | In Progress|  |
 | 16. TCA API Parity Completion | 0/0 | Planned | - |
 | 17. Test Evidence & Infrastructure Hardening | 0/0 | Planned | - |
 
@@ -321,7 +321,7 @@ Plans:
   2. Multi-destination `NavigationStack` with multiple `navigationDestination(for:)` types resolves correctly on JVM without type erasure collisions
   3. `@Dependency(\.dismiss)` completes under full JNI effect pipeline timing on Android — `withKnownIssue` wrappers replaced with passing tests
   4. All three fixes validated by dedicated Android tests (not indirect evidence)
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 
 Plans:
 - [ ] 15-01-PLAN.md — Fix binding-driven push in _TCANavigationStack adapter (NAV-02, TCA-32)
