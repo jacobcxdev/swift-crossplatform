@@ -423,8 +423,8 @@ Which phases cover which requirements. Updated during roadmap creation. Evidence
 | SHR-06 | Phase 4 | Complete | DIRECT: sharedBindingMutationTriggersChange() passes on Android |
 | SHR-07 | Phase 4 | Complete | DIRECT: sharedKeypathProjection() passes on Android |
 | SHR-08 | Phase 4 | Complete | DIRECT: sharedOptionalUnwrapping() passes on Android |
-| SHR-09 | Phase 4 | Complete | CODE_VERIFIED: bidirectionalSync(), concurrentSharedMutations() pass on macOS; async sequence mechanism works on Android |
-| SHR-10 | Phase 4 | Complete | CODE_VERIFIED: bidirectionalSync() passes on macOS; OpenCombine compiles on Android; no Android runtime concern |
+| SHR-09 | Phase 4 | Complete | DIRECT: testPublisherValuesAsyncSequence(), testPublisherAndObservationBothWork() pass on Android via OpenCombine |
+| SHR-10 | Phase 4 | Complete | DIRECT: testSharedPublisher(), testSharedPublisherMultipleValues() pass on Android via OpenCombine |
 | SHR-11 | Phase 4 | Complete | DIRECT: doubleNotificationPrevention() passes on Android |
 | SHR-12 | Phase 4 | Complete | DIRECT: multipleSharedSameKeySynchronize() passes on Android |
 | SHR-13 | Phase 4 | Complete | DIRECT: childMutationVisibleInParent(), parentMutationVisibleInChild() pass on Android |

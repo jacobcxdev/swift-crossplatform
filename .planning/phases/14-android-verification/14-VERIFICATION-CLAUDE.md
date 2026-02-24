@@ -121,29 +121,25 @@ All commits cited in plan summaries exist in the git log:
 
 ### Gaps Summary
 
-**5 Darwin-only tests identified** — these tests pass on Darwin but do not transpile to Android, meaning the corresponding functionality has no Android test coverage:
+**Gaps 1-4 CLOSED (2026-02-24):** All 4 Combine publisher tests now run on Android via OpenCombine. SharedObservationTests.swift restructured: outer `#if !SKIP` removed, publisher tests converted to XCTest format with `#if canImport(Combine) || canImport(OpenCombine)` guard and `OpenCombineShim` import. SHR-09 and SHR-10 upgraded from CODE_VERIFIED to DIRECT.
+
+**1 remaining gap:**
 
 | # | Test Name | Category | Affected Requirements | Gap Description |
 |---|-----------|----------|----------------------|-----------------|
-| 1 | `publisherAndObservationBothWork()` | Combine | SHR-10 | Combine publisher + observation integration not tested on Android |
-| 2 | `publisherValuesAsyncSequence()` | Combine | SHR-10 | Combine publisher → AsyncSequence bridge not tested on Android |
-| 3 | `sharedPublisher()` | Combine | SHR-10 | `$shared.publisher` Combine API not tested on Android |
-| 4 | `sharedPublisherMultipleValues()` | Combine | SHR-10 | `$shared.publisher` multi-value stream not tested on Android |
-| 5 | `"TextState with formatting still contains original text"` | TextState | (none — cosmetic) | AttributedString formatting not available on Android; plain text works |
+| 5 | `"TextState with formatting still contains original text"` | TextState | (none -- cosmetic) | TextState formatting modifiers (bold, italic, font, foregroundColor) unavailable on Android. Blocker: `CGFloat` type ambiguity between Foundation and SkipSwiftUI prevents importing SkipSwiftUI in TextState.swift. All TextState types exist in SkipSwiftUI but the dependency graph creates type conflicts. Plain text extraction works correctly on Android. |
 
-**Impact:** SHR-10 (`$shared.publisher` Combine/OpenCombine publisher on Android) was classified CODE_VERIFIED but has zero Android test coverage — all 4 publisher tests are Darwin-only. The publisher functionality depends on OpenCombine which compiles on Android but has never been exercised by a transpiled test.
+**Impact:** Gap 5 is cosmetic -- no requirements are affected. TextState stores and extracts verbatim text correctly on Android. Rich text formatting is a rendering concern, not a data integrity issue.
 
-**Recommended fix:** Add Android-transpilable tests for `$shared.publisher` via OpenCombine, or reclassify SHR-10 as KNOWN_LIMITATION if OpenCombine publishers cannot be transpiled by skipstone.
+All five success criteria from ROADMAP.md are still satisfied:
 
-All five success criteria from ROADMAP.md are still satisfied (the gaps are within the evidence quality, not blocking criteria):
-
-1. `skip android test` ran on actual emulator-5554 with 251 fuse-library + 30 fuse-app Kotlin tests (both non-zero). SATISFIED.
+1. `skip android test` ran on actual emulator-5554 with 255 fuse-library + 30 fuse-app tests (both non-zero, up from 251 after adding 4 publisher tests). SATISFIED.
 2. Android emulator validation completed across all four feature areas (observation bridge, TCA Store, navigation, database). SATISFIED.
 3. All requirements with passing Android test evidence are marked `[x]` Complete with specific evidence citations in REQUIREMENTS.md traceability. SATISFIED.
 4. DEP-05 and NAV-16 documented in Known Limitations section with rationale ("no preview context on Android", "iOS 26+ platform-specific") and workarounds. SATISFIED.
-5. Zero UNVERIFIED requirements — every requirement has terminal status — making the project ready for `/gsd:audit-milestone`. SATISFIED.
+5. Zero UNVERIFIED requirements -- every requirement has terminal status -- making the project ready for `/gsd:audit-milestone`. SATISFIED.
 
 ---
 
-_Verified: 2026-02-24T07:30:00Z_
-_Verifier: Claude (gsd-verifier)_
+_Verified: 2026-02-24T07:30:00Z (initial), updated 2026-02-24T07:50:00Z (gaps 1-4 closed)_
+_Verifier: Claude (gsd-verifier, gsd-executor)_
