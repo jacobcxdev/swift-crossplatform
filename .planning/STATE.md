@@ -164,6 +164,8 @@ Recent decisions affecting current work:
 - [Phase 12]: ObservationStateRegistrar Perceptible methods stay gated on Android -- BridgeObservationRegistrar only accepts Observable subjects
 - [Phase 12]: Store+Observation.swift excluded on Android (canImport(SwiftUI) is false) -- Store already Perceptible via Store.swift #if !canImport(SwiftUI) block
 - [Phase 12]: Perception.Bindable stays gated on Android (depends on SwiftUI ObservedObject)
+- [Phase 13]: Android ViewActionSending overloads delegate to plain store.send(.view(action)) -- Store.send(_:animation:) also gated out on Android
+- [Phase 13]: SwitchParent.State drops Equatable -- @Presents with @Reducer enum destination prevents auto-synthesis
 - [Phase 13]: Reused SheetChildFeature across sheet/fullScreenCover/popover tests -- data-layer lifecycle is identical for all presentation types
 - [Phase 13]: TextState formatting tests (.bold/.italic) available on macOS; on Android modifiers unavailable but String(state:) still extracts plain text
 

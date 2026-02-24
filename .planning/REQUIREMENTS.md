@@ -70,13 +70,13 @@ Store, reducers, effects, and composition patterns on Android.
 - [ ] **TCA-22**: `$store.property.sending(\.action)` derives a binding that sends a specific action on mutation on Android
 - [ ] **TCA-23**: `store.scope(state:action:)` in `ForEach` renders list of child stores on Android
 - [ ] **TCA-24**: Optional scoping `store.scope(state: \.child, action: \.child)` renders conditional content on Android
-- [ ] **TCA-25**: `switch store.case { }` enum store switching renders correctly on Android (`@Reducer enum` + `.case`)
+- [x] **TCA-25**: `switch store.case { }` enum store switching renders correctly on Android (`@Reducer enum` + `.case`)
 - [ ] **TCA-26**: `@Dependency(\.dismiss) var dismiss` -- `await dismiss()` causes presenting feature to pop/dismiss on Android
 - [ ] **TCA-27**: `@Presents` macro synthesizes property wrapper accessors for optional child state on Android
 - [ ] **TCA-28**: `PresentationAction.dismiss` -- parent reducer sets optional child state to `nil` on Android
 - [ ] **TCA-29**: `Reducer.onChange(of:_:)` runs nested reducer when a derived value changes on Android
 - [ ] **TCA-30**: `Reducer._printChanges()` logs state diffs to console on Android
-- [ ] **TCA-31**: `@ViewAction(for:)` macro synthesizes `send(_:)` for view actions on Android
+- [x] **TCA-31**: `@ViewAction(for:)` macro synthesizes `send(_:)` for view actions on Android
 - [ ] **TCA-32**: `StackState<Element>` initializes, appends, and indexes by `StackElementID` on Android
 - [ ] **TCA-33**: `StackAction` (`.push`, `.popFrom`, `.element`) routes through `forEach` on Android
 - [ ] **TCA-34**: `@ReducerCaseEphemeral` marks enum reducer case as ephemeral (alert/dialog) on Android
@@ -401,10 +401,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TCA-22 | Phase 4 | Pending |
 | TCA-23 | Phase 4 | Pending |
 | TCA-24 | Phase 4 | Pending |
-| TCA-25 | Phase 4 | Pending |
+| TCA-25 | Phase 4 | Complete |
 | TCA-29 | Phase 4 | Pending |
 | TCA-30 | Phase 4 | Pending |
-| TCA-31 | Phase 4 | Pending |
+| TCA-31 | Phase 4 | Complete |
 | SHR-01 | Phase 4 | Pending |
 | SHR-02 | Phase 4 | Pending |
 | SHR-03 | Phase 4 | Pending |
