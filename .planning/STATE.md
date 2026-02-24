@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** All phases complete. Project ready for milestone re-audit.
+**Current focus:** Phase 15 — NavigationStack Android robustness (binding-driven push, JVM type erasure, dismiss timing).
 
 ## Current Position
 
-Phase: 14 of 14 (Android Verification & Requirements Reset) -- COMPLETE
-Plan: 4 of 4 in current phase (gap closure plan 14-04 added and completed)
-Status: Phase 14 complete. All 159 pending requirements re-verified. 182 Complete, 2 Known Limitation. SHR-09/SHR-10 upgraded to DIRECT evidence via Android publisher tests.
-Last activity: 2026-02-24 -- Completed 14-04 gap closure (publisher tests, TextState formatting blocker documented)
+Phase: 15 of 17 (NavigationStack Android Robustness)
+Plan: 1 of 3 in current phase (15-01 binding-driven push fix complete)
+Status: Plan 15-01 complete. Binding-driven push fixed in _TCANavigationStack adapter. 3 new tests added. 260 Darwin tests pass.
+Last activity: 2026-02-24 -- Completed 15-01 (binding-driven push fix + tests)
 
-Progress: [##########] 100%
+Progress: [########--] 80%
 
 ## Performance Metrics
 
@@ -65,6 +65,7 @@ Progress: [##########] 100%
 | Phase 14 P03 | 3min | 2 tasks | 2 files |
 | Phase 14 P03 | 3min | 2 tasks | 2 files |
 | Phase 14 P04 | 12min | 2 tasks | 4 files |
+| Phase 15 P01 | 5min | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -179,6 +180,8 @@ Recent decisions affecting current work:
 - [Phase 14]: OpenCombineShim import pattern matches swift-sharing library; canImport(Combine) || canImport(OpenCombine) guard for cross-platform publisher tests
 - [Phase 14]: TextState formatting modifiers NOT enabled on Android -- CGFloat ambiguity between Foundation and SkipSwiftUI prevents importing SkipSwiftUI in TextState.swift
 - [Phase 14]: OpenCombine .prefix(N) completion doesn't fire on Android (mutation coalescing); use expectedFulfillmentCount pattern instead
+- [Phase 15]: Direct as? StackState<State>.Component cast on NavigationPath elements (SwiftHashable already unwrapped by skip-fuse-ui setData)
+- [Phase 15]: @_spi(Internals) import ComposableArchitecture + StackElementID integer literals for binding-driven push tests
 
 ### Pending Todos
 
@@ -214,5 +217,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 14-04-PLAN.md (gap closure: publisher tests Android-transpilable, TextState blocker documented)
-Resume file: .planning/phases/14-android-verification/
+Stopped at: Completed 15-01-PLAN.md (binding-driven push fix + 3 new tests)
+Resume file: .planning/phases/15-navigationstack-robustness/
