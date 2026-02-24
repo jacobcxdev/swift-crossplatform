@@ -1,5 +1,5 @@
 #if !SKIP
-import ComposableArchitecture
+@_spi(Internals) import ComposableArchitecture
 import SwiftUI
 import Testing
 
@@ -229,6 +229,71 @@ struct NavigationStackTests {
         // Verify the final element is the newly pushed one
         let finalElement = store.state.path[id: store.state.path.ids.last!]
         #expect(finalElement?[case: \.detail]?.title == "D")
+    }
+
+    // MARK: - Binding-Driven Push Tests (NAV-02, TCA-32)
+
+    @Test
+    func testBindingDrivenPush() {
+        // Validates binding-driven push: dispatching .push(id:state:) via the stack action
+        // path grows the navigation stack with the correct element.
+        // This is the same action the _TCANavigationStack adapter dispatches when
+        // NavigationLink(state:) appends a Component to the NavigationPath binding.
+        let store = Store(initialState: AppFeature.State()) { AppFeature() }
+
+        let id: StackElementID = 0
+        let detailState = DetailFeature.State(title: "Binding Push")
+        let pathState = AppFeaturePath.State.detail(detailState)
+
+        store.send(.path(.push(id: id, state: pathState)))
+        #expect(store.state.path.count == 1)
+
+        // Verify the pushed element has correct id and state
+        #expect(store.state.path.ids.first == id)
+        #expect(store.state.path[id: id]?[case: \.detail]?.title == "Binding Push")
+    }
+
+    @Test
+    func testBindingDrivenPushAndPop() {
+        // Regression guard: push via .push action, then pop via .popFrom — both directions
+        // must work correctly with the binding-driven push fix in place.
+        let store = Store(initialState: AppFeature.State()) { AppFeature() }
+
+        let id: StackElementID = 0
+        let pathState = AppFeaturePath.State.detail(DetailFeature.State(title: "Push Then Pop"))
+
+        // Push via binding-driven path
+        store.send(.path(.push(id: id, state: pathState)))
+        #expect(store.state.path.count == 1)
+        #expect(store.state.path[id: id]?[case: \.detail]?.title == "Push Then Pop")
+
+        // Pop via .popFrom — same action the adapter dispatches on path shrink
+        store.send(.path(.popFrom(id: id)))
+        #expect(store.state.path.count == 0)
+    }
+
+    @Test
+    func testMultipleSequentialPushes() {
+        // Validates multiple sequential binding-driven pushes each produce distinct path entries
+        // with correct element IDs and states.
+        let store = Store(initialState: AppFeature.State()) { AppFeature() }
+
+        let id1: StackElementID = 0
+        let id2: StackElementID = 1
+        let id3: StackElementID = 2
+
+        store.send(.path(.push(id: id1, state: .detail(DetailFeature.State(title: "First")))))
+        store.send(.path(.push(id: id2, state: .detail(DetailFeature.State(title: "Second")))))
+        store.send(.path(.push(id: id3, state: .detail(DetailFeature.State(title: "Third")))))
+
+        #expect(store.state.path.count == 3)
+
+        // Verify all three entries are distinct and in order
+        let ids = Array(store.state.path.ids)
+        #expect(ids == [id1, id2, id3])
+        #expect(store.state.path[id: id1]?[case: \.detail]?.title == "First")
+        #expect(store.state.path[id: id2]?[case: \.detail]?.title == "Second")
+        #expect(store.state.path[id: id3]?[case: \.detail]?.title == "Third")
     }
 
     // MARK: - Modern API Usage (NAV-16)
