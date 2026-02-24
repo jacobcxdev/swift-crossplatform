@@ -154,7 +154,7 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 | 7. Integration Testing & Documentation | 4/4 | Complete    | 2026-02-23 |
 | 8. PFW Skill Alignment | 5/5 | Complete | 2026-02-23 |
 | 9. Post-Audit Cleanup | 4/4 | Complete | 2026-02-23 |
-| 10. skip-fuse-ui Integration & Audit | 6/6 | Complete   | 2026-02-24 |
+| 10. skip-fuse-ui Integration & Audit | 6/6 | Complete    | 2026-02-24 |
 
 ### Phase 8: PFW Skill Alignment
 
@@ -198,7 +198,8 @@ Plans:
 ### Phase 10: skip-fuse-ui Fork Integration & Cross-Fork Audit
 **Goal:** Resolve SPM dependency identity conflicts, perform comprehensive audit of all fork modifications against skip-fuse-ui counterparts, fix all gaps found, verify cross-platform parity, and update project documentation. Absorbs originally-proposed Phase 11 (Presentation Dismiss on Android).
 **Depends on:** Phase 9
-**Requirements:** NAV-01, NAV-02, NAV-03, TCA-32, TCA-33 (strengthening existing Complete status from iOS-only to cross-platform)
+**Requirements:** NAV-01, NAV-02, NAV-03, TCA-32, TCA-33
+> Note: Strengthening existing Complete status from iOS-only to cross-platform
 **Gap Closure:** Closes M1-ANDROID-NAV-STACK (integration), M2-ANDROID-DISMISS (integration), Contacts deep navigation flow (E2E)
 **Canonical pattern references:** `/pfw-composable-architecture` (NavigationStack path binding, PresentationAction.dismiss), `/pfw-swift-navigation` (path-driven navigation, dismiss dependency)
 **Success Criteria** (what must be TRUE):
