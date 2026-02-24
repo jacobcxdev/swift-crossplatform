@@ -46,29 +46,34 @@ let package = Package(
         ], resources: [.process("Resources")], plugins: [.plugin(name: "skipstone", package: "skip")]),
         // Foundation library tests (Phase 2)
         .testTarget(name: "FoundationTests", dependencies: [
+            .product(name: "SkipTest", package: "skip"),
             .product(name: "CasePaths", package: "swift-case-paths"),
             .product(name: "IdentifiedCollections", package: "swift-identified-collections"),
             .product(name: "CustomDump", package: "swift-custom-dump"),
             .product(name: "IssueReporting", package: "xctest-dynamic-overlay"),
             .product(name: "IssueReportingTestSupport", package: "xctest-dynamic-overlay"),
-        ]),
+        ], plugins: [.plugin(name: "skipstone", package: "skip")]),
         // TCA core tests (Phase 3 + 4 state/bindings + Phase 7 TestStore)
         .testTarget(name: "TCATests", dependencies: [
+            .product(name: "SkipTest", package: "skip"),
             .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             .product(name: "DependenciesTestSupport", package: "swift-dependencies"),
-        ]),
+        ], plugins: [.plugin(name: "skipstone", package: "skip")]),
         // Sharing tests (Phase 4)
         .testTarget(name: "SharingTests", dependencies: [
+            .product(name: "SkipTest", package: "skip"),
             .product(name: "Sharing", package: "swift-sharing"),
-        ]),
+        ], plugins: [.plugin(name: "skipstone", package: "skip")]),
         // Navigation tests (Phase 5)
         .testTarget(name: "NavigationTests", dependencies: [
+            .product(name: "SkipTest", package: "skip"),
             .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-        ]),
+        ], plugins: [.plugin(name: "skipstone", package: "skip")]),
         // Database tests (Phase 6)
         .testTarget(name: "DatabaseTests", dependencies: [
+            .product(name: "SkipTest", package: "skip"),
             .product(name: "SQLiteData", package: "sqlite-data"),
             .product(name: "DependenciesTestSupport", package: "swift-dependencies"),
-        ]),
+        ], plugins: [.plugin(name: "skipstone", package: "skip")]),
     ]
 )
