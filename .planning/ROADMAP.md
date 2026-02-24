@@ -160,8 +160,8 @@ Note: Phases 12 and 13 could partially overlap once Phase 11 test infra is worki
 | 8. PFW Skill Alignment | 5/5 | Complete | 2026-02-23 |
 | 9. Post-Audit Cleanup | 4/4 | Complete | 2026-02-23 |
 | 10. skip-fuse-ui Integration & Audit | 8/8 | Complete    | 2026-02-24 |
-| 11. Android Test Infrastructure | 3/3 | Complete | 2026-02-24 |
-| 12. Swift Perception Android Port | 0/0 | Not Started | - |
+| 11. Android Test Infrastructure | 3/3 | Complete   | 2026-02-24 |
+| 12. Swift Perception Android Port | 0/2 | Planned | - |
 | 13. API Parity Gaps | 0/0 | Not Started | - |
 | 14. Android Verification & Requirements Reset | 0/0 | Not Started | - |
 
@@ -261,7 +261,11 @@ Plans:
   2. `Perceptible` protocol conformances in TCA (Store, etc.) resolve on Android
   3. `_PerceptionLocals` thread-local storage functions correctly on Android
   4. TCA binding helpers (`$store.property`, `@Bindable`) that depend on perception infrastructure work on Android
-**Plans:** 0/0 plans (not yet planned)
+**Plans:** 2 plans in 2 waves
+
+Plans:
+- [ ] 12-01-PLAN.md — swift-perception fork: PerceptionRegistrar verification + WithPerceptionTracking Android passthrough (OBS-29, OBS-30)
+- [ ] 12-02-PLAN.md — TCA fork: ObservableState Perceptible inheritance on Android + full test verification (OBS-29, OBS-30)
 
 ### Phase 13: API Parity Gaps
 **Goal:** Implement Android equivalents for all non-deprecated, current TCA APIs that are currently gated out with `#if !os(Android)` and no alternative
