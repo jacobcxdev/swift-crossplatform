@@ -5,21 +5,21 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 12 -- Swift Perception Android port (gap closure phases 11-14).
+**Current focus:** Phase 13 -- API Parity Gaps (gap closure phases 11-14).
 
 ## Current Position
 
-Phase: 12 of 14 (Swift Perception Android) -- COMPLETE
+Phase: 13 of 14 (API Parity Gaps) -- IN PROGRESS
 Plan: 2 of 2 in current phase (all complete)
-Status: Phase 12 complete. PerceptionRegistrar verified, WithPerceptionTracking Android passthrough added, ObservableState Perceptible inheritance enabled on Android.
-Last activity: 2026-02-24 -- Completed 12-02 (ObservableState Perceptible inheritance + full test verification).
+Status: Phase 13 plan 02 complete. Presentation parity (sheet/fullScreenCover/popover) and TextState/ButtonState data-layer tests added and passing.
+Last activity: 2026-02-24 -- Completed 13-02 (presentation parity + TextState/ButtonState tests).
 
 Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 29
+- Total plans completed: 31
 - Average duration: ~9min
 - Total execution time: ~4.1 hours
 
@@ -59,6 +59,8 @@ Progress: [██████████] 100%
 | Phase 11 P03 | 8min | 2 tasks | 3 files |
 | Phase 11 P03 | 8min | 2 tasks | 4 files |
 | Phase 12 P01 | 2min | 2 tasks | 1 files |
+| Phase 13 P01 | 3min | 2 tasks | 2 files |
+| Phase 13 P02 | 2min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -162,6 +164,8 @@ Recent decisions affecting current work:
 - [Phase 12]: ObservationStateRegistrar Perceptible methods stay gated on Android -- BridgeObservationRegistrar only accepts Observable subjects
 - [Phase 12]: Store+Observation.swift excluded on Android (canImport(SwiftUI) is false) -- Store already Perceptible via Store.swift #if !canImport(SwiftUI) block
 - [Phase 12]: Perception.Bindable stays gated on Android (depends on SwiftUI ObservedObject)
+- [Phase 13]: Reused SheetChildFeature across sheet/fullScreenCover/popover tests -- data-layer lifecycle is identical for all presentation types
+- [Phase 13]: TextState formatting tests (.bold/.italic) available on macOS; on Android modifiers unavailable but String(state:) still extracts plain text
 
 ### Pending Todos
 
@@ -197,5 +201,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Phase 12 complete. Both plans executed and verified (triple verification: Claude + Gemini passed). Next: Phase 13 (API Parity Gaps).
-Resume file: .planning/phases/13-api-parity-gaps/
+Stopped at: Completed 13-02-PLAN.md (presentation parity + TextState/ButtonState tests). Phase 13 plan 02 of 02 complete.
+Resume file: .planning/phases/13-api-parity/

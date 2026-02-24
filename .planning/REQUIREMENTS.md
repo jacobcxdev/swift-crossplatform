@@ -126,10 +126,10 @@ Navigation patterns and presentation lifecycle on Android.
 - [ ] **NAV-02**: Path append pushes a new destination onto the navigation stack on Android
 - [ ] **NAV-03**: Path removeLast pops the top destination from the navigation stack on Android
 - [ ] **NAV-04**: `navigationDestination(item:)` with binding pushes destination on Android
-- [ ] **NAV-05**: `.sheet(item: $store.scope(...))` presents modal content on Android
+- [x] **NAV-05**: `.sheet(item: $store.scope(...))` presents modal content on Android
 - [ ] **NAV-06**: `.sheet` `onDismiss` closure fires when sheet is dismissed on Android
-- [ ] **NAV-07**: `.popover(item: $store.scope(...))` displays popover on Android
-- [ ] **NAV-08**: `.fullScreenCover(item: $store.scope(...))` presents full-screen content on Android
+- [x] **NAV-07**: `.popover(item: $store.scope(...))` displays popover on Android
+- [x] **NAV-08**: `.fullScreenCover(item: $store.scope(...))` presents full-screen content on Android
 - [ ] **NAV-09**: `.alert` with `AlertState` renders alert with title, message, and buttons on Android
 - [ ] **NAV-10**: Alert buttons with roles (`.destructive`, `.cancel`) render correctly on Android
 - [ ] **NAV-11**: `.confirmationDialog` with `ConfirmationDialogState` renders action sheet on Android
@@ -423,10 +423,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | NAV-02 | Phase 5 | Pending |
 | NAV-03 | Phase 5 | Pending |
 | NAV-04 | Phase 5 | Pending |
-| NAV-05 | Phase 5 | Pending |
+| NAV-05 | Phase 5 | Complete |
 | NAV-06 | Phase 5 | Pending |
-| NAV-07 | Phase 5 | Pending |
-| NAV-08 | Phase 5 | Pending |
+| NAV-07 | Phase 5 | Complete |
+| NAV-08 | Phase 5 | Complete |
 | NAV-09 | Phase 5 | Pending |
 | NAV-10 | Phase 5 | Pending |
 | NAV-11 | Phase 5 | Pending |

@@ -21,7 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 7: Integration Testing & Documentation** - End-to-end TCA app runs on both platforms; forks documented (completed 2026-02-22)
 - [x] **Phase 11: Android Test Infrastructure** - Fix blockers preventing Android test execution: xctest-dynamic-overlay imports, skipstone plugin on all test targets, canonical XCGradleHarness (completed 2026-02-24)
 - [x] **Phase 12: Swift Perception Android Port** - Fork swift-perception for Android; provide WithPerceptionTracking, Perceptible conformances TCA depends on (completed 2026-02-24)
-- [ ] **Phase 13: API Parity Gaps** - Implement Android equivalents for non-deprecated TCA APIs gated out without alternatives
+- [x] **Phase 13: API Parity Gaps** - Implement Android equivalents for non-deprecated TCA APIs gated out without alternatives (completed 2026-02-24)
 - [ ] **Phase 14: Android Verification & Requirements Reset** - Run full Android test suite, re-verify all 169 pending requirements against actual results
 
 ## Phase Details
@@ -162,7 +162,7 @@ Note: Phases 12 and 13 could partially overlap once Phase 11 test infra is worki
 | 10. skip-fuse-ui Integration & Audit | 8/8 | Complete    | 2026-02-24 |
 | 11. Android Test Infrastructure | 3/3 | Complete   | 2026-02-24 |
 | 12. Swift Perception Android Port | 2/2 | Complete    | 2026-02-24 |
-| 13. API Parity Gaps | 0/2 | Planned | - |
+| 13. API Parity Gaps | 2/2 | Complete   | 2026-02-24 |
 | 14. Android Verification & Requirements Reset | 0/0 | Not Started | - |
 
 ### Phase 8: PFW Skill Alignment
@@ -279,7 +279,7 @@ Plans:
   3. `fullScreenCover` and `popover` presentation data-layer lifecycle (present/interact/dismiss) works on Android via `$store.scope` binding
   4. `TextState`/`ButtonState` data structures preserve content on Android (rich text formatting drops to plain text -- documented limitation)
   5. Sheet presentation lifecycle verified at data layer via TestStore
-**Plans:** 2 plans in 1 wave
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 13-01-PLAN.md -- ViewActionSending animation no-op + store.case enum switching verification (TCA-25, TCA-31)
