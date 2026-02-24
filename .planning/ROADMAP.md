@@ -163,7 +163,7 @@ Note: Phases 12 and 13 could partially overlap once Phase 11 test infra is worki
 | 11. Android Test Infrastructure | 3/3 | Complete   | 2026-02-24 |
 | 12. Swift Perception Android Port | 2/2 | Complete    | 2026-02-24 |
 | 13. API Parity Gaps | 2/2 | Complete    | 2026-02-24 |
-| 14. Android Verification & Requirements Reset | 0/0 | Not Started | - |
+| 14. Android Verification & Requirements Reset | 1/3 | In Progress|  |
 
 ### Phase 8: PFW Skill Alignment
 
@@ -296,7 +296,7 @@ Plans:
   3. All requirements with passing Android test evidence re-marked `[x]` with `Complete` status in traceability table
   4. Requirements that cannot pass on Android documented with rationale and tracked as known limitations
   5. Re-audit via `/gsd:audit-milestone` passes with no critical gaps
-**Plans:** 3 plans in 3 waves
+**Plans:** 1/3 plans executed
 
 Plans:
 - [ ] 14-01-PLAN.md -- Run Android + Darwin test suites, capture output, create requirement evidence map
