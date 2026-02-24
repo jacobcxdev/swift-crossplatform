@@ -73,3 +73,8 @@
 [submodule "forks/skip-fuse"]
 	path = forks/skip-fuse
 	url = https://github.com/jacobcxdev/skip-fuse.git
+	branch = dev/swift-crossplatform
+[submodule "forks/swift-concurrency-extras"]
+	path = forks/swift-concurrency-extras
+	url = https://github.com/jacobcxdev/swift-concurrency-extras.git
+	branch = dev/swift-crossplatform

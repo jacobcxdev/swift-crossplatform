@@ -62,9 +62,24 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
 
 extension SharedKey where Self == FileStorageKey<IdentifiedArrayOf<Todo>>.Default {
     static var savedTodos: Self {
-        Self[.fileStorage(URL.applicationSupportDirectory.appending(component: "todos.json")), default: []]
+        Self[.fileStorage(_savedTodosURL), default: []]
     }
 }
+
+private let _savedTodosURL: URL = {
+    #if os(Android)
+    // On Android, applicationSupportDirectory requires bridge init (XDG_DATA_HOME).
+    // Fall back to tmp dir if bridge hasn't run yet (e.g. during tests).
+    if let url = try? FileManager.default.url(
+        for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true
+    ) {
+        return url.appending(component: "todos.json")
+    }
+    return FileManager.default.temporaryDirectory.appending(component: "todos.json")
+    #else
+    return URL.applicationSupportDirectory.appending(component: "todos.json")
+    #endif
+}()
 
 extension SharedKey where Self == InMemoryKey<Int>.Default {
     static var sessionActionCount: Self { Self[.inMemory("sessionActionCount"), default: 0] }
