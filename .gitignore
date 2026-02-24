@@ -1,14 +1,9 @@
-# Generated files
-.claude/settings.local.json
-.omc/
+# Claude Code
 **/CLAUDE.md
 !/CLAUDE.md
 
 # Local/confidential planning context
 .planning/local/
-
-# macOS
-.DS_Store
 
 # Swift Package Manager
 .build/
