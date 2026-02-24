@@ -34,7 +34,7 @@ patterns-established:
 requirements-completed: [NAV-01, NAV-02, NAV-03, TCA-32, TCA-33]
 
 # Metrics
-duration: 3min
+duration: 6min
 completed: 2026-02-24
 ---
 
@@ -60,8 +60,8 @@ completed: 2026-02-24
 
 Each task was committed atomically:
 
-1. **Task 1: Replace XCGradleHarness with JUnit results stub** - (committed by 10-07 executor)
-2. **Task 2: Verify android-build and update STATE.md** - (committed by 10-07 executor)
+1. **Task 1: Replace XCGradleHarness with JUnit results stub** - `24a3ddc` (fix)
+2. **Task 2: Verify android-build and update STATE.md** - no separate commit (STATE.md already updated by parallel 10-08 executor; android-build verified successfully)
 
 ## Files Created/Modified
 - `examples/fuse-library/Tests/ObservationTests/XCSkipTests.swift` - Replaced XCGradleHarness with JUnit results stub
@@ -85,6 +85,12 @@ None
 - `make test` passes all tests for both examples
 - `make android-build` succeeds for both examples
 - Pattern consistent with fuse-app XCSkipTests
+
+## Self-Check: PASSED
+
+- FOUND: 10-07-SUMMARY.md
+- FOUND: 24a3ddc (Task 1 commit)
+- FOUND: XCSkipTests.swift (modified file)
 
 ---
 *Phase: 10-navigationstack-path-android*
