@@ -1,3 +1,4 @@
+#if !SKIP
 import Foundation
 import Sharing
 import Testing
@@ -147,3 +148,4 @@ struct SharedPersistenceTests {
         #expect(value == "custom")
     }
 }
+#endif

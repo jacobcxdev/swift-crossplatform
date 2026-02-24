@@ -1,3 +1,4 @@
+#if !SKIP
 import CustomDump
 import Testing
 
@@ -123,3 +124,4 @@ enum Status: Equatable {
     #expect(output.contains("value: 42"))
     #expect(output.contains("label: \"test\""))
 }
+#endif

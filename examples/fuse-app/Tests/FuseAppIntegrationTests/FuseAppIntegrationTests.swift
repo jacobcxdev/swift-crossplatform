@@ -1,3 +1,4 @@
+#if !SKIP
 import ComposableArchitecture
 import CustomDump
 import Foundation
@@ -545,3 +546,4 @@ struct AppFeatureTests {
         #expect(store.state.todos.todos.count == 1)
     }
 }
+#endif

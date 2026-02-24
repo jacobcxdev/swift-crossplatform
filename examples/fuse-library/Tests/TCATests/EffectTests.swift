@@ -1,3 +1,4 @@
+#if !SKIP
 import ComposableArchitecture
 import Testing
 
@@ -317,3 +318,4 @@ struct EffectTests {
         #expect(store.withState(\.elapsed) == true)
     }
 }
+#endif

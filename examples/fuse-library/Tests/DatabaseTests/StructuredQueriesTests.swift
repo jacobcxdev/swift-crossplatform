@@ -1,3 +1,4 @@
+#if !SKIP
 import SQLiteData
 import Testing
 
@@ -488,3 +489,4 @@ struct StructuredQueriesTests {
         }
     }
 }
+#endif

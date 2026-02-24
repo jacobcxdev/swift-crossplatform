@@ -1,3 +1,4 @@
+#if !SKIP
 import Foundation
 import Observation
 import Sharing
@@ -134,3 +135,4 @@ struct SharedBindingTests {
         #expect(binding.wrappedValue == "fromShared")
     }
 }
+#endif

@@ -1,3 +1,4 @@
+#if !SKIP
 import ComposableArchitecture
 import SwiftUI
 import Testing
@@ -386,3 +387,4 @@ struct UIPatternTests {
         #expect(store.state.buttonBTapped == true)
     }
 }
+#endif

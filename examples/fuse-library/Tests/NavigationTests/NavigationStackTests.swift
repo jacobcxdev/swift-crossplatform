@@ -1,3 +1,4 @@
+#if !SKIP
 import ComposableArchitecture
 import SwiftUI
 import Testing
@@ -246,3 +247,4 @@ struct NavigationStackTests {
         #expect(Bool(true), "Modern NavigationStack(path:) API compiles successfully")
     }
 }
+#endif

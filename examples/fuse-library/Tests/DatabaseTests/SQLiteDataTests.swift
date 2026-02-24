@@ -1,3 +1,4 @@
+#if !SKIP
 import DependenciesTestSupport
 import SQLiteData
 import Testing
@@ -406,3 +407,4 @@ struct SQLiteDataTests {
         }
     }
 }
+#endif

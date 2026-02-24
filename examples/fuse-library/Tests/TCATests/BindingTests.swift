@@ -1,3 +1,4 @@
+#if !SKIP
 import ComposableArchitecture
 import CustomDump
 import Testing
@@ -172,3 +173,4 @@ struct BindingTests {
         #expect(store.withState(\.count) == 99)
     }
 }
+#endif

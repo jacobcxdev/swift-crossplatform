@@ -1,3 +1,4 @@
+#if !SKIP
 import ComposableArchitecture
 import CustomDump
 import Foundation
@@ -340,3 +341,4 @@ struct StoreReducerTests {
         #expect(result == 99)
     }
 }
+#endif

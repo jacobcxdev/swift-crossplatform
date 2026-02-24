@@ -1,3 +1,4 @@
+#if !SKIP
 import Foundation
 import IdentifiedCollections
 import Testing
@@ -80,3 +81,4 @@ struct User: Identifiable, Equatable, Codable {
     users[id: 1]?.name = "Alicia"
     #expect(users[id: 1]?.name == "Alicia")
 }
+#endif

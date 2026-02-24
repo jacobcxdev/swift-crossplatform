@@ -1,3 +1,4 @@
+#if !SKIP
 @_spi(Reflection) import CasePaths
 import ComposableArchitecture
 import Dependencies
@@ -542,3 +543,4 @@ private struct MergedEffectFeature {
         }
     }
 }
+#endif

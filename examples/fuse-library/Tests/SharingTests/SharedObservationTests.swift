@@ -1,3 +1,4 @@
+#if !SKIP
 #if canImport(Combine)
 import Combine
 #endif
@@ -173,3 +174,4 @@ struct SharedObservationTests {
         #expect(childShared.wrappedValue == "fromParent")
     }
 }
+#endif

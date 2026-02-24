@@ -1,3 +1,4 @@
+#if !SKIP
 import ComposableArchitecture
 import SwiftUI
 import Testing
@@ -444,3 +445,4 @@ struct NavigationTests {
         #expect(state.is(\.ignored))
     }
 }
+#endif

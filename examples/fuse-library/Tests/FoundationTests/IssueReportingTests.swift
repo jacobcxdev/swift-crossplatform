@@ -1,3 +1,4 @@
+#if !SKIP
 import IssueReporting
 import Testing
 
@@ -55,3 +56,4 @@ import Testing
         #expect(result == nil)
     }
 }
+#endif

@@ -1,3 +1,4 @@
+#if !SKIP
 import ComposableArchitecture
 import CustomDump
 import Dependencies
@@ -461,3 +462,4 @@ struct TestStoreTests {
         #expect(store.state.completed == false)
     }
 }
+#endif

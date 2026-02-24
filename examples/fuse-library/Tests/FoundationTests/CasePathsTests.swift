@@ -1,3 +1,4 @@
+#if !SKIP
 import CasePaths
 import Testing
 
@@ -119,3 +120,4 @@ enum TestEnum: Equatable {
     #expect(pathB.extract(from: .b("hello")) == "hello")
     #expect(pathB.extract(from: .a(1)) == nil)
 }
+#endif

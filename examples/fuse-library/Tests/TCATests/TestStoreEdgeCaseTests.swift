@@ -1,3 +1,4 @@
+#if !SKIP
 import ComposableArchitecture
 import Testing
 
@@ -181,3 +182,4 @@ struct TestStoreEdgeCaseTests {
         await store.finish()
     }
 }
+#endif

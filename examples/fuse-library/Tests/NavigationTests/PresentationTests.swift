@@ -1,3 +1,4 @@
+#if !SKIP
 import ComposableArchitecture
 import SwiftUI
 import Testing
@@ -352,3 +353,4 @@ struct PresentationTests {
         }
     }
 }
+#endif

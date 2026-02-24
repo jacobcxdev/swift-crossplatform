@@ -1,3 +1,4 @@
+#if !SKIP
 import ComposableArchitecture
 import Foundation
 import Testing
@@ -423,3 +424,4 @@ struct ObservableStateTests {
         #expect(store.withState(\.count) == 1)
     }
 }
+#endif
