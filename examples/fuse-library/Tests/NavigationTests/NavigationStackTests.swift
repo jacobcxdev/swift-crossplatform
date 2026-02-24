@@ -311,5 +311,108 @@ struct NavigationStackTests {
         // Verify the modern pattern types resolve correctly
         #expect(Bool(true), "Modern NavigationStack(path:) API compiles successfully")
     }
+
+    // MARK: - Multi-Destination Type Discrimination (TCA-32)
+
+    @Test
+    func testMultiDestinationTypeDiscrimination() {
+        // On JVM, generic type parameters are erased at runtime, so
+        // StackState<FeatureA.State>.Component and StackState<FeatureB.State>.Component
+        // would produce identical String(describing:) keys without the destinationKey fix.
+        // This test verifies that the destination keys are distinct.
+        let keyA = StackState<FeatureA.State>.Component.destinationKey
+        let keyB = StackState<FeatureB.State>.Component.destinationKey
+
+        #expect(keyA != keyB, "Destination keys must differ for different Element types")
+        // _typeName produces fully qualified names (e.g. "ModuleName.FeatureA.State")
+        #expect(keyA.contains("FeatureA"), "Key for FeatureA should contain 'FeatureA'")
+        #expect(keyB.contains("FeatureB"), "Key for FeatureB should contain 'FeatureB'")
+    }
+
+    @Test
+    func testSingleDestinationStillWorks() {
+        // Regression guard: single-destination push/pop through StackState continues to work
+        // with the destination key changes in place.
+        let store = Store(initialState: AppFeature.State()) { AppFeature() }
+
+        // Push via reducer action
+        store.send(.pushDetail("Regression Test"))
+        #expect(store.state.path.count == 1)
+        #expect(store.state.path[id: store.state.path.ids.first!]?[case: \.detail]?.title == "Regression Test")
+
+        // Push another and verify ordering
+        store.send(.pushDetail("Second"))
+        #expect(store.state.path.count == 2)
+
+        // Pop and verify correct element remains
+        let lastID = store.state.path.ids.last!
+        store.send(.path(.popFrom(id: lastID)))
+        #expect(store.state.path.count == 1)
+        #expect(store.state.path[id: store.state.path.ids.first!]?[case: \.detail]?.title == "Regression Test")
+
+        // Pop all
+        store.send(.popAll)
+        #expect(store.state.path.count == 0)
+    }
+
+    @Test
+    func testDestinationKeyIncludesTypeName() {
+        // Verify that the destination key format includes the Element type name,
+        // captured at Swift compile time (not JVM-erased at runtime).
+        // _typeName produces fully qualified names (e.g. "NavigationTests.DetailFeature.State")
+        let detailKey = StackState<DetailFeature.State>.Component.destinationKey
+        #expect(detailKey.contains("DetailFeature"), "Key should contain the Element type name")
+        #expect(detailKey.hasPrefix("StackState.Component<"), "Key should have the expected prefix")
+        #expect(detailKey.hasSuffix(">"), "Key should have the expected suffix")
+
+        // Verify instance-level destinationKey matches static-level
+        let id: StackElementID = 0
+        let component = StackState<DetailFeature.State>.Component(
+            id: id, element: DetailFeature.State(title: "Test")
+        )
+        #expect(component.destinationKey == detailKey, "Instance and static keys must match")
+    }
+}
+
+// MARK: - Multi-Destination Test Helpers
+
+@Reducer
+struct FeatureA {
+    @ObservableState
+    struct State: Equatable {
+        var value: Int = 0
+    }
+    enum Action {
+        case increment
+    }
+    var body: some ReducerOf<Self> {
+        Reduce { state, action in
+            switch action {
+            case .increment:
+                state.value += 1
+                return .none
+            }
+        }
+    }
+}
+
+@Reducer
+struct FeatureB {
+    @ObservableState
+    struct State: Equatable {
+        var name: String = ""
+    }
+    enum Action {
+        case setName(String)
+    }
+    var body: some ReducerOf<Self> {
+        Reduce { state, action in
+            switch action {
+            case let .setName(name):
+                state.name = name
+                return .none
+            }
+        }
+    }
 }
 #endif
