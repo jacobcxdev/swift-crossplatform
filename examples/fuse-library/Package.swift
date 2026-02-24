@@ -11,7 +11,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://source.skip.tools/skip.git", from: "1.7.2"),
-        .package(url: "https://source.skip.tools/skip-fuse.git", from: "1.0.0"),
+        .package(path: "../../forks/skip-fuse"),
         // Foundation library forks (Phase 2)
         .package(path: "../../forks/xctest-dynamic-overlay"),
         .package(path: "../../forks/swift-case-paths"),
