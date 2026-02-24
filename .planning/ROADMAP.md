@@ -163,7 +163,7 @@ Note: Phases 12 and 13 could partially overlap once Phase 11 test infra is worki
 | 11. Android Test Infrastructure | 3/3 | Complete   | 2026-02-24 |
 | 12. Swift Perception Android Port | 2/2 | Complete    | 2026-02-24 |
 | 13. API Parity Gaps | 2/2 | Complete    | 2026-02-24 |
-| 14. Android Verification & Requirements Reset | 4/4 | Complete   | 2026-02-24 |
+| 14. Android Verification & Requirements Reset | 4/4 | Complete    | 2026-02-24 |
 
 ### Phase 8: PFW Skill Alignment
 
@@ -302,4 +302,4 @@ Plans:
 - [x] 14-01-PLAN.md -- Run Android + Darwin test suites, capture output, create requirement evidence map ✓ 2026-02-24
 - [x] 14-02-PLAN.md -- Update REQUIREMENTS.md traceability with evidence-backed statuses and known limitations ✓ 2026-02-24
 - [x] 14-03-PLAN.md -- Final verification, STATE.md/ROADMAP.md closure ✓ 2026-02-24
-- [ ] 14-04-PLAN.md -- Gap closure: Android-transpilable Combine publisher tests (SHR-09/SHR-10) + TextState formatting rationale
+- [x] 14-04-PLAN.md -- Gap closure: Android-transpilable Combine publisher tests (SHR-09/SHR-10) + TextState formatting rationale ✓ 2026-02-24
