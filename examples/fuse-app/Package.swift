@@ -28,12 +28,15 @@ let package = Package(
             // Database
             .product(name: "SQLiteData", package: "sqlite-data"),
         ], resources: [.process("Resources")], plugins: [.plugin(name: "skipstone", package: "skip")]),
+        .target(name: "TestUtilities", path: "Tests/TestUtilities"),
         .testTarget(name: "FuseAppTests", dependencies: [
             "FuseApp",
+            "TestUtilities",
             .product(name: "SkipTest", package: "skip")
         ], resources: [.process("Resources")], plugins: [.plugin(name: "skipstone", package: "skip")]),
         .testTarget(name: "FuseAppIntegrationTests", dependencies: [
             "FuseApp",
+            "TestUtilities",
             .product(name: "SkipTest", package: "skip"),
             .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             .product(name: "DependenciesTestSupport", package: "swift-dependencies"),
