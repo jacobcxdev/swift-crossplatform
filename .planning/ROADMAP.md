@@ -167,7 +167,7 @@ Note: Phases 12 and 13 could partially overlap once Phase 11 test infra is worki
 | 12. Swift Perception Android Port | 2/2 | Complete    | 2026-02-24 |
 | 13. API Parity Gaps | 2/2 | Complete    | 2026-02-24 |
 | 14. Android Verification & Requirements Reset | 4/4 | Complete    | 2026-02-24 |
-| 15. NavigationStack Android Robustness | 0/0 | Planned | - |
+| 15. NavigationStack Android Robustness | 0/3 | Planned | - |
 | 16. TCA API Parity Completion | 0/0 | Planned | - |
 | 17. Test Evidence & Infrastructure Hardening | 0/0 | Planned | - |
 
@@ -321,7 +321,12 @@ Plans:
   2. Multi-destination `NavigationStack` with multiple `navigationDestination(for:)` types resolves correctly on JVM without type erasure collisions
   3. `@Dependency(\.dismiss)` completes under full JNI effect pipeline timing on Android — `withKnownIssue` wrappers replaced with passing tests
   4. All three fixes validated by dedicated Android tests (not indirect evidence)
-**Plans:** 0/0 plans
+**Plans:** 3 plans in 2 waves
+
+Plans:
+- [ ] 15-01-PLAN.md — Fix binding-driven push in _TCANavigationStack adapter (NAV-02, TCA-32)
+- [ ] 15-02-PLAN.md — Type-discriminating destination key for JVM type erasure safety (TCA-32)
+- [ ] 15-03-PLAN.md — Fix dismiss JNI timing in PresentationReducer/StackReducer pipeline (NAV-02)
 
 ### Phase 16: TCA API Parity Completion
 **Goal:** Enable all P3 gated TCA extensions on Android and resolve TextState CGFloat ambiguity — with test coverage for each enablement
