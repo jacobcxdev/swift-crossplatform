@@ -160,7 +160,7 @@ Note: Phases 12 and 13 could partially overlap once Phase 11 test infra is worki
 | 8. PFW Skill Alignment | 5/5 | Complete | 2026-02-23 |
 | 9. Post-Audit Cleanup | 4/4 | Complete | 2026-02-23 |
 | 10. skip-fuse-ui Integration & Audit | 8/8 | Complete    | 2026-02-24 |
-| 11. Android Test Infrastructure | 1/3 | In Progress|  |
+| 11. Android Test Infrastructure | 2/3 | In Progress|  |
 | 12. Swift Perception Android Port | 0/0 | Not Started | - |
 | 13. API Parity Gaps | 0/0 | Not Started | - |
 | 14. Android Verification & Requirements Reset | 0/0 | Not Started | - |
@@ -243,7 +243,7 @@ Plans:
   3. XCSkipTests uses canonical `XCGradleHarness`/`runGradleTests()` pattern instead of fake JUnit XML stubs
   4. `skip test` and `skip android test` execute real Kotlin tests (non-zero test count in JUnit results)
   5. Skipstone local package symlink resolution works with fork path overrides
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 
 Plans:
 - [ ] 11-01-PLAN.md — Add skipstone plugin + SkipTest to 6 missing test targets, create XCSkipTests.swift, gate non-transpilable code
