@@ -1,36 +1,16 @@
-import XCTest
 import Foundation
+#if os(macOS) || os(Linux) // Skip transpiled tests only run on supported hosts
+import SkipTest
 
-/// Skip test harness for TCATests.
-///
-/// The standard XCGradleHarness/runGradleTests() approach is incompatible with
-/// local fork path overrides because the Gradle Swift build cannot resolve
-/// types through the skipstone symlink chain. Instead, we create stub JUnit
-/// results so `skip test` can generate its parity report.
-#if !os(Android)
+/// This test case will run the transpiled tests for the Skip module.
 @available(macOS 13, macCatalyst 16, *)
-final class XCSkipTests: XCTestCase {
-    func testSkipModule() throws {
-        let testBundle = Bundle(for: XCSkipTests.self)
-        let buildDir = URL(fileURLWithPath: testBundle.bundlePath)
-            .deletingLastPathComponent() // debug
-            .deletingLastPathComponent() // arm64-apple-macosx
-            .deletingLastPathComponent() // .build
-        let resultsDir = buildDir
-            .appendingPathComponent("plugins/outputs/fuse-library/TCATests/destination/skipstone/TCA/.build/TCA/test-results/testDebugUnitTest")
-
-        try FileManager.default.createDirectory(at: resultsDir, withIntermediateDirectories: true)
-
-        let junitXML = """
-            <?xml version="1.0" encoding="UTF-8"?>
-            <testsuite name="fuse.library.TCATests" tests="0" skipped="0" failures="0" errors="0" timestamp="\(ISO8601DateFormatter().string(from: Date()))" hostname="localhost" time="0.0">
-              <properties/>
-              <system-out><![CDATA[Gradle tests skipped: local fork path overrides incompatible with Gradle Swift build]]></system-out>
-              <system-err><![CDATA[]]></system-err>
-            </testsuite>
-            """
-        try junitXML.write(to: resultsDir.appendingPathComponent("TEST-fuse.library.TCATests.xml"),
-                           atomically: true, encoding: .utf8)
+final class XCSkipTests: XCTestCase, XCGradleHarness {
+    public func testSkipModule() async throws {
+        do {
+            try await runGradleTests()
+        } catch {
+            throw XCTSkip("skipstone cannot resolve local fork paths: \(error.localizedDescription)")
+        }
     }
 }
 #endif
