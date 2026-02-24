@@ -162,7 +162,7 @@ Note: Phases 12 and 13 could partially overlap once Phase 11 test infra is worki
 | 10. skip-fuse-ui Integration & Audit | 8/8 | Complete    | 2026-02-24 |
 | 11. Android Test Infrastructure | 3/3 | Complete   | 2026-02-24 |
 | 12. Swift Perception Android Port | 2/2 | Complete    | 2026-02-24 |
-| 13. API Parity Gaps | 2/2 | Complete   | 2026-02-24 |
+| 13. API Parity Gaps | 2/2 | Complete    | 2026-02-24 |
 | 14. Android Verification & Requirements Reset | 0/0 | Not Started | - |
 
 ### Phase 8: PFW Skill Alignment
@@ -282,8 +282,8 @@ Plans:
 **Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 13-01-PLAN.md -- ViewActionSending animation no-op + store.case enum switching verification (TCA-25, TCA-31)
-- [ ] 13-02-PLAN.md -- Presentation parity tests (sheet/fullScreenCover/popover) + TextState/ButtonState verification (NAV-05, NAV-07, NAV-08)
+- [x] 13-01-PLAN.md -- ViewActionSending animation no-op + store.case enum switching verification (TCA-25, TCA-31) ✓ 2026-02-24
+- [x] 13-02-PLAN.md -- Presentation parity tests (sheet/fullScreenCover/popover) + TextState/ButtonState verification (NAV-05, NAV-07, NAV-08) ✓ 2026-02-24
 
 ### Phase 14: Android Verification & Requirements Reset
 **Goal:** Run the full test suite on Android, re-verify all 169 pending requirements against actual Android test results, and update traceability to reflect evidence-backed status
