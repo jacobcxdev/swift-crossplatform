@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 10 gap audit complete. Executing plans 10-04+ (SPM resolution + gap fixes).
+**Current focus:** Phase 10 gap fixes complete. All 5 fix-required gaps resolved. Next: 10-05 (CLAUDE.md/Makefile updates + documentation).
 
 ## Current Position
 
 Phase: 10 of 10 (NavigationStack Path Android / skip-fuse-ui Integration)
-Plan: 3 of 5 in current phase (3 complete, 2 remaining)
-Status: Gap report complete. 14 gaps identified (5 fix-required). Next: 10-04 (SPM resolution + gap fixes).
-Last activity: 2026-02-24 -- Completed 10-03 (cross-fork gap audit).
+Plan: 4 of 5 in current phase (4 complete, 1 remaining)
+Status: SPM identity conflicts resolved, skip-fuse-ui changes committed, TCA adapter updated. All 4 build configs pass. Next: 10-05.
+Last activity: 2026-02-24 -- Completed 10-04 (SPM resolution + gap fixes).
 
-Progress: [█████████░] 92%
+Progress: [██████████] 96%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 24
+- Total plans completed: 25
 - Average duration: ~10min
-- Total execution time: ~3.5 hours
+- Total execution time: ~3.75 hours
 
 **By Phase:**
 
@@ -34,11 +34,11 @@ Progress: [█████████░] 92%
 | 7 - Integration Testing | 4 | 29min | 7min |
 | 8 - PFW Skill Alignment | 5 | 65min | 13min |
 | 9 - Post-Audit Cleanup | 4 | 25min | 6min |
-| 10 - NavigationStack Path Android | 3 | 11min | 4min |
+| 10 - NavigationStack Path Android | 4 | 26min | 6.5min |
 
 **Recent Trend:**
-- Last 5 plans: 09-03, 09-04, 10-01, 10-02, 10-03
-- Trend: stable, fast execution
+- Last 5 plans: 09-04, 10-01, 10-02, 10-03, 10-04
+- Trend: stable execution
 
 *Updated after each plan completion*
 | Phase 09 P03 | 13min | 4 tasks | 9 files |
@@ -46,6 +46,7 @@ Progress: [█████████░] 92%
 | Phase 10 P01 | 2min | 1 tasks | 1 files |
 | Phase 10 P02 | 4min | 2 tasks | 2 files |
 | Phase 10 P03 | 5min | 1 tasks | 1 files |
+| Phase 10 P04 | 15min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -120,6 +121,10 @@ Recent decisions affecting current work:
 - [Phase 10]: 16 TCA guards referencing Apple SwiftUI types are correct despite skip-fuse-ui availability -- enabling requires conditional SkipFuseUI import (significant refactor, deferred)
 - [Phase 10]: Dismiss architecturally complete on Android (PresentationReducer wires on all platforms); integration timing issue is P2
 - [Phase 10]: JVM type erasure safe for single-destination NavigationStack; multi-destination needs future mitigation (P2)
+- [Phase 10]: NavigationStack adapter uses Binding<NavigationPath> not Binding<[Any]> -- skip-fuse-ui expects NavigationPath type
+- [Phase 10]: @MainActor on free function NavigationStack adapter for Swift 6 concurrency sending requirements
+- [Phase 10]: NavigationLink TCA extensions compile unguarded on Android -- skip-fuse-ui provides compatible NavigationLink type
+- [Phase 10]: Dismiss withKnownIssue wrappers kept -- P2 integration timing issue, not architectural gap
 
 ### Pending Todos
 
@@ -148,5 +153,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 10-03-PLAN.md (cross-fork gap audit). 14 gaps cataloged. Next: 10-04 (SPM resolution + gap fixes).
-Resume file: .planning/phases/10-navigationstack-path-android/10-04-PLAN.md
+Stopped at: Completed 10-04-PLAN.md (SPM resolution + gap fixes). All 5 fix-required gaps resolved. All 4 build configs pass. Next: 10-05 (CLAUDE.md/Makefile updates).
+Resume file: .planning/phases/10-navigationstack-path-android/10-05-PLAN.md

@@ -154,7 +154,7 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 | 7. Integration Testing & Documentation | 4/4 | Complete    | 2026-02-23 |
 | 8. PFW Skill Alignment | 5/5 | Complete | 2026-02-23 |
 | 9. Post-Audit Cleanup | 4/4 | Complete | 2026-02-23 |
-| 10. skip-fuse-ui Integration & Audit | 3/5 | In Progress|  |
+| 10. skip-fuse-ui Integration & Audit | 4/5 | In Progress|  |
 
 ### Phase 8: PFW Skill Alignment
 
@@ -209,7 +209,7 @@ Plans:
   5. Makefile updated with smart defaults (both examples, both platforms)
   6. Presentation dismiss (`@Dependency(\.dismiss)`) status resolved on Android
   7. Roadmap updated with rescoped phase; Phase 11 removed
-**Plans:** 3/5 plans executed
+**Plans:** 4/5 plans executed
 
 Plans:
 - [ ] 10-01-PLAN.md (wave 1) — CLAUDE.md + Makefile updates: gotchas, env vars, smart defaults
