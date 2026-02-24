@@ -90,7 +90,6 @@ Dependency injection and resolution on Android.
 - [x] **DEP-02**: `@Dependency(Type.self)` resolves a dependency by type conformance on Android
 - [x] **DEP-03**: `DependencyKey` protocol -- `liveValue` is used in production context on Android
 - [x] **DEP-04**: `DependencyKey.testValue` is used in test context on Android
-- [ ] **DEP-05**: `DependencyKey.previewValue` is used in preview context on Android
 - [x] **DEP-06**: `DependencyValues` extension with computed property registers a custom dependency on Android
 - [x] **DEP-07**: `@DependencyClient` macro generates a client struct with `unimplemented` defaults on Android
 - [x] **DEP-08**: `Reducer.dependency(_:_:)` modifier overrides a dependency for a scoped reducer on Android
@@ -137,7 +136,6 @@ Navigation patterns and presentation lifecycle on Android.
 - [x] **NAV-13**: `ConfirmationDialogState.map(_:)` transforms action type on Android
 - [x] **NAV-14**: Dismissing a presented feature via binding (setting optional to `nil`) closes presentation on Android
 - [x] **NAV-15**: `Binding` subscript with `CaseKeyPath` extracts enum associated value on Android
-- [ ] **NAV-16**: Navigation patterns are compatible with iOS 26+ APIs (excluding past deprecations)
 
 ### CP: CasePaths
 
@@ -300,16 +298,6 @@ Deferred to future release. Tracked but not in current roadmap.
 | Snapshot testing on Android | Not used by TestStore or TCA testing infrastructure |
 | Deprecated TCA APIs | ViewStore, WithViewStore, @PresentationState, TaskResult, ForEachStore, IfLetStore, SwitchStore -- use modern equivalents |
 
-## Known Limitations (Android)
-
-> These requirements describe APIs that are architecturally unavailable on Android due to platform
-> differences. Each has a documented workaround. They are tracked but not counted toward v1 completion.
-
-| Requirement | Limitation | Rationale | Workaround | Fixable? |
-|-------------|-----------|-----------|------------|----------|
-| DEP-05 | `previewValue` never used on Android | No preview context exists on Android; `DependencyValues.Context` is never `.preview`. The `previewContextNotAvailableOnAndroid()` test explicitly verifies this. | `liveValue` is used instead; functionally correct for all runtime contexts | N/A -- by design. Android has no preview infrastructure. |
-| NAV-16 | iOS 26+ API compatibility not testable on Android | iOS-version-specific APIs (e.g., new navigation modifiers) have no Android equivalent. These are Apple platform features with no cross-platform analog. | Use current navigation APIs which are fully functional on Android | N/A -- platform-specific. iOS 26+ APIs will be adopted on iOS only. |
-
 ## Traceability
 
 Which phases cover which requirements. Updated during roadmap creation. Evidence column added Phase 14 (Android Verification).
@@ -395,7 +383,6 @@ Which phases cover which requirements. Updated during roadmap creation. Evidence
 | DEP-02 | Phase 3 | Complete | DIRECT: dependencyTypeResolution() passes on Android |
 | DEP-03 | Phase 3 | Complete | DIRECT: liveValueInProductionContext() passes on Android |
 | DEP-04 | Phase 3 | Complete | DIRECT: testValueInTestContext() passes on Android |
-| DEP-05 | Phase 3 | Known Limitation | KNOWN_LIMITATION: previewValue never used on Android; no preview context exists; liveValue used instead |
 | DEP-06 | Phase 3 | Complete | DIRECT: customDependencyKeyRegistration() passes on Android |
 | DEP-07 | Phase 3 | Complete | DIRECT: dependencyClientUnimplementedReportsIssue() passes on Android |
 | DEP-08 | Phase 3 | Complete | DIRECT: reducerDependencyModifier() passes on Android |
@@ -444,7 +431,6 @@ Which phases cover which requirements. Updated during roadmap creation. Evidence
 | NAV-13 | Phase 5 | Complete | DIRECT: testConfirmationDialogStateMap() passes on Android |
 | NAV-14 | Phase 5 | Complete | DIRECT: testDismissViaBindingNil() passes on Android |
 | NAV-15 | Phase 5 | Complete | DIRECT: testCaseKeyPathExtraction(), testCaseKeyPathSetterSubscript() pass on Android |
-| NAV-16 | Phase 5 | Known Limitation | KNOWN_LIMITATION: iOS 26+ API compatibility not testable on Android; platform-specific |
 | TCA-26 | Phase 5 | Complete | DIRECT: testDismissDependencyResolvesAndExecutes(), testDismissDependencyWithPresentation(), testDismissViaChildDependency() pass on Android |
 | TCA-27 | Phase 5 | Complete | DIRECT: testPresentsOptionalLifecycle() passes on Android |
 | TCA-28 | Phase 5 | Complete | DIRECT: testPresentationActionDismissNilsState() passes on Android |
@@ -502,14 +488,13 @@ Which phases cover which requirements. Updated during roadmap creation. Evidence
 | DOC-01 | Phase 7 | Complete | N/A: Documentation requirement |
 
 **Coverage:**
-- v1 requirements: 184 total
-- Sections: OBS (30), TCA (35), DEP (12), SHR (14), NAV (16), CP (8), IC (6), SQL (15), SD (12), CD (5), IR (4), UI (8), TEST (12), SPM (6), DOC (1)
-- Mapped to phases: 184
+- v1 requirements: 182 total
+- Sections: OBS (30), TCA (35), DEP (11), SHR (14), NAV (15), CP (8), IC (6), SQL (15), SD (12), CD (5), IR (4), UI (8), TEST (12), SPM (6), DOC (1)
+- Mapped to phases: 182
 - Unmapped: 0
-- **Complete (evidence-backed):** 182/184
-- **Known Limitation:** 2/184 (DEP-05, NAV-16)
-- **Pending/Unverified:** 0/184
+- **Complete (evidence-backed):** 182/182
+- **Pending/Unverified:** 0/182
 
 ---
 *Requirements defined: 2026-02-21*
-*Last updated: 2026-02-24 -- Phase 14 Android verification: 182/184 complete with evidence, 2 known limitations*
+*Last updated: 2026-02-24 -- DEP-05 and NAV-16 removed (N/A on Android by design); 182/182 complete with evidence*

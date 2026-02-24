@@ -61,7 +61,7 @@ Plans:
 ### Phase 3: TCA Core
 **Goal**: TCA Store, reducers, effects, and dependency injection work correctly on Android
 **Depends on**: Phase 2
-**Requirements**: TCA-01, TCA-02, TCA-03, TCA-04, TCA-05, TCA-06, TCA-07, TCA-08, TCA-09, TCA-10, TCA-11, TCA-12, TCA-13, TCA-14, TCA-15, TCA-16, DEP-01, DEP-02, DEP-03, DEP-04, DEP-05, DEP-06, DEP-07, DEP-08, DEP-09, DEP-10, DEP-11, DEP-12
+**Requirements**: TCA-01, TCA-02, TCA-03, TCA-04, TCA-05, TCA-06, TCA-07, TCA-08, TCA-09, TCA-10, TCA-11, TCA-12, TCA-13, TCA-14, TCA-15, TCA-16, DEP-01, DEP-02, DEP-03, DEP-04, DEP-06, DEP-07, DEP-08, DEP-09, DEP-10, DEP-11, DEP-12
 **Success Criteria** (what must be TRUE):
   1. A TCA Store initializes, receives dispatched actions, and updates state on Android
   2. `store.scope(state:action:)` derives child stores that correctly reflect parent state changes on Android
@@ -94,7 +94,7 @@ Plans:
 ### Phase 5: Navigation & Presentation
 **Goal**: TCA navigation patterns (stack, sheet, alert, confirmation dialog) and SwiftUI presentation lifecycle work on Android
 **Depends on**: Phase 4
-**Requirements**: NAV-01, NAV-02, NAV-03, NAV-04, NAV-05, NAV-06, NAV-07, NAV-08, NAV-09, NAV-10, NAV-11, NAV-12, NAV-13, NAV-14, NAV-15, NAV-16, TCA-26, TCA-27, TCA-28, TCA-32, TCA-33, TCA-34, TCA-35, UI-01, UI-02, UI-03, UI-04, UI-05, UI-06, UI-07, UI-08
+**Requirements**: NAV-01, NAV-02, NAV-03, NAV-04, NAV-05, NAV-06, NAV-07, NAV-08, NAV-09, NAV-10, NAV-11, NAV-12, NAV-13, NAV-14, NAV-15, TCA-26, TCA-27, TCA-28, TCA-32, TCA-33, TCA-34, TCA-35, UI-01, UI-02, UI-03, UI-04, UI-05, UI-06, UI-07, UI-08
 **Success Criteria** (what must be TRUE):
   1. `NavigationStack` with TCA path binding pushes and pops destinations on Android
   2. `.sheet`, `.fullScreenCover`, and `.popover` present and dismiss content driven by optional TCA state on Android
