@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 14 of 14 (Android Verification & Requirements Reset) -- COMPLETE
-Plan: 3 of 3 in current phase
-Status: Phase 14 complete. All 159 pending requirements re-verified with evidence-backed statuses. 182 Complete, 2 Known Limitation.
-Last activity: 2026-02-24 -- Completed Phase 14 (Android Verification & Requirements Reset)
+Plan: 4 of 4 in current phase (gap closure plan 14-04 added and completed)
+Status: Phase 14 complete. All 159 pending requirements re-verified. 182 Complete, 2 Known Limitation. SHR-09/SHR-10 upgraded to DIRECT evidence via Android publisher tests.
+Last activity: 2026-02-24 -- Completed 14-04 gap closure (publisher tests, TextState formatting blocker documented)
 
 Progress: [##########] 100%
 
@@ -64,6 +64,7 @@ Progress: [##########] 100%
 | Phase 14 P02 | 7min | 2 tasks | 1 files |
 | Phase 14 P03 | 3min | 2 tasks | 2 files |
 | Phase 14 P03 | 3min | 2 tasks | 2 files |
+| Phase 14 P04 | 12min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -174,6 +175,10 @@ Recent decisions affecting current work:
 - [Phase 14]: Evidence categories (DIRECT/INDIRECT/CODE_VERIFIED/KNOWN_LIMITATION) used for requirement verification
 - [Phase 14]: 2 requirements marked Known Limitation with documented rationale and workarounds (DEP-05 previewValue, NAV-16 iOS 26+ APIs)
 - [Phase 14]: 27 of 35 test files contain #if !SKIP guards but these guard SECTIONS not WHOLE FILES -- 251 Android tests actually run, near parity with 256 Darwin tests
+- [Phase 14]: XCTest format (not Swift Testing) required for Android-transpilable publisher tests -- skipstone cannot transpile @Test/@Suite macros
+- [Phase 14]: OpenCombineShim import pattern matches swift-sharing library; canImport(Combine) || canImport(OpenCombine) guard for cross-platform publisher tests
+- [Phase 14]: TextState formatting modifiers NOT enabled on Android -- CGFloat ambiguity between Foundation and SkipSwiftUI prevents importing SkipSwiftUI in TextState.swift
+- [Phase 14]: OpenCombine .prefix(N) completion doesn't fire on Android (mutation coalescing); use expectedFulfillmentCount pattern instead
 
 ### Pending Todos
 
@@ -209,5 +214,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Phase 14 complete. All phases executed. Project ready for milestone re-audit.
+Stopped at: Completed 14-04-PLAN.md (gap closure: publisher tests Android-transpilable, TextState blocker documented)
 Resume file: .planning/phases/14-android-verification/
