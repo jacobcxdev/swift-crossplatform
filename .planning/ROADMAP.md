@@ -161,7 +161,7 @@ Note: Phases 12 and 13 could partially overlap once Phase 11 test infra is worki
 | 9. Post-Audit Cleanup | 4/4 | Complete | 2026-02-23 |
 | 10. skip-fuse-ui Integration & Audit | 8/8 | Complete    | 2026-02-24 |
 | 11. Android Test Infrastructure | 3/3 | Complete   | 2026-02-24 |
-| 12. Swift Perception Android Port | 0/2 | Planned | - |
+| 12. Swift Perception Android Port | 1/2 | In Progress|  |
 | 13. API Parity Gaps | 0/0 | Not Started | - |
 | 14. Android Verification & Requirements Reset | 0/0 | Not Started | - |
 
@@ -261,7 +261,7 @@ Plans:
   2. `Perceptible` protocol conformances in TCA (Store, etc.) resolve on Android
   3. `_PerceptionLocals` thread-local storage functions correctly on Android
   4. TCA binding helpers (`$store.property`, `@Bindable`) that depend on perception infrastructure work on Android
-**Plans:** 2 plans in 2 waves
+**Plans:** 1/2 plans executed
 
 Plans:
 - [ ] 12-01-PLAN.md — swift-perception fork: PerceptionRegistrar verification + WithPerceptionTracking Android passthrough (OBS-29, OBS-30)

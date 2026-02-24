@@ -39,8 +39,8 @@ Bridge-level observation semantics and Swift Observation correctness on Android.
 - [ ] **OBS-26**: `Java_skip_ui_ViewObservation_nativeStartRecording()` JNI export resolves on Android
 - [ ] **OBS-27**: `Java_skip_ui_ViewObservation_nativeStopAndObserve()` JNI export resolves on Android
 - [ ] **OBS-28**: `swiftThreadingFatal()` symbol export resolves on Android (workaround for `libswiftObservation.so` loading)
-- [ ] **OBS-29**: `PerceptionRegistrar` facade delegates to `ObservationRegistrar` on Android (conditional compilation path)
-- [ ] **OBS-30**: `withPerceptionTracking(_:onChange:)` delegates to `withObservationTracking` on Android
+- [x] **OBS-29**: `PerceptionRegistrar` facade delegates to `ObservationRegistrar` on Android (conditional compilation path)
+- [x] **OBS-30**: `withPerceptionTracking(_:onChange:)` delegates to `withObservationTracking` on Android
 
 ### TCA: Composable Architecture Core
 
@@ -334,8 +334,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | OBS-26 | Phase 1 | Pending |
 | OBS-27 | Phase 1 | Pending |
 | OBS-28 | Phase 1 | Pending |
-| OBS-29 | Phase 12 | Pending |
-| OBS-30 | Phase 12 | Pending |
+| OBS-29 | Phase 12 | Complete |
+| OBS-30 | Phase 12 | Complete |
 | SPM-01 | Phase 1 | Complete |
 | SPM-02 | Phase 1 | Complete |
 | SPM-03 | Phase 1 | Complete |

@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 11 -- Android test infrastructure enablement (gap closure phases 11-14).
+**Current focus:** Phase 12 -- Swift Perception Android port (gap closure phases 11-14).
 
 ## Current Position
 
-Phase: 11 of 14 (Android Test Infrastructure) -- COMPLETE
-Plan: 3 of 3 in current phase (11-03 complete)
-Status: Phase 11 complete. All 3 plans executed. TEST-10, TEST-11, TEST-12 verified on Android emulator (253 tests passing).
-Last activity: 2026-02-24 -- Completed 11-03 (Android verification and project state update).
+Phase: 12 of 14 (Swift Perception Android)
+Plan: 1 of 2 in current phase (12-01 complete)
+Status: 12-01 complete. WithPerceptionTracking Android passthrough added. PerceptionRegistrar verified to compile on Android.
+Last activity: 2026-02-24 -- Completed 12-01 (WithPerceptionTracking Android impl + PerceptionRegistrar verification).
 
 Progress: [██████████] 100%
 
@@ -58,6 +58,7 @@ Progress: [██████████] 100%
 | Phase 11 P02 | 12min | 2 tasks | 14 files |
 | Phase 11 P03 | 8min | 2 tasks | 3 files |
 | Phase 11 P03 | 8min | 2 tasks | 4 files |
+| Phase 12 P01 | 2min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -155,6 +156,8 @@ Recent decisions affecting current work:
 - [Phase 11]: skip android test is the canonical Android test pipeline (223 fuse-library + 30 fuse-app tests); skip test (Robolectric) blocked by skipstone symlink issue
 - [Phase 11]: TestUtilities shared target created in both fuse-library and fuse-app -- deduplicates helpers (hasLocalForkPaths, isJava, isAndroid, isRobolectric) across test targets
 - [Phase 11]: XCSkipTests uses pre-emptive XCTSkipIf(hasLocalForkPaths()) before runGradleTests() -- runGradleTests() uses XCTFail internally (not throw), so do/catch pattern was ineffective
+- [Phase 12]: PerceptionRegistrar requires no changes -- already compiles on Android via canImport(Observation) path creating native ObservationRegistrar
+- [Phase 12]: WithPerceptionTracking Android impl uses SkipFuseUI View passthrough with only View conformance (no Scene/ToolbarContent/etc.)
 
 ### Pending Todos
 
@@ -190,5 +193,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Phase 11 complete (3/3 plans + post-execution TestUtilities fix). All 257 tests pass (227 fuse-library + 30 fuse-app). Next: Phase 12 (Swift Perception Android Port).
-Resume file: .planning/phases/12-*/12-01-PLAN.md (next phase)
+Stopped at: Completed 12-01-PLAN.md (WithPerceptionTracking Android passthrough + PerceptionRegistrar verification). Next: 12-02 (Store Perceptible conformance + ObservationStateRegistrar guards).
+Resume file: .planning/phases/12-swift-perception-android/12-02-PLAN.md
