@@ -162,7 +162,7 @@ Note: Phases 12 and 13 could partially overlap once Phase 11 test infra is worki
 | 10. skip-fuse-ui Integration & Audit | 8/8 | Complete    | 2026-02-24 |
 | 11. Android Test Infrastructure | 3/3 | Complete   | 2026-02-24 |
 | 12. Swift Perception Android Port | 2/2 | Complete    | 2026-02-24 |
-| 13. API Parity Gaps | 0/0 | Not Started | - |
+| 13. API Parity Gaps | 0/2 | Planned | - |
 | 14. Android Verification & Requirements Reset | 0/0 | Not Started | - |
 
 ### Phase 8: PFW Skill Alignment
@@ -274,13 +274,16 @@ Plans:
 **Gap Closure:** Closes PARITY-GAPS-IN-CURRENT-APIS from v1.0-MILESTONE-AUDIT.md
 **Canonical pattern references:** `/pfw-composable-architecture` (SwitchStore, CaseLet, ViewActionSending), `/pfw-swift-navigation` (fullScreenCover, popover, NavigationStack path binding)
 **Success Criteria** (what must be TRUE):
-  1. `SwitchStore` / `CaseLet` enum-driven navigation renders on Android
-  2. `IfLetStore(then:else:)` else branch renders on Android
-  3. `ViewActionSending.send(_:animation:)` compiles on Android (animation parameter may be no-op)
-  4. `fullScreenCover` and `popover` presentation work on Android (via skip-fuse-ui equivalents)
-  5. `NavigationStack` programmatic push via path binding works bidirectionally on Android
-  6. `TextState`/`ButtonState` rendering preserves bold, italic, color on Android (or documents known limitations)
-**Plans:** 0/0 plans (not yet planned)
+  1. `switch store.case {}` modern enum switching dispatches to correct reducer case on Android (SwitchStore/CaseLet are deprecated, out of scope)
+  2. `ViewActionSending.send(_:animation:)` compiles on Android (animation parameter is no-op)
+  3. `fullScreenCover` and `popover` presentation data-layer lifecycle (present/interact/dismiss) works on Android via `$store.scope` binding
+  4. `TextState`/`ButtonState` data structures preserve content on Android (rich text formatting drops to plain text -- documented limitation)
+  5. Sheet presentation lifecycle verified at data layer via TestStore
+**Plans:** 2 plans in 1 wave
+
+Plans:
+- [ ] 13-01-PLAN.md -- ViewActionSending animation no-op + store.case enum switching verification (TCA-25, TCA-31)
+- [ ] 13-02-PLAN.md -- Presentation parity tests (sheet/fullScreenCover/popover) + TextState/ButtonState verification (NAV-05, NAV-07, NAV-08)
 
 ### Phase 14: Android Verification & Requirements Reset
 **Goal:** Run the full test suite on Android, re-verify all 169 pending requirements against actual Android test results, and update traceability to reflect evidence-backed status
