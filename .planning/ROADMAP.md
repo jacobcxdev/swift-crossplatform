@@ -154,7 +154,7 @@ Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Ph
 | 7. Integration Testing & Documentation | 4/4 | Complete    | 2026-02-23 |
 | 8. PFW Skill Alignment | 5/5 | Complete | 2026-02-23 |
 | 9. Post-Audit Cleanup | 4/4 | Complete | 2026-02-23 |
-| 10. skip-fuse-ui Integration & Audit | 6/6 | Complete    | 2026-02-24 |
+| 10. skip-fuse-ui Integration & Audit | 6/6 | Complete   | 2026-02-24 |
 
 ### Phase 8: PFW Skill Alignment
 
@@ -218,4 +218,4 @@ Plans:
 - [x] 10-03-PLAN.md (wave 2) — Gap audit: skip-fuse-ui counterparts, TCA guards, dismiss, JVM type erasure ✓ 2026-02-24
 - [x] 10-04-PLAN.md (wave 3) — Gap fixes + tests: implement fixes from gap report, verify dismiss, Android build ✓ 2026-02-24
 - [x] 10-05-PLAN.md (wave 4) — Roadmap update + cleanup: update ROADMAP, STATE, REQUIREMENTS ✓ 2026-02-24
-- [ ] 10-06-PLAN.md (gap closure) — Apply CLAUDE.md + Makefile changes that were planned but never written to disk; correct STATE.md
+- [x] 10-06-PLAN.md (gap closure) — Apply CLAUDE.md + Makefile changes that were planned but never written to disk; correct STATE.md ✓ 2026-02-24
