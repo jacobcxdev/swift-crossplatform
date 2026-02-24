@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 15 — NavigationStack Android robustness (binding-driven push, JVM type erasure, dismiss timing).
+**Current focus:** Phase 15 complete — all 3 plans done (binding-driven push, JVM type erasure, dismiss timing).
 
 ## Current Position
 
-Phase: 15 of 17 (NavigationStack Android Robustness)
-Plan: 3 of 3 in current phase (15-03 dismiss timing tests + timeout cleanup)
-Status: Plan 15-03 complete. 4 new dismiss timing tests added. 10-second timeout workarounds removed from fuse-app. Android root cause identified as OpenCombine Concatenate. 264+30 tests pass.
-Last activity: 2026-02-24 -- Completed 15-03 (dismiss timing tests + timeout cleanup)
+Phase: 15 of 17 (NavigationStack Android Robustness) -- COMPLETE
+Plan: 3 of 3 in current phase -- all plans complete
+Status: Phase 15 complete. Plan 15-02 added type-discriminating destination key for multi-destination NavigationStack (NavigationDestinationKeyProviding protocol + _typeName). 267 Darwin tests pass.
+Last activity: 2026-02-24 -- Completed 15-02 (JVM type erasure fix)
 
 Progress: [########--] 80%
 
@@ -66,6 +66,7 @@ Progress: [########--] 80%
 | Phase 14 P03 | 3min | 2 tasks | 2 files |
 | Phase 14 P04 | 12min | 2 tasks | 4 files |
 | Phase 15 P01 | 5min | 1 tasks | 2 files |
+| Phase 15 P02 | 12min | 1 tasks | 3 files |
 | Phase 15 P03 | 15min | 1 tasks | 2 files |
 
 ## Accumulated Context
@@ -186,6 +187,8 @@ Recent decisions affecting current work:
 - [Phase 15]: Keep upstream Empty+Just concatenation in PresentationReducer/StackReducer -- works on Darwin; Android issue is in OpenCombine Concatenate (external dep)
 - [Phase 15]: Effect.run-based dismiss alternative not viable -- cancellableValue throws CancellationError regardless of task result when task is cancelled
 - [Phase 15]: 10-second timeouts removed entirely from fuse-app dismiss tests -- parent-driven dismiss via Effect.send fires synchronously
+- [Phase 15]: _typeName over String(describing:) for destination keys -- String(describing:) on nested types produces short names causing collisions
+- [Phase 15]: NavigationDestinationKeyProviding protocol in skip-fuse-ui with os(Android) conformance in TCA -- deployment target mismatch prevents canImport on Darwin
 
 ### Pending Todos
 
@@ -198,7 +201,7 @@ Recent decisions affecting current work:
 - **Android UI rendering validation (Phase 7):** Phase 5 Codex verifier flagged that NavigationStack, sheet, alert, dialog, .task tests validate data layer only, not Android Compose rendering. All UI rendering assertions deferred to Phase 7 integration testing with emulator. (Source: Codex verifier, Phase 5)
 - **Database observation wrapper-level testing (Phase 7):** Phase 6 Codex verifier flagged SD-09/SD-10/SD-11 tests use ValueObservation.start() directly, not @FetchAll/@FetchOne DynamicProperty wrappers. DynamicProperty.update() requires SwiftUI runtime (guarded out on Android). Wrapper-level integration testing deferred to Phase 7 with emulator. (Source: Codex verifier, Phase 6)
 - **Dismiss JNI timing (P2):** Dismiss mechanism is architecturally complete on Android (PresentationReducer wires on all platforms, DismissEffect has correct fallback). Root cause identified in Phase 15-03: OpenCombine's Concatenate operator (external dependency) may not correctly chain cancellation-completion into suffix subscription across JNI. Effect.run alternative not viable (cancellableValue throws CancellationError regardless). withKnownIssue wrappers removed; 10-second timeouts removed. Fix requires OpenCombine fork or upstream fix. (Source: 10-GAP-REPORT.md section F, 15-03 investigation)
-- **JVM type erasure multi-destination risk (P2):** Single-destination NavigationStack is safe. Multi-destination apps where multiple navigationDestination(for:) calls register different StackState<X>.Component types would collide on JVM due to generic type erasure producing identical String(describing:) keys. Mitigation: type-discriminating destinationKey. Not blocking current apps. (Source: 10-GAP-REPORT.md section G)
+- **~~JVM type erasure multi-destination risk (P2):~~** RESOLVED -- NavigationDestinationKeyProviding protocol added to skip-fuse-ui. StackState.Component.destinationKey uses _typeName for fully qualified names. Both registration and lookup sides prefer protocol key over String(describing:). Conformance gated on os(Android). (Source: 15-02 execution)
 - **TCA Binding+Observation extensions on Android (P3):** 4 guard blocks in Binding+Observation.swift exclude binding observation extensions on Android. Enabling requires TCA to conditionally import SkipFuseUI types instead of SwiftUI types -- significant refactor. Not blocking TCA core functionality. (Source: 10-GAP-REPORT.md G6)
 - **TCA Alert/ConfirmationDialog observation extensions on Android (P3):** Alert+Observation.swift and ConfirmationDialog.swift observation extensions guarded on Android. Alert/dialog work via PresentationReducer path. (Source: 10-GAP-REPORT.md G7)
 - **TCA IfLetStore on Android (P3):** 3 guard blocks in IfLetStore.swift exclude deprecated view on Android. Modern @Observable pattern used instead. (Source: 10-GAP-REPORT.md G8)
@@ -221,5 +224,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 15-03-PLAN.md (dismiss timing tests + timeout cleanup)
+Stopped at: Completed 15-02-PLAN.md (JVM type erasure fix -- phase 15 all plans complete)
 Resume file: .planning/phases/15-navigationstack-robustness/
