@@ -129,8 +129,8 @@ Recent decisions affecting current work:
 - [Phase 10]: Dismiss withKnownIssue wrappers kept -- P2 integration timing issue, not architectural gap
 - [Phase 10]: SPM identity conflicts resolved by converting skip-android-bridge remote URLs to local paths in 3 forks (sqlite-data, swift-composable-architecture, swift-navigation)
 - [Phase 10]: skip-fuse-ui uncommitted changes committed (ModifiedContent generics + local path deps) and fuse-library skip-fuse converted to local path
-- [Phase 10]: CLAUDE.md expanded with environment variable docs, 4 new gotchas, updated Makefile reference
-- [Phase 10]: Makefile smart defaults iterate both examples; EXAMPLE= override for single targeting
+- [Phase 10]: CLAUDE.md expanded with environment variable docs, 4 new gotchas, updated Makefile reference (applied in 10-06 gap closure)
+- [Phase 10]: Makefile smart defaults iterate both examples; EXAMPLE= override for single targeting (applied in 10-06 gap closure)
 - [Phase 10]: Phase 11 (Presentation Dismiss) absorbed into Phase 10 -- dismiss architecturally complete, timing issue is P2
 - [Phase 10]: 4 known-limitation gaps documented (G6-G9): TCA Binding/Alert/IfLetStore SwiftUI extensions, JVM type erasure for multi-destination
 - [Phase 10]: Phase 11 absorbed into Phase 10 during planning -- no separate ROADMAP removal needed

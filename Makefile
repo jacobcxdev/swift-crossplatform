@@ -1,34 +1,60 @@
-EXAMPLE ?= fuse-library
-EXAMPLE_DIR := examples/$(EXAMPLE)
+EXAMPLES ?= fuse-library fuse-app
 
-.PHONY: build test android-build android-test skip-test skip-verify clean status push-all pull-all diff-all branch-all
+ifdef EXAMPLE
+# Single example override: EXAMPLE=fuse-app make build
+TARGETS := $(EXAMPLE)
+else
+TARGETS := $(EXAMPLES)
+endif
 
-# Build & Test (run against an example project, default: fuse-library)
+.PHONY: build test test-filter android-build android-test skip-test skip-verify clean status push-all pull-all diff-all branch-all
+
+# Build & Test (iterates over all TARGETS by default)
 build:
-	cd $(EXAMPLE_DIR) && swift build
+	@for ex in $(TARGETS); do \
+		echo "=== Building $$ex ===" && \
+		cd examples/$$ex && swift build && cd ../.. || exit 1; \
+	done
 
 test:
-	cd $(EXAMPLE_DIR) && swift test
+	@for ex in $(TARGETS); do \
+		echo "=== Testing $$ex ===" && \
+		cd examples/$$ex && swift test && cd ../.. || exit 1; \
+	done
 
 test-filter:
 	@test -n "$(FILTER)" || (echo "Usage: make test-filter FILTER=ObservationTests" && exit 1)
-	cd $(EXAMPLE_DIR) && swift test --filter $(FILTER)
+	cd examples/$(firstword $(TARGETS)) && swift test --filter $(FILTER)
 
 android-build:
-	cd $(EXAMPLE_DIR) && skip android build
+	@for ex in $(TARGETS); do \
+		echo "=== Android building $$ex ===" && \
+		cd examples/$$ex && skip android build && cd ../.. || exit 1; \
+	done
 
 android-test:
-	cd $(EXAMPLE_DIR) && skip android test
+	@for ex in $(TARGETS); do \
+		echo "=== Android testing $$ex ===" && \
+		cd examples/$$ex && skip android test && cd ../.. || exit 1; \
+	done
 
 skip-test:
-	cd $(EXAMPLE_DIR) && skip test
+	@for ex in $(TARGETS); do \
+		echo "=== Skip testing $$ex ===" && \
+		cd examples/$$ex && skip test && cd ../.. || exit 1; \
+	done
 
 skip-verify:
-	cd $(EXAMPLE_DIR) && skip verify --fix
+	@for ex in $(TARGETS); do \
+		echo "=== Skip verifying $$ex ===" && \
+		cd examples/$$ex && skip verify --fix && cd ../.. || exit 1; \
+	done
 
 clean:
-	cd $(EXAMPLE_DIR) && swift package clean
-	@echo "Cleaned $(EXAMPLE_DIR)"
+	@for ex in $(TARGETS); do \
+		echo "=== Cleaning $$ex ===" && \
+		cd examples/$$ex && swift package clean && cd ../.. || exit 1; \
+	done
 
 # Submodule management
 status:
