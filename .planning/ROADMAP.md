@@ -163,7 +163,7 @@ Note: Phases 12 and 13 could partially overlap once Phase 11 test infra is worki
 | 11. Android Test Infrastructure | 3/3 | Complete   | 2026-02-24 |
 | 12. Swift Perception Android Port | 2/2 | Complete    | 2026-02-24 |
 | 13. API Parity Gaps | 2/2 | Complete    | 2026-02-24 |
-| 14. Android Verification & Requirements Reset | 3/3 | Complete | 2026-02-24 |
+| 14. Android Verification & Requirements Reset | 3/3 | Complete   | 2026-02-24 |
 
 ### Phase 8: PFW Skill Alignment
 
