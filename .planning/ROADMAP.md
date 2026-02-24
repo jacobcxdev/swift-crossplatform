@@ -24,7 +24,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 13: API Parity Gaps** - Implement Android equivalents for non-deprecated TCA APIs gated out without alternatives (completed 2026-02-24)
 - [x] **Phase 14: Android Verification & Requirements Reset** - Run full Android test suite, re-verify all 169 pending requirements against actual results (completed 2026-02-24)
 - [x] **Phase 15: NavigationStack Android Robustness** - Fix binding-driven push, JVM type erasure multi-destination, and dismiss JNI timing — all with test coverage (completed 2026-02-24)
-- [ ] **Phase 16: TCA API Parity Completion** - Enable gated Binding+Observation, Alert/Dialog, IfLetStore extensions on Android; resolve TextState CGFloat ambiguity — all with test coverage
+- [x] **Phase 16: TCA API Parity Completion** - Enable gated Binding+Observation, Alert/Dialog, IfLetStore extensions on Android; resolve TextState CGFloat ambiguity — all with test coverage (completed 2026-02-24)
 - [ ] **Phase 17: Test Evidence & Infrastructure Hardening** - Direct TEST-10/TEST-11 evidence, Robolectric pipeline fix, ObjC warning cleanup, swiftThreadingFatal version guard — all with test coverage
 
 ## Phase Details
@@ -168,7 +168,7 @@ Note: Phases 12 and 13 could partially overlap once Phase 11 test infra is worki
 | 13. API Parity Gaps | 2/2 | Complete    | 2026-02-24 |
 | 14. Android Verification & Requirements Reset | 4/4 | Complete    | 2026-02-24 |
 | 15. NavigationStack Android Robustness | 3/3 | Complete   | 2026-02-24 |
-| 16. TCA API Parity Completion | 1/2 | In Progress|  |
+| 16. TCA API Parity Completion | 2/2 | Complete   | 2026-02-24 |
 | 17. Test Evidence & Infrastructure Hardening | 0/0 | Planned | - |
 
 ### Phase 8: PFW Skill Alignment
@@ -340,7 +340,7 @@ Plans:
   3. `IfLetStore` status resolved — either enabled on Android or documented as intentionally excluded (deprecated) with test proving `@Observable` alternative works
   4. `TextState` formatting modifiers resolve on Android without CGFloat ambiguity — or fallback path tested
   5. Each enablement validated by a dedicated test
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 16-01-PLAN.md — Implement withTransaction in skip-fuse-ui + remove all Android guards from swift-navigation fork (ButtonState, TextState, Alert, ConfirmationDialog)

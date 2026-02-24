@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 16 of 17 (API Parity Completion)
-Plan: 1 of 3 in current phase -- 16-01 complete
-Status: Plan 16-01 complete. withTransaction delegates to withAnimation on Android. ButtonState.animatedSend and TextState rich text modifiers fully enabled.
-Last activity: 2026-02-24 -- Completed 16-01 (withTransaction and swift-navigation guard removal)
+Plan: 2 of 2 in current phase -- 16-02 complete (phase complete)
+Status: Plan 16-02 complete. All removable Android guards removed from TCA fork (16 files). BindingLocal deduplicated. Animation chain fully enabled. 6 enablement tests passing.
+Last activity: 2026-02-24 -- Completed 16-02 (TCA guard removal and enablement tests)
 
-Progress: [########=-] 85%
+Progress: [########=-] 87%
 
 ## Performance Metrics
 
@@ -69,6 +69,7 @@ Progress: [########=-] 85%
 | Phase 15 P02 | 12min | 1 tasks | 3 files |
 | Phase 15 P03 | 15min | 1 tasks | 2 files |
 | Phase 16 P01 | 1min | 2 tasks | 3 files |
+| Phase 16 P02 | 9min | 2 tasks | 19 files |
 
 ## Accumulated Context
 
@@ -193,6 +194,10 @@ Recent decisions affecting current work:
 - [Phase 15]: NavigationDestinationKeyProviding protocol in skip-fuse-ui with os(Android) conformance in TCA -- deployment target mismatch prevents canImport on Darwin
 - [Phase 16]: AlertState.swift and ConfirmationDialogState.swift had no Android guards to remove -- pure data types with no platform-conditional code
 - [Phase 16]: All #if canImport(SwiftUI) && !os(Android) guards in ButtonState and TextState changed uniformly to #if canImport(SwiftUI) -- no targeted inner guards needed
+- [Phase 16]: Popover.swift Android guard kept -- architectural Android fallback (popover -> sheet), not a missing API guard
+- [Phase 16]: BindingLocal deduplicated: Core.swift (#if !canImport(SwiftUI)) and ViewStore.swift (inside #if canImport(SwiftUI)) -- mutually exclusive definitions
+- [Phase 16]: ViewAction.swift Android no-op fallback removed entirely -- withTransaction now works on Android
+- [Phase 16]: Deprecated file-level guards (SwitchStore, NavigationLinkStore, LegacyAlert, ActionSheet) left as-is -- entire deprecated files
 
 ### Pending Todos
 
@@ -206,9 +211,9 @@ Recent decisions affecting current work:
 - **Database observation wrapper-level testing (Phase 7):** Phase 6 Codex verifier flagged SD-09/SD-10/SD-11 tests use ValueObservation.start() directly, not @FetchAll/@FetchOne DynamicProperty wrappers. DynamicProperty.update() requires SwiftUI runtime (guarded out on Android). Wrapper-level integration testing deferred to Phase 7 with emulator. (Source: Codex verifier, Phase 6)
 - **~~Dismiss JNI timing (P2):~~** RESOLVED — Root cause was TCA's custom Publishers.Merge polyfill losing synchronous emissions (fixed in 7b175e4), NOT OpenCombine's Concatenate as Phase 15-03 hypothesised. Empirically confirmed: all 4 child-driven dismiss tests pass on Android (269/269, 0 real failures). Stack dismiss test updated with polling for JNI latency resilience. (Source: dismiss pipeline root cause investigation, Android test run 2026-02-24)
 - **~~JVM type erasure multi-destination risk (P2):~~** RESOLVED -- NavigationDestinationKeyProviding protocol added to skip-fuse-ui. StackState.Component.destinationKey uses _typeName for fully qualified names. Both registration and lookup sides prefer protocol key over String(describing:). Conformance gated on os(Android). (Source: 15-02 execution)
-- **TCA Binding+Observation extensions on Android (P3):** 4 guard blocks in Binding+Observation.swift exclude binding observation extensions on Android. Enabling requires TCA to conditionally import SkipFuseUI types instead of SwiftUI types -- significant refactor. Not blocking TCA core functionality. (Source: 10-GAP-REPORT.md G6)
-- **TCA Alert/ConfirmationDialog observation extensions on Android (P3):** Alert+Observation.swift and ConfirmationDialog.swift observation extensions guarded on Android. Alert/dialog work via PresentationReducer path. (Source: 10-GAP-REPORT.md G7)
-- **TCA IfLetStore on Android (P3):** 3 guard blocks in IfLetStore.swift exclude deprecated view on Android. Modern @Observable pattern used instead. (Source: 10-GAP-REPORT.md G8)
+- **~~TCA Binding+Observation extensions on Android (P3):~~** PARTIALLY RESOLVED -- Binding.swift ViewStore extension and BindingViewState unguarded in Phase 16. Binding+Observation.swift ObservedObject.Wrapper guards remain (deprecated paths, ObservedObject not in SkipFuseUI). (Source: 16-02 execution)
+- **~~TCA Alert/ConfirmationDialog observation extensions on Android (P3):~~** RESOLVED -- Alert+Observation.swift and ConfirmationDialog.swift animatedSend guards removed in Phase 16. Full observation extensions now compile on Android. (Source: 16-02 execution)
+- **~~TCA IfLetStore on Android (P3):~~** RESOLVED -- All 3 guard blocks removed from IfLetStore.swift in Phase 16. Modern @Presents + .ifLet alternative pattern tested. (Source: 16-02 execution)
 - **ObjC duplicate class warnings in fuse-app macOS tests (cosmetic):** SkipModel/SkipUI classes duplicated in libSkipFuseUI.dylib and test bundle. Cosmetic warnings from Skip's macOS linking, no functional impact. (Source: 10-08 verification)
 - **~~Skip test transpilation restoration (P3):~~** RESOLVED -- All 8 JUnit stubs replaced with canonical XCGradleHarness/runGradleTests(). Skipstone symlink issue diagnosed: local fork paths resolve relative to skipstone output dir. Tests skip with diagnostic message when Gradle fails. Real transpilation will work when forks are published upstream. (Source: 11-02 execution)
 - **~~Database Android build verification (Phase 7):~~** RESOLVED — DatabaseTests (StructuredQueries + SQLiteData) build and pass on Android via `skip android test`. SQLiteDataTests suite passed after 5.275s. (Source: 09-03 Android verification)
@@ -228,5 +233,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 16-01-PLAN.md (withTransaction and swift-navigation guard removal)
+Stopped at: Completed 16-02-PLAN.md (TCA guard removal and enablement tests)
 Resume file: .planning/phases/16-api-parity-completion/
