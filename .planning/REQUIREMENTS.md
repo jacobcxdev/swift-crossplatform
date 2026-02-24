@@ -300,6 +300,16 @@ Deferred to future release. Tracked but not in current roadmap.
 | Snapshot testing on Android | Not used by TestStore or TCA testing infrastructure |
 | Deprecated TCA APIs | ViewStore, WithViewStore, @PresentationState, TaskResult, ForEachStore, IfLetStore, SwitchStore -- use modern equivalents |
 
+## Known Limitations (Android)
+
+> These requirements describe APIs that are architecturally unavailable on Android due to platform
+> differences. Each has a documented workaround. They are tracked but not counted toward v1 completion.
+
+| Requirement | Limitation | Rationale | Workaround | Fixable? |
+|-------------|-----------|-----------|------------|----------|
+| DEP-05 | `previewValue` never used on Android | No preview context exists on Android; `DependencyValues.Context` is never `.preview`. The `previewContextNotAvailableOnAndroid()` test explicitly verifies this. | `liveValue` is used instead; functionally correct for all runtime contexts | N/A -- by design. Android has no preview infrastructure. |
+| NAV-16 | iOS 26+ API compatibility not testable on Android | iOS-version-specific APIs (e.g., new navigation modifiers) have no Android equivalent. These are Apple platform features with no cross-platform analog. | Use current navigation APIs which are fully functional on Android | N/A -- platform-specific. iOS 26+ APIs will be adopted on iOS only. |
+
 ## Traceability
 
 Which phases cover which requirements. Updated during roadmap creation. Evidence column added Phase 14 (Android Verification).
