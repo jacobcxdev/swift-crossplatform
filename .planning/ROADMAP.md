@@ -210,7 +210,7 @@ Plans:
   5. Makefile updated with smart defaults (both examples, both platforms)
   6. Presentation dismiss (`@Dependency(\.dismiss)`) status resolved on Android
   7. Roadmap updated with rescoped phase; Phase 11 removed
-**Plans:** 8 plans (all complete)
+**Plans:** 8/8 plans complete
 
 Plans:
 - [x] 10-01-PLAN.md (wave 1) — CLAUDE.md + Makefile updates: gotchas, env vars, smart defaults ✓ 2026-02-24
