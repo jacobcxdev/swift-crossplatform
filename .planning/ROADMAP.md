@@ -168,7 +168,7 @@ Note: Phases 12 and 13 could partially overlap once Phase 11 test infra is worki
 | 13. API Parity Gaps | 2/2 | Complete    | 2026-02-24 |
 | 14. Android Verification & Requirements Reset | 4/4 | Complete    | 2026-02-24 |
 | 15. NavigationStack Android Robustness | 3/3 | Complete   | 2026-02-24 |
-| 16. TCA API Parity Completion | 0/0 | Planned | - |
+| 16. TCA API Parity Completion | 0/2 | Planned | - |
 | 17. Test Evidence & Infrastructure Hardening | 0/0 | Planned | - |
 
 ### Phase 8: PFW Skill Alignment
@@ -340,7 +340,11 @@ Plans:
   3. `IfLetStore` status resolved — either enabled on Android or documented as intentionally excluded (deprecated) with test proving `@Observable` alternative works
   4. `TextState` formatting modifiers resolve on Android without CGFloat ambiguity — or fallback path tested
   5. Each enablement validated by a dedicated test
-**Plans:** 0/0 plans
+**Plans:** 2 plans in 2 waves
+
+Plans:
+- [ ] 16-01-PLAN.md — Implement withTransaction in skip-fuse-ui + remove all Android guards from swift-navigation fork (ButtonState, TextState, Alert, ConfirmationDialog)
+- [ ] 16-02-PLAN.md — Comprehensive TCA guard removal, BindingLocal cleanup, and enablement tests
 
 ### Phase 17: Test Evidence & Infrastructure Hardening
 **Goal:** Provide direct test evidence for TEST-10/TEST-11, fix Robolectric pipeline, eliminate ObjC warnings, and add swiftThreadingFatal version guard — closing all remaining infra/cosmetic tech debt
