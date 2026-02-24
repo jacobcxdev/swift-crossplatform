@@ -160,7 +160,7 @@ Note: Phases 12 and 13 could partially overlap once Phase 11 test infra is worki
 | 8. PFW Skill Alignment | 5/5 | Complete | 2026-02-23 |
 | 9. Post-Audit Cleanup | 4/4 | Complete | 2026-02-23 |
 | 10. skip-fuse-ui Integration & Audit | 8/8 | Complete    | 2026-02-24 |
-| 11. Android Test Infrastructure | 0/0 | Not Started | - |
+| 11. Android Test Infrastructure | 0/3 | Planned | - |
 | 12. Swift Perception Android Port | 0/0 | Not Started | - |
 | 13. API Parity Gaps | 0/0 | Not Started | - |
 | 14. Android Verification & Requirements Reset | 0/0 | Not Started | - |
@@ -243,7 +243,12 @@ Plans:
   3. XCSkipTests uses canonical `XCGradleHarness`/`runGradleTests()` pattern instead of fake JUnit XML stubs
   4. `skip test` and `skip android test` execute real Kotlin tests (non-zero test count in JUnit results)
   5. Skipstone local package symlink resolution works with fork path overrides
-**Plans:** 0/0 plans (not yet planned)
+**Plans:** 3 plans in 3 waves
+
+Plans:
+- [ ] 11-01-PLAN.md — Add skipstone plugin + SkipTest to 6 missing test targets, create XCSkipTests.swift, gate non-transpilable code
+- [ ] 11-02-PLAN.md — Replace JUnit stubs with canonical XCGradleHarness, diagnose/fix skipstone symlink resolution
+- [ ] 11-03-PLAN.md — Android verification: TEST-10 observation bridge, TEST-11 stress stability, full suite validation
 
 ### Phase 12: Swift Perception Android Port
 **Goal:** Provide `WithPerceptionTracking`, `_PerceptionLocals`, and `Perceptible` protocol on Android so TCA binding/scoping infrastructure works correctly
