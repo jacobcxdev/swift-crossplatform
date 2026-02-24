@@ -1,7 +1,7 @@
 ---
 phase: 14-android-verification
 verified: 2026-02-24T07:30:00Z
-status: passed
+status: gaps_found
 score: 5/5 must-haves verified
 re_verification: false
 ---
@@ -121,7 +121,21 @@ All commits cited in plan summaries exist in the git log:
 
 ### Gaps Summary
 
-No gaps. All five success criteria from ROADMAP.md are satisfied:
+**5 Darwin-only tests identified** — these tests pass on Darwin but do not transpile to Android, meaning the corresponding functionality has no Android test coverage:
+
+| # | Test Name | Category | Affected Requirements | Gap Description |
+|---|-----------|----------|----------------------|-----------------|
+| 1 | `publisherAndObservationBothWork()` | Combine | SHR-10 | Combine publisher + observation integration not tested on Android |
+| 2 | `publisherValuesAsyncSequence()` | Combine | SHR-10 | Combine publisher → AsyncSequence bridge not tested on Android |
+| 3 | `sharedPublisher()` | Combine | SHR-10 | `$shared.publisher` Combine API not tested on Android |
+| 4 | `sharedPublisherMultipleValues()` | Combine | SHR-10 | `$shared.publisher` multi-value stream not tested on Android |
+| 5 | `"TextState with formatting still contains original text"` | TextState | (none — cosmetic) | AttributedString formatting not available on Android; plain text works |
+
+**Impact:** SHR-10 (`$shared.publisher` Combine/OpenCombine publisher on Android) was classified CODE_VERIFIED but has zero Android test coverage — all 4 publisher tests are Darwin-only. The publisher functionality depends on OpenCombine which compiles on Android but has never been exercised by a transpiled test.
+
+**Recommended fix:** Add Android-transpilable tests for `$shared.publisher` via OpenCombine, or reclassify SHR-10 as KNOWN_LIMITATION if OpenCombine publishers cannot be transpiled by skipstone.
+
+All five success criteria from ROADMAP.md are still satisfied (the gaps are within the evidence quality, not blocking criteria):
 
 1. `skip android test` ran on actual emulator-5554 with 251 fuse-library + 30 fuse-app Kotlin tests (both non-zero). SATISFIED.
 2. Android emulator validation completed across all four feature areas (observation bridge, TCA Store, navigation, database). SATISFIED.
