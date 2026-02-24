@@ -7,18 +7,23 @@ else
 TARGETS := $(EXAMPLES)
 endif
 
-.PHONY: build test test-filter android-build android-test skip-verify clean status push-all pull-all diff-all branch-all
+.PHONY: build test test-filter darwin-build darwin-test android-build android-test skip-verify clean status push-all pull-all diff-all branch-all
 
-# Build & Test (iterates over all TARGETS by default)
-build:
+# Cross-platform build & test (Darwin + Android)
+build: darwin-build android-build
+
+test: darwin-test android-test
+
+# Darwin-only
+darwin-build:
 	@for ex in $(TARGETS); do \
-		echo "=== Building $$ex ===" && \
+		echo "=== Building $$ex (Darwin) ===" && \
 		cd examples/$$ex && swift build && cd ../.. || exit 1; \
 	done
 
-test:
+darwin-test:
 	@for ex in $(TARGETS); do \
-		echo "=== Testing $$ex ===" && \
+		echo "=== Testing $$ex (Darwin) ===" && \
 		cd examples/$$ex && swift test && cd ../.. || exit 1; \
 	done
 
@@ -26,15 +31,16 @@ test-filter:
 	@test -n "$(FILTER)" || (echo "Usage: make test-filter FILTER=ObservationTests" && exit 1)
 	cd examples/$(firstword $(TARGETS)) && swift test --filter $(FILTER)
 
+# Android-only
 android-build:
 	@for ex in $(TARGETS); do \
-		echo "=== Android building $$ex ===" && \
+		echo "=== Building $$ex (Android) ===" && \
 		cd examples/$$ex && skip android build && cd ../.. || exit 1; \
 	done
 
 android-test:
 	@for ex in $(TARGETS); do \
-		echo "=== Android testing $$ex ===" && \
+		echo "=== Testing $$ex (Android) ===" && \
 		cd examples/$$ex && skip android test && cd ../.. || exit 1; \
 	done
 
@@ -47,7 +53,7 @@ skip-verify:
 clean:
 	@for ex in $(TARGETS); do \
 		echo "=== Cleaning $$ex ===" && \
-		cd examples/$$ex && swift package clean && cd ../.. || exit 1; \
+		cd examples/$$ex && swift package clean && rm -rf .build/plugins/outputs && cd ../.. || exit 1; \
 	done
 
 # Submodule management

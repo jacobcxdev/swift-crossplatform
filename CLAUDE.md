@@ -10,8 +10,10 @@ Build/test targets iterate over both `fuse-library` and `fuse-app` by default. O
 
 ```bash
 # From repo root (iterates both examples by default)
-make build                         # swift build both examples (macOS)
-make test                          # swift test both examples (macOS/Darwin)
+make build                         # build both platforms (Darwin + Android)
+make test                          # test both platforms (Darwin + Android emulator)
+make darwin-build                  # swift build both examples (macOS only)
+make darwin-test                   # swift test both examples (macOS only)
 make android-build                 # skip android build both examples
 make android-test                  # skip android test both examples
 make skip-verify                   # skip verify --fix both examples
@@ -21,7 +23,7 @@ make test-filter FILTER=ObservationTests  # Run a single test suite (uses EXAMPL
 # Or run directly from an example directory
 cd examples/fuse-app && swift build
 cd examples/fuse-app && swift test              # macOS/Darwin only
-cd examples/fuse-app && swift test              # macOS/Darwin only
+cd examples/fuse-app && skip test               # Darwin + Android/Robolectric parity
 cd examples/fuse-app && skip android test       # Android device/emulator only
 cd examples/fuse-app && skip android build --configuration release --arch aarch64
 
