@@ -6,33 +6,70 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Prerequisites: Swift 6.2+, [Skip](https://skip.tools) (`brew install skiptools/skip/skip`), Xcode. Android builds also need Android SDK/NDK (`skip android sdk install`).
 
-Build/test targets iterate over both `fuse-library` and `fuse-app` by default. Override with `EXAMPLE=fuse-app` to target a single example.
+### Makefile (preferred)
+
+Grammar: `make [platform] [action…] [target…]`
+- **platform**: `ios` | `android` | `xc` (default: both ios + android)
+- **action**: `build` | `test` | `run` | `clean` (default: `build`)
+- **target**: example name — `fuse-library` | `fuse-app` (default: all)
+- For **xc**: target is `<project> [<scheme…>]` (`xc clean` only needs project; `xc build`/`xc run` need project + scheme)
+- `clean` is platform-agnostic (`.build` is shared) — `make clean ios` ≡ `make clean`
 
 ```bash
-# From repo root (iterates both examples by default)
-make build                         # build both platforms (Darwin + Android)
-make test                          # test both platforms (Darwin + Android emulator)
-make darwin-build                  # swift build both examples (macOS only)
-make darwin-test                   # swift test both examples (macOS only)
-make android-build                 # skip android build both examples
-make android-test                  # skip android test both examples
-make skip-verify                   # skip verify --fix both examples
-make clean                         # clean both examples
-make test-filter FILTER=ObservationTests  # Run a single test suite (uses EXAMPLE, default: fuse-library)
+# Build
+make                                       # build all examples, both platforms
+make fuse-app                              # build fuse-app, both platforms
+make ios fuse-app                          # build fuse-app for iOS only
+make android build fuse-app                # build fuse-app for Android only
 
-# Or run directly from an example directory
-cd examples/fuse-app && swift build
-cd examples/fuse-app && swift test              # macOS/Darwin only
-cd examples/fuse-app && skip test               # Darwin + Android/Robolectric parity
-cd examples/fuse-app && skip android test       # Android device/emulator only
+# Test
+make test                                  # test all examples, both platforms
+make ios test fuse-library                 # test fuse-library on iOS
+make ios test fuse-library FILTER=Obs      # filtered iOS test
+make android test fuse-app                 # test fuse-app on Android
+
+# Run (launches on simulator/emulator)
+make run fuse-app                          # run on both platforms
+make ios run fuse-app                      # run on iOS Simulator (auto-detects scheme)
+make android run fuse-app                  # run on Android device/emulator
+make run fuse-app SIMULATOR="iPhone 16"    # override iOS simulator (default: iPhone 17 Pro)
+
+# Xcode (explicit workspace/scheme control)
+make xc clean fuse-app                     # clean SPM cache + DerivedData
+make xc build fuse-app FuseApp App         # xcodebuild with explicit scheme
+make xc run fuse-app FuseApp App           # xcodebuild + simulator launch
+
+# Combined actions
+make clean build fuse-app                  # clean then build
+make android test run fuse-app             # test then run on Android
+make test run fuse-app                     # test + run on both platforms
+
+# Standalone
+make skip-verify                           # skip verify --fix all examples
+make clean                                 # clean all examples
+```
+
+### Direct commands (from example directory)
+
+```bash
+cd examples/fuse-app && swift build                # iOS/macOS
+cd examples/fuse-app && swift test                 # iOS/macOS tests
+cd examples/fuse-app && skip test                  # Darwin + Android/Robolectric parity
+cd examples/fuse-app && skip android test          # Android device/emulator only
 cd examples/fuse-app && skip android build --configuration release --arch aarch64
+```
 
-# Skip toolchain
+### Skip toolchain
+
+```bash
 skip doctor --native               # Verify environment (native SDK)
 skip checkup                       # Full system verification (builds sample)
 skip devices                       # List available emulators/simulators
+```
 
-# Android debugging
+### Android debugging
+
+```bash
 adb logcat -s swift                # Stream Swift logs from device/emulator
 skip android emulator launch --logcat '*:W'  # Launch emulator with filtered logs
 ```
@@ -73,7 +110,7 @@ The observation bridge fix spans 3 files across forks:
 
 **Skip reference docs** in `docs/skip/`: `modes.md` (Fuse vs Lite), `bridging.md` (JNI mechanics), `debugging.md` (adb/logcat), `testing.md` (parity tests).
 
-**Example projects** (`EXAMPLE=` values): `fuse-library` (default, reusable library with observation tests), `fuse-app` (full app), `lite-app`/`lite-library` (Lite mode, not for TCA).
+**Example projects** (Makefile targets): `fuse-library` (default, reusable library with observation tests), `fuse-app` (full app), `lite-app`/`lite-library` (Lite mode, not for TCA).
 
 ## Platform Conditionals
 
@@ -110,7 +147,9 @@ Planning state lives in `.planning/`:
 - **JNI naming**: Exports must match `Java_skip_ui_ViewObservation_<method>` exactly — package dots become underscores
 - **Fuse mode only**: Lite mode's counter-based observation is fundamentally incompatible with TCA. Don't attempt Lite mode for TCA apps
 - **No `swift-perception` on Android**: Use native `libswiftObservation.so` (ships with Swift Android SDK)
-- **`withTransaction` unavailable on Android**: `withTransaction` is `@available(*, unavailable)` with `fatalError()` in skip-fuse-ui. Use plain `store.send()` for state mutations -- never use animated navigation or dismiss paths on Android.
+- **`withAnimation` requires JNI context on Android**: `withAnimation` in skip-fuse-ui bridges to Java via JNI. In Robolectric test contexts where JNI is uninitialised, it guards with `isJNIInitialized` and skips animation bridge calls (executing the body directly). Animation is purely visual, so state mutations still apply correctly.
 - **Android builds can pass when running fails**: `skip android build` succeeding does NOT mean the app works. Always verify with `skip android test` or emulator testing -- runtime JNI/bridge failures only surface at execution time.
 - **Clean builds after dependency changes**: After modifying any fork's `Package.swift` or changing submodule pointers, run `swift package clean` or `make clean` before rebuilding. Incremental builds can use stale dependency artifacts.
 - **skip-fuse-ui NavigationStack is generic**: Unlike skip-ui's non-generic `NavigationStack`, skip-fuse-ui provides `NavigationStack<Data, Root>` matching SwiftUI's generic signature. TCA extensions constrain `Data` to `StackState<State>.PathView` -- this compiles on Android via skip-fuse-ui.
+- **SF Symbol mapping on Android**: skip-ui maps ~60 SF Symbol names to Material Design icons (core set only). Unmapped names display a warning triangle. Before using a new SF Symbol, check the mapping table in `forks/skip-ui/Sources/SkipUI/SkipUI/Components/Image.swift` (~line 431). To add a mapping, the target Material icon must exist in `material-icons-core` (verified by the resolver function at ~line 516). Build-verify after adding.
+- **@Shared reactivity on Android**: `@Shared` properties are reactive on Android via the `BridgeObservationRegistrar` integration in swift-perception. If reactivity issues resurface, check that `PerceptionRegistrar` on Android is using `BridgeObservationRegistrar` (not stdlib `ObservationRegistrar`).

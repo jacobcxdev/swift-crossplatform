@@ -78,3 +78,7 @@
 	path = forks/swift-concurrency-extras
 	url = https://github.com/jacobcxdev/swift-concurrency-extras.git
 	branch = dev/swift-crossplatform
+[submodule "forks/swift-macro-testing"]
+	path = forks/swift-macro-testing
+	url = https://github.com/jacobcxdev/swift-macro-testing.git
+	branch = main
