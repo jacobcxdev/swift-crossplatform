@@ -1,6 +1,8 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## Architecture
+
+Cross-platform Swift framework targeting iOS (native) and Android (via [Skip](https://skip.tools) JNI bridging). Uses TCA (swift-composable-architecture) for state management with a custom observation bridge (`BridgeObservationRegistrar`) that replays `@Observable` access tracking across the Swift→Kotlin→JNI boundary. Forked Point-Free and Skip dependencies in `forks/` provide Android compatibility while preserving iOS behaviour.
 
 ## Build & Test
 
@@ -69,7 +71,7 @@ skip android emulator launch --logcat '*:W'  # Launch emulator with filtered log
 
 ## Submodule Management
 
-19 fork submodules live in `forks/`. Use these from the repo root:
+Fork submodules live in `forks/`. Use these from the repo root:
 
 ```bash
 # After fresh clone
@@ -84,7 +86,7 @@ make diff-all          # Show uncommitted changes across submodules
 
 ## Working with Forks
 
-- All 19 forks track the `dev/swift-crossplatform` branch
+- All forks track the `dev/swift-crossplatform` branch
 - Example projects reference forks via local path: `.package(path: "../../forks/<name>")`
 - All fork changes must gate behind `#if os(Android)` or `#if SKIP_BRIDGE` to preserve iOS behavior
 - No iOS regressions — every fork must build and test cleanly on both platforms
@@ -93,26 +95,7 @@ make diff-all          # Show uncommitted changes across submodules
 
 **Point-Free fork verification:** When writing tests or making changes to Point-Free forks, verify implementations against the corresponding `/pfw-*` skill (e.g. `/pfw-composable-architecture`, `/pfw-sharing`, `/pfw-case-paths`). These skills contain canonical API patterns and anti-pattern rules that tests must conform to.
 
-## Key Files
-
-The observation bridge fix spans 3 files across forks:
-
-- `forks/skip-android-bridge/Sources/SkipAndroidBridge/Observation.swift` — `ObservationRecording` record-replay + JNI exports
-- `forks/skip-ui/Sources/SkipUI/SkipUI/View/View.swift` — `ViewObservation` hooks around `Evaluate()`
-- `forks/swift-composable-architecture/Sources/ComposableArchitecture/Observation/ObservationStateRegistrar.swift` — Android registrar path
-
-**Skip reference docs** in `docs/skip/`: `modes.md` (Fuse vs Lite), `bridging.md` (JNI mechanics), `debugging.md` (adb/logcat), `testing.md` (parity tests).
-
-**Example projects** (Makefile targets): `fuse-library` (default, reusable library with observation tests), `fuse-app` (full app), `lite-app`/`lite-library` (Lite mode, not for TCA).
-
-## Platform Conditionals
-
-```swift
-#if os(Android)    // Android-specific code paths
-#if SKIP_BRIDGE    // Bridge-level observation wrappers (skip-android-bridge)
-```
-
-## Environment Variables
+## Platform Conditionals & Environment Variables
 
 | Variable / Guard | Scope | Effect |
 |------------------|-------|--------|
@@ -121,18 +104,14 @@ The observation bridge fix spans 3 files across forks:
 | `#if os(Android)` | Swift conditional compilation | Standard platform check for Android-specific runtime code paths |
 | `#if canImport(SwiftUI)` | Swift conditional compilation | False on Android -- SkipFuseUI re-exports SkipSwiftUI, not Apple's SwiftUI module |
 | `#if SKIP` | Swift conditional compilation | True only in Skip-transpiled Kotlin context (e.g., `loadPeerLibrary`) |
+| `FUSE_NAV_DEBUG` | Swift compiler define (opt-in) | Enables navigation debug logging in skip-ui, skip-fuse-ui, skip-android-bridge, TCA. Add `.define("FUSE_NAV_DEBUG")` to relevant Package.swift targets |
+| `FUSE_TAB_DEBUG` | Swift compiler define (opt-in) | Enables tab debug logging in skip-ui. Add `.define("FUSE_TAB_DEBUG")` to SkipUI target in `forks/skip-ui/Package.swift` |
 
-## Project Planning
+## Testing
 
-Planning state lives in `.planning/`:
-
-- `STATE.md` — current phase and progress
-- `ROADMAP.md` — 10 phases with requirements and success criteria
-- `REQUIREMENTS.md` — 184 atomic API-level specifications
-- `PROJECT.md` — project context, decisions, constraints
-- `config.json` — GSD workflow configuration
-- `research/` — domain research documents
-- `local/` — private context (gitignored)
+- Use Swift Testing (preferred) or XCTest
+- Run `skip test` (not just `swift test`) to catch platform divergence — it runs both Darwin and Android/Robolectric
+- Filter with `make ios test fuse-library FILTER=Obs`
 
 ## Gotchas
 
