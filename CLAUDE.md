@@ -9,10 +9,10 @@ Prerequisites: Swift 6.2+, [Skip](https://skip.tools) (`brew install skiptools/s
 ### Makefile (preferred)
 
 Grammar: `make [platform] [action…] [target…]`
-- **platform**: `ios` | `android` | `xc` (default: both ios + android)
+- **platform**: `ios` | `android` (default: both)
 - **action**: `build` | `test` | `run` | `clean` (default: `build`)
 - **target**: example name — `fuse-library` | `fuse-app` (default: all)
-- For **xc**: target is `<project> [<scheme…>]` (`xc clean` only needs project; `xc build`/`xc run` need project + scheme)
+- `run` on Android: launches emulator if needed → `skip export` → `adb install` → launch → streams `logcat` (Ctrl+C to stop). Skips export if APK is up to date (timestamp-checks `Sources/`, `Package.swift`, `forks/`). iOS `run` prints Xcode guidance.
 - `clean` is platform-agnostic (`.build` is shared) — `make clean ios` ≡ `make clean`
 
 ```bash
@@ -28,26 +28,19 @@ make ios test fuse-library                 # test fuse-library on iOS
 make ios test fuse-library FILTER=Obs      # filtered iOS test
 make android test fuse-app                 # test fuse-app on Android
 
-# Run (launches on simulator/emulator)
-make run fuse-app                          # run on both platforms
-make ios run fuse-app                      # run on iOS Simulator (auto-detects scheme)
-make android run fuse-app                  # run on Android device/emulator
-make run fuse-app SIMULATOR="iPhone 16"    # override iOS simulator (default: iPhone 17 Pro)
-
-# Xcode (explicit workspace/scheme control)
-make xc clean fuse-app                     # clean SPM cache + DerivedData
-make xc build fuse-app FuseApp App         # xcodebuild with explicit scheme
-make xc run fuse-app FuseApp App           # xcodebuild + simulator launch
+# Run (Android only — iOS: use Xcode Cmd+R)
+make android run fuse-app                  # export APK, install, launch, stream logs
+make run fuse-app                          # iOS: Xcode hint; Android: full pipeline
 
 # Combined actions
 make clean build fuse-app                  # clean then build
-make android test run fuse-app             # test then run on Android
-make test run fuse-app                     # test + run on both platforms
 
 # Standalone
 make skip-verify                           # skip verify --fix all examples
 make clean                                 # clean all examples
 ```
+
+To run iOS, use Xcode (Cmd+R). To run Android from CLI, use `make android run <target>` — this auto-launches the emulator, exports an APK via `skip export`, installs it, launches the app, and streams `adb logcat -s swift` (Ctrl+C to stop). When running from Xcode, set `SKIP_ACTION` in the `.xcconfig` to control Android: `launch` (default, build + run both platforms), `build` (build Android but don't launch), or `none` (skip Android entirely for faster iteration).
 
 ### Direct commands (from example directory)
 

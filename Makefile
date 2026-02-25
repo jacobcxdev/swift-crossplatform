@@ -1,16 +1,13 @@
 SHELL := /bin/bash
 # ── Configuration ─────────────────────────────────────────────────
 EXAMPLES := fuse-library fuse-app
-SIMULATOR ?= iPhone 17 Pro
 FILTER ?=
 
 # ── Dispatch grammar ──────────────────────────────────────────────
 # make [platform] [action…] [target…]
-#   platform : ios | android | xc              (default: both)
-#   action   : build | test | run | clean      (default: build)
+#   platform : ios | android                   (default: both)
+#   action   : build | test | run | clean        (default: build)
 #   target   : example name                    (default: all examples)
-#   For xc  : target = <project> [<scheme…>]    (scheme words are joined)
-#             xc clean only needs <project>; xc build/run need <project> <scheme>
 #
 # Examples:
 #   make                                       build all, both platforms
@@ -20,14 +17,21 @@ FILTER ?=
 #         'make clean ios' and 'make clean' behave identically.
 #   make ios test fuse-library                 test fuse-library on iOS
 #   make android build fuse-app                build fuse-app for Android
-#   make android test run fuse-app             test + run fuse-app on Android
-#   make test run fuse-app                     test + run on both platforms
-#   make run fuse-app                          run fuse-app on both platforms
-#   make xc build fuse-app FuseApp App         xcodebuild specific scheme
-#   make xc run fuse-app FuseApp App           xcodebuild + simulator launch
+#   make ios test fuse-library FILTER=Obs      filtered iOS test
+#   make android run fuse-app                  export APK, install, launch
+#
+# Run:
+#   android: skip export → adb install → launch → logcat (Ctrl+C to stop)
+#            skips export if APK is up to date (timestamps Sources/ + forks/)
+#   ios:     use Xcode (Cmd+R) — prints guidance instead
+#
+# To run from Xcode, set SKIP_ACTION in .xcconfig:
+#   launch (default) = build + run both platforms
+#   build  = build Android but don't launch
+#   none   = skip Android entirely for faster iteration
 
 # ── Dispatch routing ──────────────────────────────────────────────
-_DISPATCH_WORDS := ios android xc build test run clean $(EXAMPLES)
+_DISPATCH_WORDS := ios android build test run clean $(EXAMPLES)
 _FIRST := $(firstword $(MAKECMDGOALS))
 
 ifneq ($(filter $(_FIRST),$(_DISPATCH_WORDS)),)
@@ -54,7 +58,7 @@ set -e; \
 platform=""; actions=""; targets=""; \
 for w in $(MAKECMDGOALS); do \
   case "$$w" in \
-    ios|android|xc) platform="$$w" ;; \
+    ios|android) platform="$$w" ;; \
     build|test|run|clean) actions="$$actions $$w" ;; \
     *) targets="$$targets $$w" ;; \
   esac; \
@@ -62,98 +66,67 @@ done; \
 actions=$${actions# }; targets=$${targets# }; \
 [ -z "$$actions" ] && actions="build"; \
 \
-if [ "$$platform" = "xc" ]; then \
-  proj=$$(echo "$$targets" | awk '{print $$1}'); \
-  scheme=$$(echo "$$targets" | awk '{$$1=""; print}' | xargs); \
-  [ -z "$$proj" ] && echo "Error: xc requires at least <project>" >&2 && exit 1; \
-  ws="examples/$$proj/Project.xcworkspace"; \
-  dd="examples/$$proj/.build/DerivedData"; \
-  for action in $$actions; do \
+[ -z "$$targets" ] && targets="$(EXAMPLES)"; \
+[ -z "$$platform" ] && platforms="ios android" || platforms="$$platform"; \
+for action in $$actions; do \
+  for ex in $$targets; do \
     case "$$action" in \
       clean) \
-        echo "=== Cleaning $$proj (including DerivedData) ==="; \
-        (cd "examples/$$proj" && swift package clean && rm -rf .build/plugins/outputs .build/DerivedData) ;; \
+        echo "=== Cleaning $$ex ==="; \
+        (cd "examples/$$ex" && swift package clean; rm -rf .build/plugins/outputs .build/DerivedData) ;; \
       build) \
-        [ -z "$$scheme" ] && echo "Error: xc build requires <project> <scheme>" >&2 && exit 1; \
-        echo "=== xcodebuild $$proj / $$scheme ==="; \
-        xcodebuild -workspace "$$ws" -scheme "$$scheme" \
-          -destination "platform=iOS Simulator,name=$(SIMULATOR)" \
-          -derivedDataPath "$$dd" build ;; \
-      run) \
-        [ -z "$$scheme" ] && echo "Error: xc run requires <project> <scheme>" >&2 && exit 1; \
-        echo "=== xcodebuild + launch $$proj / $$scheme ==="; \
-        : "xcodebuild uses a different toolchain than swift build / skip android build," ; \
-        : "so stale SPM artifacts cause build failures — clean first." ; \
-        (cd "examples/$$proj" && swift package clean && rm -rf .build/plugins/outputs); \
-        xcodebuild -workspace "$$ws" -scheme "$$scheme" \
-          -destination "platform=iOS Simulator,name=$(SIMULATOR)" \
-          -derivedDataPath "$$dd" clean build; \
-        xcrun simctl boot "$(SIMULATOR)" 2>/dev/null || true; \
-        open -a Simulator; \
-        app=$$(find "$$dd" -path "*/Debug-iphonesimulator/*.app" -maxdepth 6 | head -1); \
-        xcrun simctl install booted "$$app"; \
-        bid=$$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$$app/Info.plist"); \
-        xcrun simctl launch booted "$$bid" ;; \
+        for p in $$platforms; do \
+          case "$$p" in \
+            ios) echo "=== Building $$ex (iOS) ===" && (cd "examples/$$ex" && swift build) ;; \
+            android) echo "=== Building $$ex (Android) ===" && (cd "examples/$$ex" && skip android build) ;; \
+          esac; \
+        done ;; \
       test) \
-        echo "Error: use 'ios test' or 'android test' instead of 'xc test'" >&2 && exit 1 ;; \
+        for p in $$platforms; do \
+          case "$$p" in \
+            ios) echo "=== Testing $$ex (iOS) ===" && (cd "examples/$$ex" && swift test $(if $(FILTER),--filter $(FILTER))) ;; \
+            android) echo "=== Testing $$ex (Android) ===" && (cd "examples/$$ex" && skip android test) ;; \
+          esac; \
+        done ;; \
+      run) \
+        for p in $$platforms; do \
+          case "$$p" in \
+            ios) \
+              echo "=== Running $$ex (iOS) ==="; \
+              echo "Use Xcode to run iOS apps (Cmd+R), or:"; \
+              echo "  open examples/$$ex" ;; \
+            android) \
+              echo "=== Running $$ex (Android) ==="; \
+              if ! adb devices 2>/dev/null | grep -q 'emulator.*device$$'; then \
+                echo "No emulator running — launching one..."; \
+                skip android emulator launch & \
+                adb wait-for-device; \
+              fi; \
+              export_dir="examples/$$ex/.build/export"; \
+              apk=$$(ls "$$export_dir"/*-debug.apk 2>/dev/null | head -1); \
+              if [ -z "$$apk" ] || [ -n "$$(find "examples/$$ex/Sources" "examples/$$ex/Package.swift" forks/ -newer "$$apk" -name '*.swift' -print -quit 2>/dev/null)" ]; then \
+                echo "Source changed — rebuilding APK..."; \
+                rm -rf "$$export_dir"; \
+                (cd "examples/$$ex" && skip export --debug --android --no-ios -d .build/export) || true; \
+                apk=$$(ls "$$export_dir"/*-debug.apk 2>/dev/null | head -1); \
+                if [ -z "$$apk" ]; then echo "Error: no APK found in $$export_dir" >&2; exit 1; fi; \
+              else \
+                echo "APK up to date — skipping export"; \
+              fi && \
+              aapt_bin=$$(ls -d "$$HOME/Library/Android/sdk/build-tools"/*/ 2>/dev/null | sort -V | tail -1)aapt && \
+              if [ ! -x "$$aapt_bin" ]; then echo "Error: aapt not found — install Android SDK build-tools" >&2; exit 1; fi && \
+              pkg=$$($$aapt_bin dump badging "$$apk" | awk -F"'" '/^package:/{print $$2}') && \
+              activity=$$($$aapt_bin dump badging "$$apk" | awk -F"'" '/launchable-activity/{print $$2}') && \
+              echo "Installing $$apk..." && adb install -r "$$apk" && \
+              adb shell am force-stop "$$pkg" 2>/dev/null; \
+              echo "Launching $$pkg/$$activity..." && adb shell am start -n "$$pkg/$$activity" && \
+              pkill -f 'adb.*logcat' 2>/dev/null; \
+              echo "=== Streaming logs (Ctrl+C to stop) ===" && (trap 'exit 0' INT TERM; adb logcat -s swift) ;; \
+          esac; \
+        done ;; \
     esac; \
   done; \
-else \
-  [ -z "$$targets" ] && targets="$(EXAMPLES)"; \
-  [ -z "$$platform" ] && platforms="ios android" || platforms="$$platform"; \
-  for action in $$actions; do \
-    for ex in $$targets; do \
-      case "$$action" in \
-        clean) \
-          echo "=== Cleaning $$ex ==="; \
-          (cd "examples/$$ex" && swift package clean && rm -rf .build/plugins/outputs) ;; \
-        build) \
-          for p in $$platforms; do \
-            case "$$p" in \
-              ios) echo "=== Building $$ex (iOS) ===" && (cd "examples/$$ex" && swift build) ;; \
-              android) echo "=== Building $$ex (Android) ===" && (cd "examples/$$ex" && skip android build) ;; \
-            esac; \
-          done ;; \
-        test) \
-          for p in $$platforms; do \
-            case "$$p" in \
-              ios) echo "=== Testing $$ex (iOS) ===" && (cd "examples/$$ex" && swift test $(if $(FILTER),--filter $(FILTER))) ;; \
-              android) echo "=== Testing $$ex (Android) ===" && (cd "examples/$$ex" && skip android test) ;; \
-            esac; \
-          done ;; \
-        run) \
-          for p in $$platforms; do \
-            case "$$p" in \
-              ios) \
-                echo "=== Running $$ex (iOS Simulator) ==="; \
-                ws="examples/$$ex/Project.xcworkspace"; \
-                if [ ! -d "$$ws" ]; then echo "Error: no xcworkspace for $$ex — use 'xc run' with explicit scheme" >&2 && exit 1; fi; \
-                schemes=$$(xcodebuild -workspace "$$ws" -list 2>/dev/null | sed -n '/Schemes:/,/^$$/p' | tail -n +2); \
-                scheme=$$(echo "$$schemes" | grep -m1 'App' | xargs); \
-                [ -z "$$scheme" ] && scheme=$$(echo "$$schemes" | head -1 | xargs); \
-                [ -z "$$scheme" ] && echo "Error: no scheme found for $$ex" >&2 && exit 1; \
-                dd="examples/$$ex/.build/DerivedData"; \
-                : "xcodebuild uses a different toolchain than swift build / skip android build," ; \
-                : "so stale SPM artifacts cause build failures — clean first." ; \
-                (cd "examples/$$ex" && swift package clean && rm -rf .build/plugins/outputs); \
-                xcodebuild -workspace "$$ws" -scheme "$$scheme" \
-                  -destination "platform=iOS Simulator,name=$(SIMULATOR)" \
-                  -derivedDataPath "$$dd" clean build; \
-                xcrun simctl boot "$(SIMULATOR)" 2>/dev/null || true; \
-                open -a Simulator; \
-                app=$$(find "$$dd" -path "*/Debug-iphonesimulator/*.app" -maxdepth 6 | head -1); \
-                xcrun simctl install booted "$$app"; \
-                bid=$$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$$app/Info.plist"); \
-                xcrun simctl launch booted "$$bid" ;; \
-              android) \
-                echo "=== Running $$ex (Android) ==="; \
-                (cd "examples/$$ex" && skip android run) ;; \
-            esac; \
-          done ;; \
-      esac; \
-    done; \
-  done; \
-fi
+done
 endef
 
 # ── Standalone targets ────────────────────────────────────────────
