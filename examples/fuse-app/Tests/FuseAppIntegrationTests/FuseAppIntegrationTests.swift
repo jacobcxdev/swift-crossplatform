@@ -1,6 +1,5 @@
 #if !SKIP
 import ComposableArchitecture
-import CustomDump
 import Foundation
 import SQLiteData
 import Testing
@@ -96,7 +95,9 @@ struct TodosFeatureTests {
             $0.date = .constant(testDate)
         }
         await store.send(.addButtonTapped) {
-            $0.todos.append(Todo(id: testUUID, title: "New Todo", isComplete: false, createdAt: testDate))
+            let newTodo = Todo(id: testUUID, title: "New Todo", isComplete: false, createdAt: testDate)
+            $0.todos.append(newTodo)
+            $0.$savedTodos.withLock { $0 = [newTodo] }
         }
         #expect(store.state.todos.count == 1)
     }
@@ -108,33 +109,19 @@ struct TodosFeatureTests {
         }
         await store.send(.toggleTodo(todo.id)) {
             $0.todos[id: todo.id]?.isComplete = true
+            let expected = $0.todos
+            $0.$savedTodos.withLock { $0 = expected }
         }
     }
 
-    @Test func deleteWithAlertConfirmation() async {
+    @Test func deleteSwiped() async {
         let todo = Todo(id: UUID(), title: "Delete me", createdAt: .distantPast)
         let store = TestStore(initialState: TodosFeature.State(todos: [todo])) {
             TodosFeature()
         }
-        await store.send(.deleteTapped(todo.id)) {
-            $0.todoToDelete = todo.id
-            $0.alert = AlertState {
-                TextState("Delete Todo?")
-            } actions: {
-                ButtonState(role: .destructive, action: .confirmDeletion) {
-                    TextState("Delete")
-                }
-                ButtonState(role: .cancel) {
-                    TextState("Cancel")
-                }
-            } message: {
-                TextState("This action cannot be undone.")
-            }
-        }
-        await store.send(.alert(.presented(.confirmDeletion))) {
-            $0.alert = nil
+        await store.send(.deleteSwiped(IndexSet(integer: 0))) {
             $0.todos = []
-            $0.todoToDelete = nil
+            $0.$savedTodos.withLock { $0 = [] }
         }
     }
 
@@ -156,15 +143,79 @@ struct TodosFeatureTests {
             TodosFeature()
         }
         await store.send(.sortButtonTapped) {
-            $0.confirmationDialog = ConfirmationDialogState {
-                TextState("Sort Todos")
-            } actions: {
-                ButtonState(action: .sortByTitle) { TextState("By Title") }
-                ButtonState(action: .sortByDate) { TextState("By Date") }
-                ButtonState(action: .sortByStatus) { TextState("By Status") }
-                ButtonState(role: .cancel) { TextState("Cancel") }
-            }
+            $0.destination = .confirmationDialog(
+                ConfirmationDialogState {
+                    TextState("Sort Todos")
+                } actions: {
+                    ButtonState(action: .sortByTitle) { TextState("By Title") }
+                    ButtonState(action: .sortByDate) { TextState("By Date") }
+                    ButtonState(action: .sortByStatus) { TextState("By Status") }
+                    ButtonState(role: .cancel) { TextState("Cancel") }
+                }
+            )
         }
+    }
+
+    @Test func sortByTitle() async {
+        let todoB = Todo(id: UUID(), title: "Banana", createdAt: .distantPast)
+        let todoA = Todo(id: UUID(), title: "Apple", createdAt: .distantPast)
+        let store = TestStore(initialState: TodosFeature.State(todos: [todoB, todoA])) {
+            TodosFeature()
+        }
+        store.exhaustivity = .off
+        await store.send(.sortButtonTapped)
+        await store.send(.destination(.presented(.confirmationDialog(.sortByTitle)))) {
+            $0.destination = nil
+            $0.todos = [todoA, todoB]
+            $0.$savedTodos.withLock { $0 = [todoA, todoB] }
+        }
+    }
+
+    @Test func sortByDate() async {
+        let older = Todo(id: UUID(), title: "Older", createdAt: Date(timeIntervalSince1970: 100))
+        let newer = Todo(id: UUID(), title: "Newer", createdAt: Date(timeIntervalSince1970: 200))
+        let store = TestStore(initialState: TodosFeature.State(todos: [newer, older])) {
+            TodosFeature()
+        }
+        store.exhaustivity = .off
+        await store.send(.sortButtonTapped)
+        await store.send(.destination(.presented(.confirmationDialog(.sortByDate)))) {
+            $0.destination = nil
+            $0.todos = [older, newer]
+            $0.$savedTodos.withLock { $0 = [older, newer] }
+        }
+    }
+
+    @Test func sortByStatus() async {
+        let done = Todo(id: UUID(), title: "Done", isComplete: true, createdAt: .distantPast)
+        let active = Todo(id: UUID(), title: "Active", isComplete: false, createdAt: .distantPast)
+        let store = TestStore(initialState: TodosFeature.State(todos: [done, active])) {
+            TodosFeature()
+        }
+        store.exhaustivity = .off
+        await store.send(.sortButtonTapped)
+        await store.send(.destination(.presented(.confirmationDialog(.sortByStatus)))) {
+            $0.destination = nil
+            $0.todos = [active, done]
+            $0.$savedTodos.withLock { $0 = [active, done] }
+        }
+    }
+
+    @Test func savedTodosSyncOnMutation() async {
+        let testUUID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
+        let testDate = Date(timeIntervalSince1970: 1_000_000)
+        let store = TestStore(initialState: TodosFeature.State()) {
+            TodosFeature()
+        } withDependencies: {
+            $0.uuid = .constant(testUUID)
+            $0.date = .constant(testDate)
+        }
+        let newTodo = Todo(id: testUUID, title: "New Todo", isComplete: false, createdAt: testDate)
+        await store.send(.addButtonTapped) {
+            $0.todos.append(newTodo)
+            $0.$savedTodos.withLock { $0 = [newTodo] }
+        }
+        #expect(store.state.savedTodos.count == 1)
     }
 }
 
@@ -196,6 +247,16 @@ struct ContactsFeatureTests {
                 Contact(id: testUUIDs[2], name: "Charlie", email: "charlie@example.com"),
             ]
         }
+    }
+
+    @Test func viewAppearedDoesNotReseedWhenContactsExist() async {
+        let existing = Contact(id: UUID(), name: "Existing", email: "e@e.com")
+        let store = TestStore(initialState: ContactsFeature.State(contacts: [existing])) {
+            ContactsFeature()
+        }
+        await store.send(.viewAppeared)
+        #expect(store.state.contacts.count == 1)
+        #expect(store.state.contacts.first?.name == "Existing")
     }
 
     @Test func pushContactDetail() async {
@@ -318,6 +379,78 @@ struct ContactDetailFeatureTests {
     }
 }
 
+// MARK: - AddContactFeature Integration Tests
+
+@Suite(.serialized) @MainActor
+struct AddContactFeatureTests {
+
+    @Test func bindingChanges() async {
+        let store = TestStore(initialState: AddContactFeature.State()) {
+            AddContactFeature()
+        }
+        await store.send(.binding(.set(\.name, "Dave"))) {
+            $0.name = "Dave"
+        }
+        await store.send(.binding(.set(\.email, "dave@example.com"))) {
+            $0.email = "dave@example.com"
+        }
+    }
+
+    @Test func cancelDismisses() async {
+        let store = TestStore(initialState: AddContactFeature.State()) {
+            AddContactFeature()
+        }
+        await store.send(.cancelButtonTapped)
+    }
+
+    @Test func saveCreatesContact() async {
+        let testUUID = UUID(uuidString: "00000000-0000-0000-0000-000000000042")!
+        let store = TestStore(initialState: AddContactFeature.State(name: "Dave", email: "dave@example.com")) {
+            AddContactFeature()
+        } withDependencies: {
+            $0.uuid = .constant(testUUID)
+        }
+        await store.send(.saveButtonTapped)
+        await store.receive(\.delegate.saveContact)
+    }
+}
+
+// MARK: - EditContactFeature Integration Tests
+
+@Suite(.serialized) @MainActor
+struct EditContactFeatureTests {
+
+    @Test func bindingChanges() async {
+        let contact = Contact(id: UUID(), name: "Alice", email: "alice@example.com")
+        let store = TestStore(initialState: EditContactFeature.State(contact: contact)) {
+            EditContactFeature()
+        }
+        await store.send(.binding(.set(\.contact.name, "Bob"))) {
+            $0.contact.name = "Bob"
+        }
+        await store.send(.binding(.set(\.contact.email, "bob@example.com"))) {
+            $0.contact.email = "bob@example.com"
+        }
+    }
+
+    @Test func cancelDismisses() async {
+        let contact = Contact(id: UUID(), name: "Alice", email: "alice@example.com")
+        let store = TestStore(initialState: EditContactFeature.State(contact: contact)) {
+            EditContactFeature()
+        }
+        await store.send(.cancelButtonTapped)
+    }
+
+    @Test func saveEmitsDelegate() async {
+        let contact = Contact(id: UUID(), name: "Updated", email: "updated@example.com")
+        let store = TestStore(initialState: EditContactFeature.State(contact: contact)) {
+            EditContactFeature()
+        }
+        await store.send(.saveButtonTapped)
+        await store.receive(\.delegate.save)
+    }
+}
+
 // MARK: - DatabaseFeature Integration Tests
 
 @Suite(.serialized) @MainActor
@@ -325,19 +458,9 @@ struct DatabaseFeatureTests {
 
     private func createMigratedDatabase() throws -> DatabaseQueue {
         let db = try DatabaseQueue()
-        try db.write { db in
-            try #sql(
-                """
-                CREATE TABLE "notes" (
-                    "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                    "title" TEXT NOT NULL DEFAULT '',
-                    "body" TEXT NOT NULL DEFAULT '',
-                    "category" TEXT NOT NULL DEFAULT 'general',
-                    "createdAt" REAL NOT NULL DEFAULT 0
-                ) STRICT
-                """
-            ).execute(db)
-        }
+        var migrator = DatabaseMigrator()
+        DatabaseFeature.registerMigrations(on: &migrator)
+        try migrator.migrate(db)
         return db
     }
 
@@ -405,7 +528,7 @@ struct SettingsFeatureTests {
         }
         await store.send(.userNameChanged("Alice")) {
             $0.$userName.withLock { $0 = "Alice" }
-            $0.$sessionActionCount.withLock { $0 = 1 }
+            $0.$settingsActionCount.withLock { $0 = 1 }
         }
     }
 
@@ -415,7 +538,7 @@ struct SettingsFeatureTests {
         }
         await store.send(.appearanceChanged("dark")) {
             $0.$appearance.withLock { $0 = "dark" }
-            $0.$sessionActionCount.withLock { $0 = 1 }
+            $0.$settingsActionCount.withLock { $0 = 1 }
         }
     }
 
@@ -425,7 +548,7 @@ struct SettingsFeatureTests {
         }
         await store.send(.notificationsToggled(false)) {
             $0.$notificationsEnabled.withLock { $0 = false }
-            $0.$sessionActionCount.withLock { $0 = 1 }
+            $0.$settingsActionCount.withLock { $0 = 1 }
         }
     }
 
@@ -435,31 +558,31 @@ struct SettingsFeatureTests {
         }
         await store.send(.userNameChanged("Alice")) {
             $0.$userName.withLock { $0 = "Alice" }
-            $0.$sessionActionCount.withLock { $0 = 1 }
+            $0.$settingsActionCount.withLock { $0 = 1 }
         }
         await store.send(.resetButtonTapped) {
             $0.$userName.withLock { $0 = "Skipper" }
             $0.$appearance.withLock { $0 = "" }
             $0.$notificationsEnabled.withLock { $0 = true }
-            $0.$sessionActionCount.withLock { $0 = 2 }
+            $0.$settingsActionCount.withLock { $0 = 2 }
         }
     }
 
-    @Test func sessionActionCountIncrementsAcrossActions() async {
+    @Test func settingsActionCountIncrementsAcrossActions() async {
         let store = TestStore(initialState: SettingsFeature.State()) {
             SettingsFeature()
         }
         await store.send(.userNameChanged("A")) {
             $0.$userName.withLock { $0 = "A" }
-            $0.$sessionActionCount.withLock { $0 = 1 }
+            $0.$settingsActionCount.withLock { $0 = 1 }
         }
         await store.send(.appearanceChanged("dark")) {
             $0.$appearance.withLock { $0 = "dark" }
-            $0.$sessionActionCount.withLock { $0 = 2 }
+            $0.$settingsActionCount.withLock { $0 = 2 }
         }
         await store.send(.notificationsToggled(false)) {
             $0.$notificationsEnabled.withLock { $0 = false }
-            $0.$sessionActionCount.withLock { $0 = 3 }
+            $0.$settingsActionCount.withLock { $0 = 3 }
         }
     }
 }
@@ -522,10 +645,10 @@ struct AppFeatureTests {
             $0.uuid = .constant(testUUID)
             $0.date = .constant(testDate)
         }
+        let newTodo = Todo(id: testUUID, title: "New Todo", isComplete: false, createdAt: testDate)
         await store.send(.todos(.addButtonTapped)) {
-            $0.todos.todos.append(
-                Todo(id: testUUID, title: "New Todo", isComplete: false, createdAt: testDate)
-            )
+            $0.todos.todos.append(newTodo)
+            $0.todos.$savedTodos.withLock { $0 = [newTodo] }
         }
         #expect(store.state.todos.todos.count == 1)
     }

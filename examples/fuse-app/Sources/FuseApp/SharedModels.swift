@@ -77,12 +77,17 @@ private let _savedTodosURL: URL = {
     }
     return FileManager.default.temporaryDirectory.appending(component: "todos.json")
     #else
+    if let url = try? FileManager.default.url(
+        for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true
+    ) {
+        return url.appending(component: "todos.json")
+    }
     return URL.applicationSupportDirectory.appending(component: "todos.json")
     #endif
 }()
 
 extension SharedKey where Self == InMemoryKey<Int>.Default {
-    static var sessionActionCount: Self { Self[.inMemory("sessionActionCount"), default: 0] }
+    static var settingsActionCount: Self { Self[.inMemory("settingsActionCount"), default: 0] }
 }
 
 // MARK: - Number Fact Dependency Client

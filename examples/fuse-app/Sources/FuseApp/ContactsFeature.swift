@@ -1,5 +1,16 @@
 import ComposableArchitecture
+import Foundation
 import SwiftUI
+
+#if os(Android)
+import SkipAndroidBridge
+@inline(__always)
+private func navLog(_ msg: @autoclosure () -> String) {
+    #if FUSE_NAV_DEBUG
+    _navDebugLog(msg())
+    #endif
+}
+#endif
 
 // MARK: - ContactsFeaturePath
 
@@ -43,11 +54,15 @@ struct ContactsFeature {
                 return .none
 
             case let .contactTapped(contact):
+                #if os(Android)
+                navLog("ContactsFeature: .contactTapped, pathCount before=\(state.path.count)")
+                #endif
                 state.path.append(.detail(ContactDetailFeature.State(contact: contact)))
                 return .none
 
             case .path(.element(let stackID, .detail(.delegate(.deleteContact(let contactID))))):
                 state.contacts.remove(id: contactID)
+                // Pop before any further path actions so the stack is consistent
                 state.path.pop(from: stackID)
                 return .none
 
@@ -62,13 +77,12 @@ struct ContactsFeature {
                 return .none
 
             case .viewAppeared:
-                if state.contacts.isEmpty {
-                    state.contacts = [
+                guard state.contacts.isEmpty else { return .none }
+                state.contacts = [
                         Contact(id: uuid(), name: "Alice", email: "alice@example.com"),
-                        Contact(id: uuid(), name: "Bob", email: "bob@example.com"),
-                        Contact(id: uuid(), name: "Charlie", email: "charlie@example.com"),
-                    ]
-                }
+                    Contact(id: uuid(), name: "Bob", email: "bob@example.com"),
+                    Contact(id: uuid(), name: "Charlie", email: "charlie@example.com"),
+                ]
                 return .none
             }
         }
@@ -117,8 +131,6 @@ struct ContactDetailFeature {
             case deleteContact(Contact.ID)
         }
     }
-
-    @Dependency(\.dismiss) var dismiss
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -293,6 +305,7 @@ struct ContactsView: View {
                     HStack {
                         Image(systemName: "person.circle.fill")
                             .foregroundStyle(.blue)
+                            .accessibilityHidden(true)
                         VStack(alignment: .leading) {
                             Text(contact.name)
                                 .font(.headline)
@@ -312,7 +325,7 @@ struct ContactsView: View {
                 }
             }
         }
-        .task { store.send(.viewAppeared) }
+        .onAppear { store.send(.viewAppeared) }
     }
 }
 
@@ -325,7 +338,9 @@ struct ContactDetailView: View {
         List {
             Section("Info") {
                 HStack { Text("Name"); Spacer(); Text(store.contact.name).foregroundStyle(.secondary) }
+                    .accessibilityElement(children: .combine)
                 HStack { Text("Email"); Spacer(); Text(store.contact.email).foregroundStyle(.secondary) }
+                    .accessibilityElement(children: .combine)
             }
 
             Section {
@@ -404,3 +419,4 @@ struct AddContactView: View {
 extension ContactsFeature.Destination.State: Equatable {}
 extension ContactsFeaturePath.State: Equatable {}
 extension ContactDetailFeature.Destination.State: Equatable {}
+

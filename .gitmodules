@@ -81,4 +81,20 @@
 [submodule "forks/swift-macro-testing"]
 	path = forks/swift-macro-testing
 	url = https://github.com/jacobcxdev/swift-macro-testing.git
-	branch = main
+	branch = dev/swift-crossplatform
+[submodule "forks/skip"]
+	path = forks/skip
+	url = https://github.com/jacobcxdev/skip.git
+	branch = dev/swift-crossplatform
+[submodule "forks/skipstone"]
+	path = forks/skipstone
+	url = https://github.com/jacobcxdev/skipstone.git
+	branch = dev/swift-crossplatform
+[submodule "examples/skipapp-showcase"]
+	path = examples/skipapp-showcase
+	url = https://github.com/jacobcxdev/skipapp-showcase.git
+	branch = dev/swift-crossplatform
+[submodule "examples/skipapp-showcase-fuse"]
+	path = examples/skipapp-showcase-fuse
+	url = https://github.com/jacobcxdev/skipapp-showcase-fuse.git
+	branch = dev/swift-crossplatform

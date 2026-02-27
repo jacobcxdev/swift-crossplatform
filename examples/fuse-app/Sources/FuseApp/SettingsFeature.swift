@@ -14,50 +14,40 @@ struct SettingsFeature {
         @Shared(.appearance) var appearance: String
         @Shared(.notificationsEnabled) var notificationsEnabled: Bool
         @Shared(.savedTodos) var savedTodos: IdentifiedArrayOf<Todo> = []
-        @Shared(.sessionActionCount) var sessionActionCount: Int
-        @ObservationStateIgnored var debugInfo: String = ""
+        @Shared(.settingsActionCount) var settingsActionCount: Int
     }
 
     @CasePathable
-    enum Action: BindableAction {
-        case binding(BindingAction<State>)
+    enum Action {
         case userNameChanged(String)
         case appearanceChanged(String)
         case notificationsToggled(Bool)
         case resetButtonTapped
-        case viewAppeared
     }
 
     var body: some ReducerOf<Self> {
-        BindingReducer()
         Reduce { state, action in
             switch action {
-            case .binding:
-                return .none
-
             case let .userNameChanged(name):
                 state.$userName.withLock { $0 = name }
-                state.$sessionActionCount.withLock { $0 += 1 }
+                state.$settingsActionCount.withLock { $0 += 1 }
                 return .none
 
             case let .appearanceChanged(appearance):
                 state.$appearance.withLock { $0 = appearance }
-                state.$sessionActionCount.withLock { $0 += 1 }
+                state.$settingsActionCount.withLock { $0 += 1 }
                 return .none
 
             case let .notificationsToggled(enabled):
                 state.$notificationsEnabled.withLock { $0 = enabled }
-                state.$sessionActionCount.withLock { $0 += 1 }
+                state.$settingsActionCount.withLock { $0 += 1 }
                 return .none
 
             case .resetButtonTapped:
                 state.$userName.withLock { $0 = "Skipper" }
                 state.$appearance.withLock { $0 = "" }
                 state.$notificationsEnabled.withLock { $0 = true }
-                state.$sessionActionCount.withLock { $0 += 1 }
-                return .none
-
-            case .viewAppeared:
+                state.$settingsActionCount.withLock { $0 += 1 }
                 return .none
             }
         }
@@ -72,15 +62,9 @@ struct SettingsView: View {
     var body: some View {
         List {
             Section("Profile") {
-                TextField("Name", text: Binding(
-                    get: { store.userName },
-                    set: { store.send(.userNameChanged($0)) }
-                ))
+                TextField("Name", text: $store.userName.sending(\.userNameChanged))
 
-                Picker("Appearance", selection: Binding(
-                    get: { store.appearance },
-                    set: { store.send(.appearanceChanged($0)) }
-                )) {
+                Picker("Appearance", selection: $store.appearance.sending(\.appearanceChanged)) {
                     Text("System").tag("")
                     Text("Light").tag("light")
                     Text("Dark").tag("dark")
@@ -88,21 +72,21 @@ struct SettingsView: View {
             }
 
             Section("Preferences") {
-                Toggle("Notifications", isOn: Binding(
-                    get: { store.notificationsEnabled },
-                    set: { store.send(.notificationsToggled($0)) }
-                ))
+                Toggle("Notifications", isOn: $store.notificationsEnabled.sending(\.notificationsToggled))
             }
 
             Section("Storage Demo") {
                 HStack { Text("Saved Todos (fileStorage)"); Spacer(); Text("\(store.savedTodos.count)").foregroundStyle(.secondary) }
-                HStack { Text("Actions (inMemory)"); Spacer(); Text("\(store.sessionActionCount)").foregroundStyle(.secondary) }
+                    .accessibilityElement(children: .combine)
+                HStack { Text("Actions (inMemory)"); Spacer(); Text("\(store.settingsActionCount)").foregroundStyle(.secondary) }
+                    .accessibilityElement(children: .combine)
             }
 
             Section {
                 Button("Reset to Defaults", role: .destructive) {
                     store.send(.resetButtonTapped)
                 }
+                .accessibilityHint("Resets name, appearance, and notifications to default values.")
             }
 
             Section("About") {
@@ -114,6 +98,5 @@ struct SettingsView: View {
             }
         }
         .navigationTitle("Settings")
-        .task { store.send(.viewAppeared) }
     }
 }

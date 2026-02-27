@@ -15,10 +15,13 @@ let logger: Logger = Logger(subsystem: "dev.jacobcx.fuseApp", category: "FuseApp
 ///
 /// The default implementation merely loads the `AppView` for the app and logs a message.
 /* SKIP @bridge */public struct FuseAppRootView : View {
-    let store = Store(initialState: AppFeature.State()) {
-        AppFeature()
-            ._printChanges()
-    }
+    let store: StoreOf<AppFeature> = {
+        #if DEBUG
+        Store(initialState: AppFeature.State()) { AppFeature()._printChanges() }
+        #else
+        Store(initialState: AppFeature.State()) { AppFeature() }
+        #endif
+    }()
 
     /* SKIP @bridge */public init() {
         prepareDependencies {

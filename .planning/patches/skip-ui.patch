@@ -1,0 +1,219 @@
+diff --git a/Sources/SkipUI/SkipUI/Components/Image.swift b/Sources/SkipUI/SkipUI/Components/Image.swift
+index b50af21..26b2bbd 100644
+--- a/Sources/SkipUI/SkipUI/Components/Image.swift
++++ b/Sources/SkipUI/SkipUI/Components/Image.swift
+@@ -473,7 +473,22 @@ public struct Image : View, Renderable, Equatable {
+         case "cart": return "Icons.Outlined.ShoppingCart" //􀍩
+         // #148 Icons.Outlined.Star is not actually outlined!
+         // case "star": return "Icons.Outlined.Star" //􀋃
++        case "number": return "Icons.Outlined.Tag" //􀋡
++        case "number.circle": return "Icons.Outlined.Tag" //􀁜
++        case "checklist": return "Icons.Outlined.Checklist" //􀷾
++        case "person.2": return "Icons.Outlined.People" //􀉫
++        case "person.2.fill": return "Icons.Filled.People" //􀉬
++        case "cylinder": return "Icons.Outlined.Storage" //􀤂
++        case "cylinder.fill": return "Icons.Filled.Storage" //􀤃
+         case "hand.thumbsup": return "Icons.Outlined.ThumbUp" //􀉿
++        case "circle": return "Icons.Outlined.RadioButtonUnchecked" //􀁝
++        case "arrow.up.arrow.down": return "Icons.Outlined.SwapVert" //􀄬
++        case "person.circle": return "Icons.Outlined.AccountCircle" //􀉭
++        case "xmark.circle": return "Icons.Outlined.Close" //􀁡
++        case "pencil.circle": return "Icons.Outlined.Edit" //
++        case "square.and.pencil": return "Icons.Outlined.Edit" //
++        case "phone.circle": return "Icons.Outlined.Phone" //
++        case "envelope.badge": return "Icons.Outlined.MailOutline" //
+         case "exclamationmark.triangle": return "Icons.Outlined.Warning" //􀇿
+ 
+         case "person.crop.square.fill": return "Icons.Filled.AccountBox" //􀉺
+@@ -497,6 +512,11 @@ public struct Image : View, Renderable, Equatable {
+         case "cart.fill": return "Icons.Filled.ShoppingCart" //􀍪
+         case "star.fill": return "Icons.Filled.Star" //􀋃
+         case "hand.thumbsup.fill": return "Icons.Filled.ThumbUp" //􀊀
++        case "circle.fill": return "Icons.Filled.RadioButtonChecked" //􀁝
++        case "person.circle.fill": return "Icons.Filled.AccountCircle" //􀉮
++        case "xmark.circle.fill": return "Icons.Filled.Close" //
++        case "pencil.circle.fill": return "Icons.Filled.Edit" //
++        case "phone.circle.fill": return "Icons.Filled.Phone" //
+         case "exclamationmark.triangle.fill": return "Icons.Filled.Warning" //􀇿
+ 
+         default: return nil
+@@ -555,7 +575,13 @@ public struct Image : View, Renderable, Equatable {
+         case "Icons.Outlined.Share": return Icons.Outlined.Share
+         case "Icons.Outlined.ShoppingCart": return Icons.Outlined.ShoppingCart
+         case "Icons.Outlined.Star": return Icons.Outlined.Star
++        case "Icons.Outlined.Tag": return Icons.Outlined.Tag
++        case "Icons.Outlined.Checklist": return Icons.Outlined.Checklist
++        case "Icons.Outlined.People": return Icons.Outlined.People
++        case "Icons.Outlined.Storage": return Icons.Outlined.Storage
+         case "Icons.Outlined.ThumbUp": return Icons.Outlined.ThumbUp
++        case "Icons.Outlined.RadioButtonUnchecked": return Icons.Outlined.RadioButtonUnchecked
++        case "Icons.Outlined.SwapVert": return Icons.Outlined.SwapVert
+         case "Icons.Outlined.Warning": return Icons.Outlined.Warning
+ 
+         case "Icons.Filled.AccountBox": return Icons.Filled.AccountBox
+@@ -605,7 +631,10 @@ public struct Image : View, Renderable, Equatable {
+         case "Icons.Filled.Share": return Icons.Filled.Share
+         case "Icons.Filled.ShoppingCart": return Icons.Filled.ShoppingCart
+         case "Icons.Filled.Star": return Icons.Filled.Star
++        case "Icons.Filled.People": return Icons.Filled.People
++        case "Icons.Filled.Storage": return Icons.Filled.Storage
+         case "Icons.Filled.ThumbUp": return Icons.Filled.ThumbUp
++        case "Icons.Filled.RadioButtonChecked": return Icons.Filled.RadioButtonChecked
+         case "Icons.Filled.Warning": return Icons.Filled.Warning
+ 
+         case "Icons.Rounded.AccountBox": return Icons.Rounded.AccountBox
+diff --git a/Sources/SkipUI/SkipUI/Containers/List.swift b/Sources/SkipUI/SkipUI/Containers/List.swift
+index b671df1..7a70261 100644
+--- a/Sources/SkipUI/SkipUI/Containers/List.swift
++++ b/Sources/SkipUI/SkipUI/Containers/List.swift
+@@ -485,17 +485,16 @@ public final class List : View, Renderable {
+                     withAnimation { (objectsBinding.wrappedValue as? RangeReplaceableCollection<Any>)?.remove(at: index) }
+                 }
+             })
+-            let coroutineScope = rememberCoroutineScope()
+-            let positionalThreshold = with(LocalDensity.current) { 164.dp.toPx() }
+             let dismissState = rememberSwipeToDismissBoxState(confirmValueChange: {
+-                if $0 == SwipeToDismissBoxValue.EndToStart {
+-                    coroutineScope.launch {
+-                        rememberedOnDelete.value()
+-                    }
+-                }
+-                return false
++                $0 == SwipeToDismissBoxValue.EndToStart
+             }, positionalThreshold = SwipeToDismissBoxDefaults.positionalThreshold)
+ 
++            LaunchedEffect(dismissState.currentValue) {
++                if dismissState.currentValue == SwipeToDismissBoxValue.EndToStart {
++                    rememberedOnDelete.value()
++                }
++            }
++
+             let itemContent: @Composable (Modifier) -> Void = {
+                 SwipeToDismissBox(state: dismissState, enableDismissFromEndToStart: true, enableDismissFromStartToEnd: false, modifier: $0, backgroundContent: {
+                     let trashVector = Image.composeImageVector(named: "trash")!
+diff --git a/Sources/SkipUI/SkipUI/Containers/Navigation.swift b/Sources/SkipUI/SkipUI/Containers/Navigation.swift
+index b76eb38..ce034c8 100644
+--- a/Sources/SkipUI/SkipUI/Containers/Navigation.swift
++++ b/Sources/SkipUI/SkipUI/Containers/Navigation.swift
+@@ -2,6 +2,7 @@
+ // SPDX-License-Identifier: LGPL-3.0-only WITH LGPL-3.0-linking-exception
+ #if !SKIP_BRIDGE
+ import Foundation
++import OSLog
+ #if SKIP
+ import androidx.activity.compose.BackHandler
+ import androidx.compose.animation.fadeIn
+@@ -612,6 +613,14 @@ struct NavigationDestination {
+     }
+ }
+ 
++private let navLogger = Logger(subsystem: "skip.ui", category: "NAV_DEBUG")
++
++private func navLog(_ msg: String) {
++    #if FUSE_NAV_DEBUG
++    navLogger.debug("\(msg)")
++    #endif
++}
++
+ @Stable final class Navigator {
+     /// Route for the root of the navigation stack.
+     static let rootRoute = "navigationroot"
+@@ -670,6 +679,7 @@ struct NavigationDestination {
+ 
+     /// Call with updated state on recompose.
+     @Composable func didCompose(navController: NavHostController, destinations: NavigationDestinations, path: Binding<[Any]>?, navigationPath: Binding<NavigationPath>?, keyboardController: SoftwareKeyboardController?) {
++        navLog("Navigator.didCompose: hasPath=\(path != nil), pathCount=\(path?.wrappedValue.count ?? navigationPath?.wrappedValue.count)")
+         self.navController = navController
+         self.destinations = destinations
+         self.path = path
+@@ -687,6 +697,7 @@ struct NavigationDestination {
+ 
+     /// Navigate to a target value specified in a `NavigationLink`.
+     func navigate(to targetValue: Any) {
++        navLog("navigate(to): hasPath=\(path != nil), value=\(type(of: targetValue))")
+         if let path {
+             path.wrappedValue.append(targetValue)
+         } else if let navigationPath {
+@@ -817,6 +828,7 @@ struct NavigationDestination {
+             return
+         }
+         let backStack = navController.currentBackStack.value
++        navLog("navigateToPath: pathCount=\(path.count), backStackCount=\(backStack.count())")
+         guard !backStack.isEmpty() else {
+             return
+         }
+@@ -835,6 +847,7 @@ struct NavigationDestination {
+             pathIndex += 1
+             backStackIndex += 1
+         }
++        navLog("navigateToPath: pathIndex=\(pathIndex), backStackIndex=\(backStackIndex)")
+ 
+         // If we exhausted the path and the back stack contains only post-path views, keep them in place. This allows
+         // users to have a path binding but then append arbitrary views as leaves
+@@ -850,15 +863,21 @@ struct NavigationDestination {
+             }
+         }
+         guard !hasOnlyTrailingViews else {
++            navLog("navigateToPath: hasOnlyTrailingViews, skipping")
+             return
+         }
+ 
+         // Pop back to last common value
+-        for _ in 0..<(backStack.count() - backStackIndex) {
++        let popCount = backStack.count() - backStackIndex
++        if popCount > 0 {
++            navLog("navigateToPath: popping \(popCount) entries")
++        }
++        for _ in 0..<popCount {
+             navController.popBackStack()
+         }
+         // Navigate to any new path values
+         for i in pathIndex..<path.count {
++            navLog("navigateToPath: pushing path[\(i)]")
+             let _ = navigate(toKeyed: path[i])
+         }
+     }
+@@ -867,6 +886,7 @@ struct NavigationDestination {
+         guard let key else {
+             return false
+         }
++        navLog("navigate(toKeyed): key=\(key), destFound=\(destinations[key] != nil)")
+         guard let destination = destinations[key] else {
+             if let type = key as? Any.Type {
+                 for supertype in type.superclasses {
+@@ -884,6 +904,7 @@ struct NavigationDestination {
+     }
+ 
+     private func navigate(route: String, destination: ((Any) -> any View)?, targetValue: Any, binding: Binding<Bool>? = nil) -> String? {
++        navLog("navigate(route): \(route)")
+         // We see a top app bar glitch when the keyboard animates away after push, so manually dismiss it first
+         keyboardController?.hide()
+         navController.navigate(route)
+diff --git a/Sources/SkipUI/SkipUI/Containers/TabView.swift b/Sources/SkipUI/SkipUI/Containers/TabView.swift
+index 4cccedb..79bb158 100644
+--- a/Sources/SkipUI/SkipUI/Containers/TabView.swift
++++ b/Sources/SkipUI/SkipUI/Containers/TabView.swift
+@@ -139,6 +139,7 @@ public struct TabView : View, Renderable {
+         guard let selectedTag = selection?.wrappedValue else {
+             return
+         }
++        print("TAB_DEBUG syncPagerStateToSelection: selectedTag=\(selectedTag), targetPage=\(pagerState.targetPage)")
+         let selectedPageState = rememberUpdatedState(tags.indexOfFirst { $0 == selectedTag })
+         let selectedPage = selectedPageState.value
+         guard selectedPage != -1 && selectedPage != pagerState.targetPage else {
+@@ -315,6 +316,7 @@ public struct TabView : View, Renderable {
+                     let tabsState = rememberUpdatedState(tabs)
+                     let containerColor = showScrolledBackground ? tabBarBackgroundColor : unscrolledTabBarBackgroundColor
+                     let onItemClick: (Int) -> Void = { tabIndex in
++                        print("TAB_DEBUG onItemClick: tabIndex=\(tabIndex)")
+                         let route = String(describing: tabIndex)
+                         if let selection, let tagValue = tagValue(route: route, in: tabRenderables) {
+                             selection.wrappedValue = tagValue
+@@ -489,6 +491,7 @@ public struct TabView : View, Renderable {
+ 
+     @Composable private func navigateToCurrentRoute(controller navController: NavHostController, tabRenderables: kotlin.collections.List<Renderable>) {
+         let currentRoute = currentRoute(for: navController)
++        print("TAB_DEBUG navigateToCurrentRoute: currentRoute=\(currentRoute ?? "nil"), selection=\(selection?.wrappedValue ?? "nil" as Any)")
+         if let selection, let currentRoute, selection.wrappedValue != tagValue(route: currentRoute, in: tabRenderables) {
+             if let route = route(tagValue: selection.wrappedValue, in: tabRenderables) {
+                 navigate(controller: navController, route: route)

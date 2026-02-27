@@ -1,0 +1,8 @@
+diff --git a/Tests/CustomSQLite/GRDB b/Tests/CustomSQLite/GRDB
+deleted file mode 120000
+index c25bddb6d..000000000
+--- a/Tests/CustomSQLite/GRDB
++++ /dev/null
+@@ -1 +0,0 @@
+-../..
+\ No newline at end of file

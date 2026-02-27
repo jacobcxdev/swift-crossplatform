@@ -1,18 +1,30 @@
 import ComposableArchitecture
 import IdentifiedCollections
+import Sharing
 import SwiftUI
 
 // MARK: - TodosFeature Reducer
 
 @Reducer
 struct TodosFeature {
+    @Reducer
+    enum Destination {
+        case confirmationDialog(ConfirmationDialogState<ConfirmationDialog>)
+
+        @CasePathable
+        enum ConfirmationDialog: Equatable {
+            case sortByTitle
+            case sortByDate
+            case sortByStatus
+        }
+    }
+
     @ObservableState
     struct State: Equatable {
         var todos: IdentifiedArrayOf<Todo> = []
         var filter: Filter = .all
-        @Presents var alert: AlertState<Action.Alert>?
-        @Presents var confirmationDialog: ConfirmationDialogState<Action.ConfirmationDialog>?
-        var todoToDelete: Todo.ID?
+        @Presents var destination: Destination.State?
+        @Shared(.savedTodos) var savedTodos: IdentifiedArrayOf<Todo> = []
 
         var filteredTodos: IdentifiedArrayOf<Todo> {
             switch filter {
@@ -37,22 +49,9 @@ struct TodosFeature {
         case addButtonTapped
         case toggleTodo(Todo.ID)
         case filterChanged(State.Filter)
-        case deleteTapped(Todo.ID)
-        case alert(PresentationAction<Alert>)
-        case confirmationDialog(PresentationAction<ConfirmationDialog>)
+        case deleteSwiped(IndexSet)
+        case destination(PresentationAction<Destination.Action>)
         case sortButtonTapped
-
-        @CasePathable
-        enum Alert {
-            case confirmDeletion
-        }
-
-        @CasePathable
-        enum ConfirmationDialog {
-            case sortByTitle
-            case sortByDate
-            case sortByStatus
-        }
     }
 
     @Dependency(\.uuid) var uuid
@@ -69,72 +68,58 @@ struct TodosFeature {
                     createdAt: date.now
                 )
                 state.todos.append(newTodo)
+                state.$savedTodos.withLock { $0 = state.todos }
                 return .none
 
             case let .toggleTodo(id):
                 state.todos[id: id]?.isComplete.toggle()
+                state.$savedTodos.withLock { $0 = state.todos }
                 return .none
 
             case let .filterChanged(filter):
                 state.filter = filter
                 return .none
 
-            case let .deleteTapped(id):
-                state.todoToDelete = id
-                state.alert = AlertState {
-                    TextState("Delete Todo?")
-                } actions: {
-                    ButtonState(role: .destructive, action: .confirmDeletion) {
-                        TextState("Delete")
-                    }
-                    ButtonState(role: .cancel) {
-                        TextState("Cancel")
-                    }
-                } message: {
-                    TextState("This action cannot be undone.")
-                }
-                return .none
-
-            case .alert(.presented(.confirmDeletion)):
-                if let id = state.todoToDelete {
+            case let .deleteSwiped(indexSet):
+                for id in indexSet.map({ state.filteredTodos[$0].id }) {
                     state.todos.remove(id: id)
                 }
-                state.todoToDelete = nil
-                return .none
-
-            case .alert(.dismiss):
-                state.todoToDelete = nil
+                state.$savedTodos.withLock { $0 = state.todos }
                 return .none
 
             case .sortButtonTapped:
-                state.confirmationDialog = ConfirmationDialogState {
-                    TextState("Sort Todos")
-                } actions: {
-                    ButtonState(action: .sortByTitle) { TextState("By Title") }
-                    ButtonState(action: .sortByDate) { TextState("By Date") }
-                    ButtonState(action: .sortByStatus) { TextState("By Status") }
-                    ButtonState(role: .cancel) { TextState("Cancel") }
-                }
+                state.destination = .confirmationDialog(
+                    ConfirmationDialogState {
+                        TextState("Sort Todos")
+                    } actions: {
+                        ButtonState(action: .sortByTitle) { TextState("By Title") }
+                        ButtonState(action: .sortByDate) { TextState("By Date") }
+                        ButtonState(action: .sortByStatus) { TextState("By Status") }
+                        ButtonState(role: .cancel) { TextState("Cancel") }
+                    }
+                )
                 return .none
 
-            case .confirmationDialog(.presented(.sortByTitle)):
+            case .destination(.presented(.confirmationDialog(.sortByTitle))):
                 state.todos.sort { $0.title < $1.title }
+                state.$savedTodos.withLock { $0 = state.todos }
                 return .none
 
-            case .confirmationDialog(.presented(.sortByDate)):
+            case .destination(.presented(.confirmationDialog(.sortByDate))):
                 state.todos.sort { $0.createdAt < $1.createdAt }
+                state.$savedTodos.withLock { $0 = state.todos }
                 return .none
 
-            case .confirmationDialog(.presented(.sortByStatus)):
+            case .destination(.presented(.confirmationDialog(.sortByStatus))):
                 state.todos.sort { !$0.isComplete && $1.isComplete }
+                state.$savedTodos.withLock { $0 = state.todos }
                 return .none
 
-            case .confirmationDialog(.dismiss):
+            case .destination:
                 return .none
             }
         }
-        .ifLet(\.$alert, action: \.alert)
-        .ifLet(\.$confirmationDialog, action: \.confirmationDialog)
+        .ifLet(\.$destination, action: \.destination)
     }
 }
 
@@ -143,17 +128,10 @@ struct TodosFeature {
 struct TodosView: View {
     @Bindable var store: StoreOf<TodosFeature>
 
-    private var filterBinding: Binding<TodosFeature.State.Filter> {
-        Binding(
-            get: { store.filter },
-            set: { store.send(.filterChanged($0)) }
-        )
-    }
-
     var body: some View {
         List {
             Section {
-                Picker("Filter", selection: filterBinding) {
+                Picker("Filter", selection: $store.filter.sending(\.filterChanged)) {
                     ForEach(TodosFeature.State.Filter.allCases, id: \.self) { filter in
                         Text(filter.rawValue.capitalized).tag(filter)
                     }
@@ -163,19 +141,12 @@ struct TodosView: View {
 
             Section {
                 ForEach(store.filteredTodos) { todo in
-                    HStack {
-                        TodoRowView(todo: todo) {
-                            store.send(.toggleTodo(todo.id))
-                        }
-                        Spacer()
-                        Button {
-                            store.send(.deleteTapped(todo.id))
-                        } label: {
-                            Image(systemName: "trash")
-                                .foregroundStyle(.red)
-                        }
-                        .buttonStyle(.borderless)
+                    TodoRowView(todo: todo) {
+                        store.send(.toggleTodo(todo.id))
                     }
+                }
+                .onDelete { indexSet in
+                    store.send(.deleteSwiped(indexSet))
                 }
             }
 
@@ -196,8 +167,7 @@ struct TodosView: View {
                 }
             }
         }
-        .alert($store.scope(state: \.alert, action: \.alert))
-        .confirmationDialog($store.scope(state: \.confirmationDialog, action: \.confirmationDialog))
+        .confirmationDialog($store.scope(state: \.destination?.confirmationDialog, action: \.destination.confirmationDialog))
     }
 }
 
@@ -214,6 +184,8 @@ struct TodoRowView: View {
                     .foregroundStyle(todo.isComplete ? .green : .secondary)
             }
             .buttonStyle(.borderless)
+            .accessibilityLabel(todo.isComplete ? "Completed" : "Not completed")
+            .accessibilityAddTraits(.isToggle)
 
             Text(todo.title)
                 .strikethrough(todo.isComplete)
@@ -221,3 +193,5 @@ struct TodoRowView: View {
         }
     }
 }
+
+extension TodosFeature.Destination.State: Equatable {}

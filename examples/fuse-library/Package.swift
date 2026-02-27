@@ -10,7 +10,7 @@ let package = Package(
         .library(name: "FuseLibrary", type: .dynamic, targets: ["FuseLibrary"]),
     ],
     dependencies: [
-        .package(url: "https://source.skip.tools/skip.git", from: "1.7.2"),
+        .package(path: "../../forks/skip"),
         .package(path: "../../forks/skip-fuse"),
         // Foundation library forks (Phase 2)
         .package(path: "../../forks/xctest-dynamic-overlay"),

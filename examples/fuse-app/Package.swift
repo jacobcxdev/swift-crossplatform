@@ -10,12 +10,11 @@ let package = Package(
         .library(name: "FuseApp", type: .dynamic, targets: ["FuseApp"]),
     ],
     dependencies: [
-        .package(url: "https://source.skip.tools/skip.git", from: "1.7.2"),
+        .package(path: "../../forks/skip"),
         .package(path: "../../forks/skip-fuse-ui"),
         .package(path: "../../forks/skip-android-bridge"),
         .package(path: "../../forks/skip-ui"),
         .package(path: "../../forks/swift-composable-architecture"),
-        .package(path: "../../forks/swift-dependencies"),
         .package(path: "../../forks/sqlite-data"),
     ],
     targets: [
@@ -39,7 +38,6 @@ let package = Package(
             "TestUtilities",
             .product(name: "SkipTest", package: "skip"),
             .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-            .product(name: "DependenciesTestSupport", package: "swift-dependencies"),
             .product(name: "SQLiteData", package: "sqlite-data"),
         ], plugins: [.plugin(name: "skipstone", package: "skip")]),
     ]

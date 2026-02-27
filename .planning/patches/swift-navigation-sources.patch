@@ -1,0 +1,391 @@
+diff --git a/Sources/SwiftNavigation/ButtonState.swift b/Sources/SwiftNavigation/ButtonState.swift
+index 9b66233d..2257e9a2 100644
+--- a/Sources/SwiftNavigation/ButtonState.swift
++++ b/Sources/SwiftNavigation/ButtonState.swift
+@@ -260,6 +260,8 @@ extension ButtonState: Sendable where Action: Sendable {}
+ #if canImport(SwiftUI)
+   // MARK: - SwiftUI bridging
+ 
++  #if !os(Android)
++  // Alert is deprecated and not provided by SkipSwiftUI.
+   extension Alert.Button {
+     /// Initializes a `SwiftUI.Alert.Button` from `ButtonState` and an action handler.
+     ///
+@@ -301,7 +303,10 @@ extension ButtonState: Sendable where Action: Sendable {}
+       }
+     }
+   }
++  #endif  // !os(Android) — Alert.Button
+ 
++  #if !os(Android)
++  // Android has its own simplified Button.init and ButtonRole.init below.
+   @available(iOS 15, macOS 12, tvOS 15, watchOS 8, *)
+   extension ButtonRole {
+     public init(_ role: ButtonStateRole) {
+@@ -354,6 +359,7 @@ extension ButtonState: Sendable where Action: Sendable {}
+       }
+     }
+   }
++  #endif
+ #endif
+ 
+ @usableFromInline
+diff --git a/Sources/SwiftNavigation/TextState.swift b/Sources/SwiftNavigation/TextState.swift
+index f209873b..7387bed9 100644
+--- a/Sources/SwiftNavigation/TextState.swift
++++ b/Sources/SwiftNavigation/TextState.swift
+@@ -5,6 +5,12 @@ import Foundation
+   import SwiftUI
+ #endif
+ 
++// On Android, both Foundation.CGFloat and SkipSwiftUI.CGFloat (via SkipFuseUI's SwiftUI module)
++// are in scope, causing ambiguity. Resolve by preferring Foundation's definition.
++#if os(Android)
++  public typealias CGFloat = Foundation.CGFloat
++#endif
++
+ /// An equatable description of SwiftUI `Text`. Useful for storing rich text in feature models
+ /// that can still be tested for equality.
+ ///
+@@ -125,7 +131,9 @@ public struct TextState: Equatable, Hashable, Sendable {
+         bundle: Bundle?,
+         comment: StaticString?
+       )
+-      case localizedStringResource(LocalizedStringResourceBox)
++      #if !os(Android)
++        case localizedStringResource(LocalizedStringResourceBox)
++      #endif
+     #endif
+     case verbatim(String)
+ 
+@@ -142,18 +150,22 @@ public struct TextState: Equatable, Hashable, Sendable {
+ 
+       #if canImport(SwiftUI)
+         case (.concatenated, .localizedStringKey),
+-          (.localizedStringKey, .concatenated),
+-          (.concatenated, .localizedStringResource),
+-          (.localizedStringResource, .concatenated):
++          (.localizedStringKey, .concatenated):
+           // NB: We do not attempt to equate concatenated cases.
+           return false
+ 
+-        case (.verbatim(let string), .localizedStringResource(let resource)),
+-          (.localizedStringResource(let resource), .verbatim(let string)):
+-          return string == resource.asString()
++        #if !os(Android)
++          case (.concatenated, .localizedStringResource),
++            (.localizedStringResource, .concatenated):
++            return false
+ 
+-        case (.localizedStringResource(let lhs), .localizedStringResource(let rhs)):
+-          return lhs.asString() == rhs.asString()
++          case (.verbatim(let string), .localizedStringResource(let resource)),
++            (.localizedStringResource(let resource), .verbatim(let string)):
++            return string == resource.asString()
++
++          case (.localizedStringResource(let lhs), .localizedStringResource(let rhs)):
++            return lhs.asString() == rhs.asString()
++        #endif
+ 
+         case (
+           .verbatim(let string), .localizedStringKey(let key, let table, let bundle, let comment)
+@@ -168,16 +180,18 @@ public struct TextState: Equatable, Hashable, Sendable {
+           return lk.formatted(tableName: lt, bundle: lb, comment: lc)
+             == rk.formatted(tableName: rt, bundle: rb, comment: rc)
+ 
+-        case (
+-          .localizedStringKey(let key, let table, let bundle, let comment),
+-          .localizedStringResource(let resource)
+-        ),
+-          (
+-            .localizedStringResource(let resource),
+-            .localizedStringKey(let key, let table, let bundle, let comment)
+-          ):
+-          return key.formatted(tableName: table, bundle: bundle, comment: comment)
+-            == resource.asString()
++        #if !os(Android)
++          case (
++            .localizedStringKey(let key, let table, let bundle, let comment),
++            .localizedStringResource(let resource)
++          ),
++            (
++              .localizedStringResource(let resource),
++              .localizedStringKey(let key, let table, let bundle, let comment)
++            ):
++            return key.formatted(tableName: table, bundle: bundle, comment: comment)
++              == resource.asString()
++        #endif
+ 
+       #endif
+       }
+@@ -193,8 +207,10 @@ public struct TextState: Equatable, Hashable, Sendable {
+         case .localizedStringKey(let key, let tableName, let bundle, let comment):
+           hasher.combine(key.formatted(tableName: tableName, bundle: bundle, comment: comment))
+ 
+-        case .localizedStringResource(let resource):
+-          hasher.combine(resource.asString())
++        #if !os(Android)
++          case .localizedStringResource(let resource):
++            hasher.combine(resource.asString())
++        #endif
+       #endif
+ 
+       case .verbatim(let string):
+@@ -206,7 +222,8 @@ public struct TextState: Equatable, Hashable, Sendable {
+ 
+ // MARK: - LocalizedStringResourceBox
+ 
+-#if canImport(SwiftUI)
++#if canImport(SwiftUI) && !os(Android)
++  // LocalizedStringResource is Apple Foundation-only, not available on Android.
+   private struct LocalizedStringResourceBox: @unchecked Sendable {
+     // REVISIT: Make 'Any' into 'any Sendable' when minimum deployment target is iOS 18
+     let value: Any
+@@ -271,6 +288,7 @@ extension TextState {
+       )
+     }
+ 
++    #if !os(Android)
+     @available(iOS 16, macOS 13, tvOS 16, watchOS 9, *)
+     public init(
+       _ resource: LocalizedStringResource
+@@ -279,6 +297,7 @@ extension TextState {
+         LocalizedStringResourceBox(resource)
+       )
+     }
++    #endif
+   #endif
+ 
+   public static func + (lhs: Self, rhs: Self) -> Self {
+@@ -470,6 +489,7 @@ extension TextState {
+       return `self`
+     }
+ 
++    #if !os(Android)
+     @available(iOS 16, macOS 13, tvOS 16, watchOS 9, *)
+     public func accessibilityLabel(
+       _ resource: LocalizedStringResource
+@@ -480,6 +500,7 @@ extension TextState {
+       )
+       return `self`
+     }
++    #endif
+ 
+     public func accessibilityLabel(
+       _ key: LocalizedStringKey,
+@@ -534,6 +555,8 @@ extension TextState {
+     }
+   }
+ 
++  #if !os(Android)
++  // Android has its own simplified Text.init(_ state:) below that flattens to plain text.
+   extension Text {
+     public init(_ state: TextState) {
+       let text: Text
+@@ -663,6 +686,7 @@ extension TextState {
+       }
+     }
+   }
++  #endif  // !os(Android)
+ #endif
+ 
+ extension String {
+@@ -680,8 +704,10 @@ extension String {
+           comment: comment
+         )
+ 
+-      case .localizedStringResource(let resourceBox):
+-        self = resourceBox.asString()
++      #if !os(Android)
++        case .localizedStringResource(let resourceBox):
++          self = resourceBox.asString()
++      #endif
+     #endif
+ 
+     case .verbatim(let string):
+@@ -692,41 +718,61 @@ extension String {
+ 
+ #if canImport(SwiftUI)
+   extension LocalizedStringKey {
+-    // NB: `LocalizedStringKey` conforms to `Equatable` but returns false for equivalent format
+-    //     strings. To account for this we reflect on it to extract and string-format its storage.
+-    fileprivate func formatted(
+-      locale: Locale? = nil,
+-      tableName: String? = nil,
+-      bundle: Bundle? = nil,
+-      comment: StaticString? = nil
+-    ) -> String {
+-      let children = Array(Mirror(reflecting: self).children)
+-      let key = children[0].value as! String
+-      let arguments: [CVarArg] = Array(Mirror(reflecting: children[2].value).children)
+-        .compactMap {
+-          let children = Array(Mirror(reflecting: $0.value).children)
+-          let value: Any
+-          let formatter: Formatter?
+-          // `LocalizedStringKey.FormatArgument` differs depending on OS/platform.
+-          if children[0].label == "storage" {
+-            (value, formatter) =
+-              Array(Mirror(reflecting: children[0].value).children)[0].value as! (Any, Formatter?)
+-          } else {
+-            value = children[0].value
+-            formatter = children[1].value as? Formatter
+-          }
+-          return formatter?.string(for: value) ?? value as! CVarArg
++    #if os(Android)
++      // On Android, LocalizedStringKey stores an AndroidStringInterpolation (from SkipAndroidBridge)
++      // rather than Darwin's internal storage. Extract the format pattern and values directly.
++      fileprivate func formatted(
++        locale: Locale? = nil,
++        tableName: String? = nil,
++        bundle: Bundle? = nil,
++        comment: StaticString? = nil
++      ) -> String {
++        let children = Array(Mirror(reflecting: self).children)
++        guard let interpolation = children[0].value as? AndroidStringInterpolation else {
++          return String(describing: self)
+         }
++        let arguments: [CVarArg] = interpolation.values.map { value in
++          (value as? CVarArg) ?? String(describing: value) as CVarArg
++        }
++        return String(format: interpolation.pattern, locale: locale, arguments: arguments)
++      }
++    #else
++      // NB: `LocalizedStringKey` conforms to `Equatable` but returns false for equivalent format
++      //     strings. To account for this we reflect on it to extract and string-format its storage.
++      fileprivate func formatted(
++        locale: Locale? = nil,
++        tableName: String? = nil,
++        bundle: Bundle? = nil,
++        comment: StaticString? = nil
++      ) -> String {
++        let children = Array(Mirror(reflecting: self).children)
++        let key = children[0].value as! String
++        let arguments: [CVarArg] = Array(Mirror(reflecting: children[2].value).children)
++          .compactMap {
++            let children = Array(Mirror(reflecting: $0.value).children)
++            let value: Any
++            let formatter: Formatter?
++            // `LocalizedStringKey.FormatArgument` differs depending on OS/platform.
++            if children[0].label == "storage" {
++              (value, formatter) =
++                Array(Mirror(reflecting: children[0].value).children)[0].value as! (Any, Formatter?)
++            } else {
++              value = children[0].value
++              formatter = children[1].value as? Formatter
++            }
++            return formatter?.string(for: value) ?? value as! CVarArg
++          }
+ 
+-      let format = NSLocalizedString(
+-        key,
+-        tableName: tableName,
+-        bundle: bundle ?? .main,
+-        value: "",
+-        comment: comment.map(String.init) ?? ""
+-      )
+-      return String(format: format, locale: locale, arguments: arguments)
+-    }
++        let format = NSLocalizedString(
++          key,
++          tableName: tableName,
++          bundle: bundle ?? .main,
++          value: "",
++          comment: comment.map(String.init) ?? ""
++        )
++        return String(format: format, locale: locale, arguments: arguments)
++      }
++    #endif
+   }
+ #endif
+ 
+@@ -742,8 +788,10 @@ extension TextState: CustomDumpRepresentable {
+       #if canImport(SwiftUI)
+         case .localizedStringKey(let key, let tableName, let bundle, let comment):
+           output = key.formatted(tableName: tableName, bundle: bundle, comment: comment)
++        #if !os(Android)
+         case .localizedStringResource(let resourceBox):
+           output = resourceBox.asString()
++        #endif
+       #endif
+       case .verbatim(let string):
+         output = string
+@@ -852,20 +900,75 @@ extension TextState: CustomDumpRepresentable {
+   extension Text {
+     /// Creates a SwiftUI `Text` view from `TextState`.
+     ///
+-    /// On Android, this handles verbatim and concatenated text (no rich text modifiers).
+-    /// Note: Text concatenation (`+`) is unavailable in SkipSwiftUI, so concatenated
++    /// On Android (via SkipSwiftUI), this supports most rich text modifiers.
++    /// `Text` concatenation (`+`) is unavailable in SkipSwiftUI, so concatenated
+     /// text is flattened to a single verbatim string.
+     public init(_ state: TextState) {
+-      self = Text(verbatim: state._plainText)
++      let text: Text
++      switch state.storage {
++      case .concatenated(_, _):
++        // Text.+ is @available(*, unavailable) in SkipSwiftUI — flatten to plain text.
++        text = Text(verbatim: state._plainText)
++      case .localizedStringKey(let content, let tableName, let bundle, let comment):
++        text = Text(content, tableName: tableName, bundle: bundle, comment: comment)
++      case .verbatim(let content):
++        text = Text(verbatim: content)
++      }
++      self = state.modifiers.reduce(text) { text, modifier in
++        switch modifier {
++        // Supported modifiers — apply directly
++        case .bold(let isActive):
++          return text.bold(isActive)
++        case .font(let font):
++          return text.font(font)
++        case .fontDesign(let design):
++          return text.fontDesign(design)
++        case .fontWeight(let weight):
++          return text.fontWeight(weight)
++        case .foregroundColor(let color):
++          return text.foregroundColor(color)
++        case .italic(let isActive):
++          return text.italic(isActive)
++        case .strikethrough(let isActive, let pattern, let color):
++          if let pattern {
++            return text.strikethrough(isActive, pattern: pattern.toSwiftUI, color: color)
++          } else {
++            return text.strikethrough(isActive, color: color)
++          }
++        case .tracking(let tracking):
++          return text.tracking(tracking)
++        case .underline(let isActive, let pattern, let color):
++          if let pattern {
++            return text.underline(isActive, pattern: pattern.toSwiftUI, color: color)
++          } else {
++            return text.underline(isActive, color: color)
++          }
++        // Unsupported on SkipSwiftUI — skip silently
++        case .accessibilityHeading,
++          .accessibilityLabel,
++          .accessibilityTextContentType,
++          .baselineOffset,
++          .fontWidth,
++          .kerning,
++          .monospacedDigit,
++          .speechAdjustedPitch,
++          .speechAlwaysIncludesPunctuation,
++          .speechAnnouncementsQueued,
++          .speechSpellsOutCharacters:
++          return text
++        }
++      }
+     }
+   }
+ 
+   extension TextState {
+-    /// Extracts the plain text content, flattening concatenation.
++    /// Extracts the plain text content, flattening concatenation and localized strings.
+     internal var _plainText: String {
+       switch storage {
+       case .concatenated(let lhs, let rhs):
+         return lhs._plainText + rhs._plainText
++      case .localizedStringKey(let key, let tableName, let bundle, let comment):
++        return key.formatted(tableName: tableName, bundle: bundle, comment: comment)
+       case .verbatim(let content):
+         return content
+       }

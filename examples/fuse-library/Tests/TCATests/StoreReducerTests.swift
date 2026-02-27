@@ -1,10 +1,8 @@
 #if !SKIP
-#if canImport(SwiftUI)
-import SwiftUI
-#endif
 import ComposableArchitecture
 import CustomDump
 import Foundation
+import SwiftUI
 import Testing
 
 // MARK: - Test Reducers
@@ -346,7 +344,6 @@ struct StoreReducerTests {
 
     // MARK: - Store.send with animation (Plan 16-02)
 
-    #if canImport(SwiftUI)
     /// Tests that Store.send(_:animation:) compiles and routes correctly.
     /// This exercises the withTransaction chain: send(animation:) -> Transaction(animation:) -> withTransaction.
     @Test func testSendWithAnimation() {
@@ -387,6 +384,5 @@ struct StoreReducerTests {
         #expect(store.withState(\.count) == 1)
         #expect(store.withState(\.doubled) == true)
     }
-    #endif
 }
 #endif

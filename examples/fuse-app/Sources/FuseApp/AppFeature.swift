@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sharing
 import SwiftUI
 
 // MARK: - AppFeature Reducer
@@ -13,6 +14,7 @@ struct AppFeature {
         var contacts = ContactsFeature.State()
         var database = DatabaseFeature.State()
         var settings = SettingsFeature.State()
+        @Shared(.appearance) var appearance: String
 
         enum Tab: String, Equatable {
             case counter, todos, contacts, database, settings
@@ -67,17 +69,17 @@ struct AppView: View {
             NavigationStack {
                 CounterView(store: store.scope(state: \.counter, action: \.counter))
             }
-            .tabItem { Label("Counter", systemImage: "number") }
+            .tabItem { Label("Counter", systemImage: "plus") }
             .tag(AppFeature.State.Tab.counter)
 
             NavigationStack {
                 TodosView(store: store.scope(state: \.todos, action: \.todos))
             }
-            .tabItem { Label("Todos", systemImage: "checklist") }
+            .tabItem { Label("Todos", systemImage: "list.bullet") }
             .tag(AppFeature.State.Tab.todos)
 
             ContactsView(store: store.scope(state: \.contacts, action: \.contacts))
-                .tabItem { Label("Contacts", systemImage: "person.2") }
+                .tabItem { Label("Contacts", systemImage: "person") }
                 .tag(AppFeature.State.Tab.contacts)
 
             NavigationStack {
@@ -92,5 +94,9 @@ struct AppView: View {
             .tabItem { Label("Settings", systemImage: "gearshape") }
             .tag(AppFeature.State.Tab.settings)
         }
+        .preferredColorScheme(
+            store.appearance == "light" ? .light :
+            store.appearance == "dark" ? .dark : nil
+        )
     }
 }

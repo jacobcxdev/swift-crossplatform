@@ -6,14 +6,9 @@ import SwiftUI
 
 // MARK: - Database Setup
 
-extension DependencyValues {
-    mutating func bootstrapDatabase() throws {
-        let database = try SQLiteData.defaultDatabase(path: URL.applicationSupportDirectory.appending(component: "fuse-app.sqlite").path)
-
-        var migrator = DatabaseMigrator()
-        #if DEBUG
-        migrator.eraseDatabaseOnSchemaChange = true
-        #endif
+extension DatabaseFeature {
+    /// Registers all database migrations. Shared between production bootstrap and tests.
+    static func registerMigrations(on migrator: inout DatabaseMigrator) {
         migrator.registerMigration("v1") { db in
             try #sql(
                 """
@@ -27,6 +22,21 @@ extension DependencyValues {
                 """
             ).execute(db)
         }
+    }
+}
+
+extension DependencyValues {
+    mutating func bootstrapDatabase() throws {
+        let url = try FileManager.default.url(
+            for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true
+        )
+        let database = try SQLiteData.defaultDatabase(path: url.appending(component: "fuse-app.sqlite").path)
+
+        var migrator = DatabaseMigrator()
+        #if DEBUG && targetEnvironment(simulator)
+        migrator.eraseDatabaseOnSchemaChange = true
+        #endif
+        DatabaseFeature.registerMigrations(on: &migrator)
         try migrator.migrate(database)
         self.defaultDatabase = database
     }
@@ -42,6 +52,13 @@ struct DatabaseFeature {
         var selectedCategory: String = "all"
         var noteCount: Int = 0
         var isLoading = false
+
+        var filteredNotes: IdentifiedArrayOf<Note> {
+            if selectedCategory == "all" {
+                return notes
+            }
+            return notes.filter { $0.category == selectedCategory }
+        }
     }
 
     @CasePathable
@@ -75,6 +92,7 @@ struct DatabaseFeature {
                         await send(.notesLoaded(notes))
                         await send(.noteCountLoaded(count))
                     } catch {
+                        await send(.notesLoaded([]))
                         reportIssue(error)
                     }
                 }
@@ -144,17 +162,14 @@ struct DatabaseFeature {
 // MARK: - DatabaseView
 
 struct DatabaseView: View {
-    let store: StoreOf<DatabaseFeature>
+    @Bindable var store: StoreOf<DatabaseFeature>
 
     private let categories = ["all", "general", "work", "personal"]
 
     var body: some View {
         List {
             Section("Filter") {
-                Picker("Category", selection: Binding(
-                    get: { store.selectedCategory },
-                    set: { store.send(.categoryFilterChanged($0)) }
-                )) {
+                Picker("Category", selection: $store.selectedCategory.sending(\.categoryFilterChanged)) {
                     ForEach(categories, id: \.self) { cat in
                         Text(cat.capitalized).tag(cat)
                     }
@@ -165,11 +180,11 @@ struct DatabaseView: View {
             Section("Notes (\(store.noteCount))") {
                 if store.isLoading {
                     ProgressView()
-                } else if filteredNotes.isEmpty {
+                } else if store.filteredNotes.isEmpty {
                     Text("No notes yet. Tap + to add one.")
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(filteredNotes) { note in
+                    ForEach(store.filteredNotes) { note in
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(note.title)
@@ -194,6 +209,8 @@ struct DatabaseView: View {
                                     .foregroundStyle(.red)
                             }
                             .buttonStyle(.borderless)
+                            .accessibilityLabel("Delete \(note.title)")
+                            .accessibilityHint("Immediately deletes this note.")
                         }
                     }
                 }
@@ -208,75 +225,5 @@ struct DatabaseView: View {
             }
         }
         .task { store.send(.viewAppeared) }
-    }
-
-    private var filteredNotes: IdentifiedArrayOf<Note> {
-        if store.selectedCategory == "all" {
-            return store.notes
-        }
-        return store.notes.filter { $0.category == store.selectedCategory }
-    }
-}
-
-// MARK: - DatabaseObservingView (@FetchAll/@FetchOne pattern)
-
-/// Demonstrates PFW canonical @FetchAll/@FetchOne reactive database observation.
-/// This view uses SQLiteData property wrappers for automatic database-driven updates
-/// instead of the polling-via-reducer pattern used in DatabaseView above.
-/// Write operations (add/delete) remain in the reducer for transactional safety.
-struct DatabaseObservingView: View {
-    let store: StoreOf<DatabaseFeature>
-
-    @FetchAll(Note.all.order { $0.createdAt.desc() })
-    var notes
-
-    @FetchOne(Note.count())
-    var noteCount = 0
-
-    var body: some View {
-        List {
-            Section("Notes (\(noteCount))") {
-                if notes.isEmpty {
-                    Text("No notes yet. Tap + to add one.")
-                        .foregroundStyle(.secondary)
-                } else {
-                    ForEach(notes) { note in
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(note.title)
-                                    .font(.headline)
-                                HStack {
-                                    Text(note.category)
-                                        .font(.caption)
-                                        .padding(.horizontal, 6)
-                                        .padding(.vertical, 2)
-                                        .background(.secondary.opacity(0.2))
-                                        .clipShape(Capsule())
-                                    Spacer()
-                                    Text(Date(timeIntervalSince1970: note.createdAt), style: .date)
-                                        .font(.caption2)
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
-                            Button {
-                                store.send(.deleteNote(note.id))
-                            } label: {
-                                Image(systemName: "trash")
-                                    .foregroundStyle(.red)
-                            }
-                            .buttonStyle(.borderless)
-                        }
-                    }
-                }
-            }
-        }
-        .navigationTitle("Database (Observing)")
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button { store.send(.addButtonTapped) } label: {
-                    Label("Add", systemImage: "plus")
-                }
-            }
-        }
     }
 }

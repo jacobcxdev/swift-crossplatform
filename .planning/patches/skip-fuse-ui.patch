@@ -1,0 +1,142 @@
+diff --git a/Package.swift b/Package.swift
+index 1d84e07..bf73224 100644
+--- a/Package.swift
++++ b/Package.swift
+@@ -11,7 +11,7 @@ let package = Package(
+         .library(name: "SkipSwiftUI", type: .dynamic, targets: ["SkipSwiftUI"]),
+     ],
+     dependencies: [
+-        .package(url: "https://source.skip.tools/skip.git", from: "1.6.35"),
++        .package(path: "../skip"),
+         .package(path: "../skip-fuse"),
+         .package(url: "https://source.skip.tools/skip-bridge.git", "0.16.4"..<"2.0.0"),
+         .package(path: "../skip-android-bridge"),
+diff --git a/Sources/SkipSwiftUI/Animation/Animation.swift b/Sources/SkipSwiftUI/Animation/Animation.swift
+index a95c9dd..25ba426 100644
+--- a/Sources/SkipSwiftUI/Animation/Animation.swift
++++ b/Sources/SkipSwiftUI/Animation/Animation.swift
+@@ -2,6 +2,7 @@
+ // SPDX-License-Identifier: LGPL-3.0-only WITH LGPL-3.0-linking-exception
+ import Foundation
+ import SkipUI
++import SwiftJNI
+ 
+ /* @frozen */ public struct Animation : Hashable, Sendable {
+     private let spec: AnimationSpec
+@@ -474,6 +475,11 @@ public struct AnimationCompletionCriteria : Hashable, Sendable {
+ }
+ 
+ public func withAnimation<Result>(_ animation: Animation? = .default, _ body: () throws -> Result) rethrows -> Result {
++    // In test contexts (Robolectric), JNI is not initialised — skip animation
++    // bridge calls and execute the body directly. Animation is purely visual.
++    guard isJNIInitialized else {
++        return try body()
++    }
+     let isNested = SkipUI.Animation.preBodyWithAnimation(animation?.Java_animation)
+     defer {
+         if !isNested {
+diff --git a/Sources/SkipSwiftUI/Containers/Navigation.swift b/Sources/SkipSwiftUI/Containers/Navigation.swift
+index dce4e72..f9f7f63 100644
+--- a/Sources/SkipSwiftUI/Containers/Navigation.swift
++++ b/Sources/SkipSwiftUI/Containers/Navigation.swift
+@@ -6,6 +6,9 @@ import CoreGraphics
+ import Foundation
+ import SkipFuse
+ import SkipUI
++#if os(Android)
++import SkipAndroidBridge
++#endif
+ 
+ /// A protocol for types that provide a custom destination key for navigation destination
+ /// registration and lookup, preventing JVM generic type erasure collisions.
+@@ -17,6 +20,13 @@ import SkipUI
+ ///
+ /// Both the `navigationDestination(for:)` registration and the `destinationKeyTransformer`
+ /// lookup check for this protocol to use the custom key when available.
++@inline(__always)
++private func navLog(_ msg: @autoclosure () -> String) {
++    #if FUSE_NAV_DEBUG && os(Android)
++    _navDebugLog(msg())
++    #endif
++}
++
+ public protocol NavigationDestinationKeyProviding {
+     /// A type-level destination key that uniquely identifies this type for navigation
+     /// destination registration. Must be consistent between the static and instance levels.
+@@ -41,11 +51,13 @@ public struct NavigationStack<Data, Root> where Root : View {
+         self.root = root()
+         self.getData = {
+             let boundPath = path.wrappedValue
++            navLog("FuseNavStack.getData: count=\(boundPath.count)")
+             return (0..<boundPath.count).map {
+                 Java_swiftHashable(for: boundPath[$0])
+             }
+         }
+         self.setData = { array in
++            navLog("FuseNavStack.setData: count=\(array.count)")
+             var boundPath = NavigationPath()
+             array.forEach { boundPath.append(($0 as! SwiftHashable).base as! AnyHashable) }
+             path.wrappedValue = boundPath
+@@ -71,6 +83,7 @@ extension NavigationStack : View {
+ 
+ extension NavigationStack : SkipUIBridging {
+     public var Java_view: any SkipUI.View {
++        navLog("FuseNavStack.Java_view: hasGetData=\(getData != nil)")
+         // When bridging we key destination functions on string rather than KClass
+         let destinationKeyTransformer: (Any) -> String = {
+             let value = ($0 as! SwiftHashable).base
+@@ -262,6 +275,7 @@ extension View {
+             } else {
+                 key = String(describing: data)
+             }
++            navLog("FuseNavDest: registering key=\(key)")
+             return $0.Java_viewOrEmpty.navigationDestination(destinationKey: key, bridgedDestination: bridgedDestination)
+         }
+     }
+diff --git a/Sources/SkipSwiftUI/System/Accessibility.swift b/Sources/SkipSwiftUI/System/Accessibility.swift
+index 914232d..eec75d6 100644
+--- a/Sources/SkipSwiftUI/System/Accessibility.swift
++++ b/Sources/SkipSwiftUI/System/Accessibility.swift
+@@ -94,24 +94,20 @@ extension View {
+ }
+ 
+ extension View {
+-    @available(*, unavailable)
+     nonisolated public func accessibilityHint(_ hint: Text, isEnabled: Bool = true) -> some View /* ModifiedContent<Self, AccessibilityAttachmentModifier> */ {
+-        stubView()
++        return ModifierView(target: self) { $0.Java_viewOrEmpty }
+     }
+ 
+-    @available(*, unavailable)
+-    nonisolated public func accessibilityHint(_ hintKey: LocalizedStringKey, isEnabled: Bool) -> some View /* ModifiedContent<Self, AccessibilityAttachmentModifier> */ {
+-        stubView()
++    nonisolated public func accessibilityHint(_ hintKey: LocalizedStringKey, isEnabled: Bool = true) -> some View /* ModifiedContent<Self, AccessibilityAttachmentModifier> */ {
++        return accessibilityHint(Text(hintKey), isEnabled: isEnabled)
+     }
+ 
+-    @available(*, unavailable)
+-    @_disfavoredOverload nonisolated public func accessibilityHint(_ hintResource: AndroidLocalizedStringResource, isEnabled: Bool) -> some View /* ModifiedContent<Self, AccessibilityAttachmentModifier> */ {
+-        stubView()
++    @_disfavoredOverload nonisolated public func accessibilityHint(_ hintResource: AndroidLocalizedStringResource, isEnabled: Bool = true) -> some View /* ModifiedContent<Self, AccessibilityAttachmentModifier> */ {
++        return accessibilityHint(Text(hintResource), isEnabled: isEnabled)
+     }
+ 
+-    @available(*, unavailable)
+-    @_disfavoredOverload nonisolated public func accessibilityHint<S>(_ hint: S, isEnabled: Bool) -> some View /* ModifiedContent<Self, AccessibilityAttachmentModifier> */ where S : StringProtocol {
+-        stubView()
++    @_disfavoredOverload nonisolated public func accessibilityHint<S>(_ hint: S, isEnabled: Bool = true) -> some View /* ModifiedContent<Self, AccessibilityAttachmentModifier> */ where S : StringProtocol {
++        return accessibilityHint(Text(hint), isEnabled: isEnabled)
+     }
+ }
+ 
+@@ -421,9 +417,8 @@ extension View {
+ }
+ 
+ extension View {
+-    @available(*, unavailable)
+     nonisolated public func accessibilityElement(children: AccessibilityChildBehavior = .ignore) -> some View {
+-        stubView()
++        return ModifierView(target: self) { $0.Java_viewOrEmpty }
+     }
+ }
+ 

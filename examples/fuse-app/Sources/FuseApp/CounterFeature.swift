@@ -88,11 +88,6 @@ struct CounterFeature {
                 return .none
             }
         }
-        .onChange(of: \.count) { _, _ in
-            Reduce { state, _ in
-                return .none
-            }
-        }
     }
 }
 
@@ -108,11 +103,13 @@ struct CounterView: View {
                 HStack {
                     Button("-") { send(.decrementButtonTapped) }
                         .buttonStyle(.borderless)
+                        .accessibilityLabel("Decrement")
                     Text("\(store.count)")
                         .font(.title2)
                         .frame(maxWidth: .infinity)
                     Button("+") { send(.incrementButtonTapped) }
                         .buttonStyle(.borderless)
+                        .accessibilityLabel("Increment")
                 }
 
                 Button("Delayed +1") { send(.delayedIncrementButtonTapped) }
@@ -138,6 +135,7 @@ struct CounterView: View {
                     Text("\(store.totalChanges)")
                         .foregroundStyle(.secondary)
                 }
+                .accessibilityElement(children: .combine)
             }
         }
         .navigationTitle("Counter")

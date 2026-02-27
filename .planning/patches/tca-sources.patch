@@ -1,0 +1,246 @@
+diff --git a/Sources/ComposableArchitecture/Effects/Animation.swift b/Sources/ComposableArchitecture/Effects/Animation.swift
+index f2bd1b2541..3f934b8ea3 100644
+--- a/Sources/ComposableArchitecture/Effects/Animation.swift
++++ b/Sources/ComposableArchitecture/Effects/Animation.swift
+@@ -60,6 +60,12 @@ extension Effect {
+   }
+ }
+ 
++#if canImport(Combine)
++  private typealias _CombineSubscriber = Combine.Subscriber
++#else
++  private typealias _CombineSubscriber = OpenCombine.Subscriber
++#endif
++
+ private struct TransactionPublisher<Upstream: Publisher>: Publisher {
+   typealias Output = Upstream.Output
+   typealias Failure = Upstream.Failure
+@@ -67,12 +73,12 @@ private struct TransactionPublisher<Upstream: Publisher>: Publisher {
+   var upstream: Upstream
+   var transaction: Transaction
+ 
+-  func receive(subscriber: some Combine.Subscriber<Upstream.Output, Upstream.Failure>) {
++  func receive(subscriber: some _CombineSubscriber<Upstream.Output, Upstream.Failure>) {
+     let conduit = Subscriber(downstream: subscriber, transaction: self.transaction)
+     self.upstream.receive(subscriber: conduit)
+   }
+ 
+-  private final class Subscriber<Downstream: Combine.Subscriber>: Combine.Subscriber {
++  private final class Subscriber<Downstream: _CombineSubscriber>: _CombineSubscriber {
+     typealias Input = Downstream.Input
+     typealias Failure = Downstream.Failure
+ 
+diff --git a/Sources/ComposableArchitecture/Observation/NavigationStack+Observation.swift b/Sources/ComposableArchitecture/Observation/NavigationStack+Observation.swift
+index eb9bc67e70..67119b6a91 100644
+--- a/Sources/ComposableArchitecture/Observation/NavigationStack+Observation.swift
++++ b/Sources/ComposableArchitecture/Observation/NavigationStack+Observation.swift
+@@ -147,6 +147,9 @@ extension UIBindable {
+   }
+ }
+ 
++// TODO: Fix actor isolation error on Android: "cannot form key path to main actor-isolated subscript"
++// Track in separate plan — the subscript on StackState.PathView needs actor isolation review.
++#if !os(Android)
+ @available(iOS 16, macOS 13, tvOS 16, watchOS 9, *)
+ extension NavigationStack {
+   /// Drives a navigation stack with a store.
+@@ -189,6 +192,7 @@ extension NavigationStack {
+     }
+   }
+ }
++#endif  // !os(Android)
+ 
+ @available(iOS 16, macOS 13, tvOS 16, watchOS 9, *)
+ public struct _NavigationDestinationViewModifier<
+@@ -228,6 +232,16 @@ public struct _NavigationDestinationViewModifier<
+ }
+ 
+ #if os(Android)
++import Foundation
++import SkipAndroidBridge
++
++@inline(__always)
++private func navLog(_ msg: @autoclosure () -> String) {
++    #if FUSE_NAV_DEBUG
++    _navDebugLog(msg())
++    #endif
++}
++
+ @available(iOS 16, macOS 13, tvOS 16, watchOS 9, *)
+ public struct _TCANavigationStack<
+   State: ObservableState, Action, Root: View, Destination: View
+@@ -241,10 +255,13 @@ public struct _TCANavigationStack<
+   let column: UInt
+ 
+   public var body: some View {
++    let _ = navLog("_TCANavStack.body: evaluating")
+     let store = pathBinding.wrappedValue
+     let androidPath = Binding<NavigationPath>(
+       get: {
+-        NavigationPath(store.currentState.path.map { $0 as AnyHashable })
++        store._$observationRegistrar.access(store, keyPath: \.currentState)
++        navLog("_TCANavStack.get: pathCount=\(store.currentState.count)")
++        return NavigationPath(store.currentState.path.map { $0 as AnyHashable })
+       },
+       set: { newPath in
+         let currentCount = store.currentState.count
+@@ -254,25 +271,30 @@ public struct _TCANavigationStack<
+           // StackState<State>.Component after SwiftHashable unwrapping in skip-fuse-ui's setData
+           let lastElement = newPath[newPath.count - 1]
+           if let component = lastElement as? StackState<State>.Component {
++            navLog("_TCANavStack.set: PUSH component=\(component.id)")
+             store.send(.push(id: component.id, state: component.element))
++          } else {
++            navLog("_TCANavStack.set: push FAILED - lastElement type=\(type(of: lastElement))")
+           }
+         } else if newPath.count < currentCount {
++          navLog("_TCANavStack.set: POP from id=\(store.currentState.ids[newPath.count])")
+           store.send(.popFrom(id: store.currentState.ids[newPath.count]))
+         }
+       }
+     )
++    // On Android, SkipSwiftUI's ViewModifier bridging uses Java_modifier (not body()),
++    // so _NavigationDestinationViewModifier.body() is never called. Inline the destination
++    // registration directly to ensure it reaches skip-fuse-ui's navigationDestination(for:).
+     NavigationStack(path: androidPath) {
+       root
+-        .modifier(
+-          _NavigationDestinationViewModifier(
+-            store: store,
+-            destination: destination,
+-            fileID: fileID,
+-            filePath: filePath,
+-            line: line,
+-            column: column
++        .environment(\.navigationDestinationType, State.self)
++        .navigationDestination(for: StackState<State>.Component.self) { component in
++          destination(
++            store.scope(
++              component: component, fileID: fileID, filePath: filePath, line: line, column: column)
+           )
+-        )
++          .environment(\.navigationDestinationType, State.self)
++        }
+     }
+   }
+ }
+@@ -711,6 +733,19 @@ extension EnvironmentValues {
+ import SkipSwiftUI
+ 
+ extension StackState.Component: NavigationDestinationKeyProviding {}
++
++private struct _UncheckedSendableView: @unchecked Sendable {
++    let view: any SkipUI.View
++}
++
++extension _TCANavigationStack: SkipUIBridging {
++    public nonisolated var Java_view: any SkipUI.View {
++        navLog("_TCANavStack.Java_view: bridging")
++        return MainActor.assumeIsolated {
++            _UncheckedSendableView(view: body.Java_viewOrEmpty)
++        }.view
++    }
++}
+ #endif
+ 
+ #endif
+diff --git a/Sources/ComposableArchitecture/Store.swift b/Sources/ComposableArchitecture/Store.swift
+index 7157429e1d..5f00ba9d06 100644
+--- a/Sources/ComposableArchitecture/Store.swift
++++ b/Sources/ComposableArchitecture/Store.swift
+@@ -6,6 +6,13 @@ import SwiftUI
+ #endif
+ #if os(Android)
+ import SkipAndroidBridge
++
++@inline(__always)
++private func navLog(_ msg: @autoclosure () -> String) {
++    #if FUSE_NAV_DEBUG
++    _navDebugLog(msg())
++    #endif
++}
+ #endif
+ 
+ /// A store represents the runtime that powers the application. It is the object that you will pass
+@@ -357,6 +364,9 @@ public final class Store<State, Action>: _Store {
+             }
+           } receiveValue: { [weak self] _ in
+             guard let self else { return }
++            #if os(Android)
++            navLog("Store.parentCancellable: firing withMutation for \(storeTypeName(of: self))")
++            #endif
+             self._$observationRegistrar.withMutation(of: self, keyPath: \.currentState) {}
+           }
+       }
+@@ -431,6 +441,9 @@ public typealias StoreOf<R: Reducer> = Store<R.State, R.Action>
+ extension Store: Perceptible {}
+ extension Store {
+   public var state: State {
++    #if os(Android)
++    navLog("Store.state: accessed on \(String(describing: State.self))")
++    #endif
+     self._$observationRegistrar.access(self, keyPath: \.currentState)
+     return self.currentState
+   }
+diff --git a/Sources/ComposableArchitecture/SwiftUI/IfLetStore.swift b/Sources/ComposableArchitecture/SwiftUI/IfLetStore.swift
+index 30e9bed852..1d9f43c197 100644
+--- a/Sources/ComposableArchitecture/SwiftUI/IfLetStore.swift
++++ b/Sources/ComposableArchitecture/SwiftUI/IfLetStore.swift
+@@ -43,6 +43,7 @@ public struct IfLetStore<State, Action, Content: View>: View {
+   private let content: (ViewStore<State?, Action>) -> Content
+   private let store: Store<State?, Action>
+ 
++  #if !os(Android)
+   /// Initializes an ``IfLetStore`` view that computes content depending on if a store of optional
+   /// state is `nil` or non-`nil`.
+   ///
+@@ -89,6 +90,7 @@ public struct IfLetStore<State, Action, Content: View>: View {
+       }
+     }
+   }
++  #endif
+ 
+   /// Initializes an ``IfLetStore`` view that computes content depending on if a store of optional
+   /// state is `nil` or non-`nil`.
+@@ -132,6 +134,7 @@ public struct IfLetStore<State, Action, Content: View>: View {
+     }
+   }
+ 
++  #if !os(Android)
+   /// Initializes an ``IfLetStore`` view that computes content depending on if a store of
+   /// ``PresentationState`` and ``PresentationAction`` is `nil` or non-`nil`.
+   ///
+@@ -176,6 +179,7 @@ public struct IfLetStore<State, Action, Content: View>: View {
+       else: elseContent
+     )
+   }
++  #endif
+ 
+   /// Initializes an ``IfLetStore`` view that computes content depending on if a store of
+   /// ``PresentationState`` and ``PresentationAction`` is `nil` or non-`nil`.
+@@ -219,6 +223,7 @@ public struct IfLetStore<State, Action, Content: View>: View {
+     )
+   }
+ 
++  #if !os(Android)
+   /// Initializes an ``IfLetStore`` view that computes content depending on if a store of
+   /// ``PresentationState`` and ``PresentationAction`` is `nil` or non-`nil` and state can further
+   /// be extracted from the destination state, _e.g._ it matches a particular case of an enum.
+@@ -259,6 +264,7 @@ public struct IfLetStore<State, Action, Content: View>: View {
+       else: elseContent
+     )
+   }
++  #endif
+ 
+   /// Initializes an ``IfLetStore`` view that computes content depending on if a store of
+   /// ``PresentationState`` and ``PresentationAction`` is `nil` or non-`nil` and state can further
+diff --git a/Sources/ComposableArchitecture/SwiftUI/NavigationStackStore.swift b/Sources/ComposableArchitecture/SwiftUI/NavigationStackStore.swift
+index d6eab21fca..85086431c9 100644
+--- a/Sources/ComposableArchitecture/SwiftUI/NavigationStackStore.swift
++++ b/Sources/ComposableArchitecture/SwiftUI/NavigationStackStore.swift
+@@ -1,4 +1,4 @@
+-#if canImport(SwiftUI)
++#if canImport(SwiftUI) && !os(Android)
+ import OrderedCollections
+ import SwiftUI
+ 

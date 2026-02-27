@@ -116,7 +116,31 @@ Mistakes that cause rewrites, infinite loops, or project-blocking failures.
 
 ## Moderate Pitfalls
 
-### Pitfall 5: Compose Recomposition Skipping Breaks Observation Replay
+### Pitfall 5: Compose View Identity Gap — `let` Properties Reinitialised on Recomposition
+
+**What goes wrong:** SwiftUI preserves `let` properties on View structs via its render graph identity system. Compose has no equivalent — recomposition re-executes the function, reinitialising all local variables. Any `let` property that creates a stateful object (e.g. `let store = Store(...)`) produces a fresh instance with default state on every recomposition, causing stale reads from bindings.
+
+**Why it happens:** SwiftUI and Compose have fundamentally different state persistence models. SwiftUI's is implicit (render graph); Compose's is explicit (`remember {}`). Skip maps `@State` → `remember {}` correctly, but plain `let` properties have no Compose equivalent.
+
+**Consequences:**
+- State resets to defaults when ancestor composables recompose (e.g. MaterialTheme change from appearance toggle)
+- Bindings read stale/default values from recreated objects
+- Affects any component that reads a binding during composition where the binding source can be recreated
+
+**Prevention:**
+- See **[docs/skip/compose-view-identity-gap.md](../../docs/skip/compose-view-identity-gap.md)** for full analysis, workaround patterns, and proposed transpiler fix
+- Component-level workaround: initial-value-guard pattern (track first-composition binding value, skip sync when binding reads back the same value after recomposition)
+- App-level workaround: use `@State var store` instead of `let store` (works but deviates from canonical TCA pattern)
+
+**Detection:** State unexpectedly resets to defaults after a configuration/theme change. Logs show binding reading initial/default value despite user having navigated away from it.
+
+**Phase relevance:** All phases — this is a structural gap between SwiftUI and Compose that affects any stateful component.
+
+**Confidence:** HIGH — reproduced, root-caused, and workaround verified on Android emulator.
+
+---
+
+### Pitfall 6: Compose Recomposition Skipping Breaks Observation Replay
 
 **What goes wrong:** Compose aggressively skips recomposition of composables whose inputs have not changed (stability-based skipping). If the bridge triggers a `MutableState` increment but Compose determines the composable's parameters are "stable and unchanged," the `Evaluate()` call (and thus `startRecording`/`stopAndObserve`) is skipped entirely. The view does not update despite the state having changed.
 
@@ -136,7 +160,7 @@ Mistakes that cause rewrites, infinite loops, or project-blocking failures.
 
 ---
 
-### Pitfall 6: Thread-Local Recording Stack Corruption Under Concurrent Composition
+### Pitfall 7: Thread-Local Recording Stack Corruption Under Concurrent Composition
 
 **What goes wrong:** The `ObservationRecording` class uses `pthread_key_t` thread-local storage for its frame stack (lines 96-118 of Observation.swift). If Compose recomposes multiple views concurrently on different threads (which it does), and a Swift callback re-enters the recording stack from an unexpected thread, frames can be mismatched -- a `stopAndObserve()` call pops a frame that belongs to a different view's `startRecording()`.
 
@@ -159,7 +183,7 @@ Mistakes that cause rewrites, infinite loops, or project-blocking failures.
 
 ---
 
-### Pitfall 7: DispatchSemaphore Deadlocks on Main Thread
+### Pitfall 8: DispatchSemaphore Deadlocks on Main Thread
 
 **What goes wrong:** `BridgeObservationSupport` uses `DispatchSemaphore(value: 1)` (line 249 of Observation.swift) to protect JNI peer access. If `Java_update` is called from the main thread while another thread holds the semaphore, the main thread blocks. On Android, blocking the main thread for >5 seconds triggers an ANR (Application Not Responding) dialog.
 
@@ -179,7 +203,7 @@ Mistakes that cause rewrites, infinite loops, or project-blocking failures.
 
 ---
 
-### Pitfall 8: `try!` in JNI Calls Crashes Instead of Degrading Gracefully
+### Pitfall 9: `try!` in JNI Calls Crashes Instead of Degrading Gracefully
 
 **What goes wrong:** Lines 220, 233, and 245 of Observation.swift use `try!` for JNI calls (`cls.create`, `peer.call`). If the JNI call fails for any reason (class not found, method signature mismatch, JVM out of memory), the app crashes with a `fatalError` instead of gracefully handling the failure.
 
@@ -199,7 +223,7 @@ Mistakes that cause rewrites, infinite loops, or project-blocking failures.
 
 ---
 
-### Pitfall 9: SPM + Gradle + skipstone Three-Way Build Failures
+### Pitfall 10: SPM + Gradle + skipstone Three-Way Build Failures
 
 **What goes wrong:** The build system involves three interacting dependency resolvers: SPM resolves Swift packages, Gradle resolves Android/Kotlin dependencies, and Skip's `skipstone` plugin bridges the two by generating Gradle projects from `Package.swift`. A version mismatch in any layer can cause cryptic build failures that point to the wrong layer.
 
@@ -225,7 +249,7 @@ Mistakes that cause rewrites, infinite loops, or project-blocking failures.
 
 ---
 
-### Pitfall 10: Submodule Pointer Desync Across Team Members
+### Pitfall 11: Submodule Pointer Desync Across Team Members
 
 **What goes wrong:** Git submodules record a specific commit SHA. When one developer updates a fork and pushes the parent repo, other developers must run `git submodule update --recursive` to sync. If they forget (or run `git pull` without `--recurse-submodules`), they build against stale fork versions. With 12+ submodules, this happens frequently.
 
@@ -253,7 +277,7 @@ Mistakes that cause rewrites, infinite loops, or project-blocking failures.
 
 ## Minor Pitfalls
 
-### Pitfall 11: Swift `print()` Invisible on Android
+### Pitfall 12: Swift `print()` Invisible on Android
 
 **What goes wrong:** Standard `print()` statements produce no output on Android. Developers add debug prints, see nothing in Logcat, and waste time debugging the wrong thing.
 
@@ -265,7 +289,7 @@ Mistakes that cause rewrites, infinite loops, or project-blocking failures.
 
 ---
 
-### Pitfall 12: Key Paths Not Supported Across Bridge Boundary
+### Pitfall 13: Key Paths Not Supported Across Bridge Boundary
 
 **What goes wrong:** Skip's bridging reference explicitly states "Key paths: NOT supported" for bridging between compiled Swift and transpiled Swift/Kotlin. TCA makes heavy use of key paths for scoping stores and accessing state. If any key path expression crosses the bridge boundary, it will fail to compile or crash at runtime.
 
@@ -281,7 +305,7 @@ Mistakes that cause rewrites, infinite loops, or project-blocking failures.
 
 ---
 
-### Pitfall 13: Int is 32-bit on JVM (Overflow Risk)
+### Pitfall 14: Int is 32-bit on JVM (Overflow Risk)
 
 **What goes wrong:** Kotlin/JVM `Int` is 32-bit while Swift `Int` is 64-bit. If TCA state includes `Int` values that exceed `Int32.max` (e.g., timestamps, large IDs), they overflow silently or crash when crossing the JNI bridge. The `MutableStateBacking` index is passed as `Int32` (line 233 of Observation.swift: `Int32(index).toJavaParameter()`).
 
@@ -296,7 +320,7 @@ Mistakes that cause rewrites, infinite loops, or project-blocking failures.
 
 ---
 
-### Pitfall 14: Upstream PR Rejection Due to Style/Scope Mismatch
+### Pitfall 15: Upstream PR Rejection Due to Style/Scope Mismatch
 
 **What goes wrong:** After stabilizing fork changes, PRs to Skip or Point-Free are rejected because they include too many unrelated changes, use different code style, or introduce patterns the maintainers have explicitly decided against.
 
@@ -313,7 +337,7 @@ Mistakes that cause rewrites, infinite loops, or project-blocking failures.
 
 ---
 
-### Pitfall 15: `swiftThreadingFatal` Workaround Masking Real Crashes
+### Pitfall 16: `swiftThreadingFatal` Workaround Masking Real Crashes
 
 **What goes wrong:** Lines 294-298 of Observation.swift define a `@_cdecl` stub for `_ZN5swift9threading5fatalEPKcz` to work around a missing symbol in `libswiftObservation.so`. This stub does nothing except print -- meaning any real threading fatal error in Swift's threading library is silently swallowed instead of crashing.
 
@@ -339,15 +363,16 @@ Mistakes that cause rewrites, infinite loops, or project-blocking failures.
 |-------------|---------------|------------|
 | Observation bridge fix (Phase 1) | Pitfall 2: Infinite recomposition from backwards writes | Ensure `isEnabled` gates all willSet calls during recording; test with high-frequency TCA mutations |
 | Observation bridge fix (Phase 1) | Pitfall 1: onChange fires once | Verify record-replay re-registers on every Evaluate() cycle; test multi-tap sequences |
-| Observation bridge fix (Phase 1) | Pitfall 7: Semaphore deadlock | Profile JNI call contention; consider replacing DispatchSemaphore with lock |
+| Observation bridge fix (Phase 1) | Pitfall 8: Semaphore deadlock | Profile JNI call contention; consider replacing DispatchSemaphore with lock |
 | TCA on Android (Phase 2) | Pitfall 3: JNI thread affinity | Verify jniContext handles AttachCurrentThread; test effects completing on background threads |
-| TCA on Android (Phase 2) | Pitfall 6: Recording stack corruption | Assert thread identity between start/stop; test nested Fuse views |
-| TCA on Android (Phase 2) | Pitfall 12: Key paths cannot bridge | Keep all TCA scoping in native Swift; never pass WritableKeyPath through JNI |
+| TCA on Android (Phase 2) | Pitfall 7: Recording stack corruption | Assert thread identity between start/stop; test nested Fuse views |
+| TCA on Android (Phase 2) | Pitfall 13: Key paths cannot bridge | Keep all TCA scoping in native Swift; never pass WritableKeyPath through JNI |
 | Stable releases (Phase 3) | Pitfall 4: Fork divergence | Create FORKS.md; track upstream distance; minimize diff surface |
-| Stable releases (Phase 3) | Pitfall 9: Three-way build failures | Clean-build CI; pin exact versions; document SKIP_BRIDGE requirement |
-| Stable releases (Phase 3) | Pitfall 10: Submodule desync | Configure recurse=true; add post-merge hook |
-| Upstream contributions (Phase 4+) | Pitfall 14: PR rejection | Discuss first per Stephen's request; match upstream style; atomic changes |
-| All phases | Pitfall 11: print() invisible | Use OSLog.Logger exclusively |
+| Stable releases (Phase 3) | Pitfall 10: Three-way build failures | Clean-build CI; pin exact versions; document SKIP_BRIDGE requirement |
+| Stable releases (Phase 3) | Pitfall 11: Submodule desync | Configure recurse=true; add post-merge hook |
+| Upstream contributions (Phase 4+) | Pitfall 15: PR rejection | Discuss first per Stephen's request; match upstream style; atomic changes |
+| All phases | Pitfall 5: View identity gap | Apply initial-value-guard pattern; see [docs/skip/compose-view-identity-gap.md](../../docs/skip/compose-view-identity-gap.md) |
+| All phases | Pitfall 12: print() invisible | Use OSLog.Logger exclusively |
 
 ## Sources
 
