@@ -1,8 +1,8 @@
 # Compose View Identity Gap
 
-**Status:** Active workaround in skip-ui fork; transpiler-level fix proposed
+**Status:** Phase 1-4 implemented (2026-02-27–28); Phase 5 investigated and deferred; workaround reverted
 **Affects:** Any SwiftUI View with inline-initialised `let` properties when bridged to Compose via Skip (Fuse mode)
-**Tracking:** [skiptools/skipstone](https://github.com/skiptools/skipstone) — proposed change to `KotlinBridgeToKotlinVisitor.swift`
+**Tracking:** [skiptools/skipstone](https://github.com/skiptools/skipstone) — implemented in `KotlinBridgeToKotlinVisitor.swift`
 
 ---
 
@@ -135,7 +135,9 @@ But `@State var store` isn't the canonical TCA pattern — TCA docs use `let sto
 
 ---
 
-## 4. Current Workaround: Initial-Binding-Route Guard
+## 4. Former Workaround: Initial-Binding-Route Guard (REVERTED)
+
+**Status:** Reverted — the Phase 1 transpiler fix (Section 7) eliminates the root cause, making this workaround unnecessary.
 
 **File:** `forks/skip-ui/Sources/SkipUI/SkipUI/Containers/TabView.swift` (~line 236)
 
@@ -250,41 +252,57 @@ The fix must operate at the **peer level**, not the property level.
 
 ## 6. Approach Evaluation
 
-### Approach A: Remember `Swift_peer` in `Evaluate` (Recommended)
+### Approach A: Remember `Swift_peer` in `Evaluate` (Implemented)
 
-Instead of remembering individual property values, remember the entire `Swift_peer` pointer. On subsequent recompositions, replace the fresh peer with the remembered one before `body` runs.
+Instead of remembering individual property values, remember the entire `Swift_peer` pointer via a `SwiftPeerHandle` that implements Compose's `RememberObserver` for lifecycle-managed retain/release. On subsequent recompositions, replace the fresh peer with the remembered one before `body` runs.
 
-**Generated code:**
+**Generated code (actual implementation):**
 ```kotlin
 @Composable
 override fun Evaluate(context: ComposeContext, options: Int): List<Renderable> {
-    // Preserve the peer (and all its let properties) across recompositions
-    val rememberedPeer = remember { Swift_peer }
-    if (rememberedPeer != Swift_peer) {
-        Swift_retain(rememberedPeer)       // +1 retain: this instance now also references remembered peer
-        Swift_release(Swift_peer)          // release the freshly-created peer
-        Swift_peer = rememberedPeer        // restore the original
-    }
+    val peerHandle = remember { SwiftPeerHandle(Swift_peer, ::Swift_retain, ::Swift_release) }
+    if (peerHandle.peer != Swift_peer) { peerHandle.swapFrom(Swift_peer); Swift_peer = peerHandle.peer }
     // ... existing @State sync code ...
     return super.Evaluate(context, options)
 }
+
+// Generated as a nested private class per view:
+private class SwiftPeerHandle(
+    val peer: Long,
+    private val retainFn: (Long) -> Unit,
+    private val releaseFn: (Long) -> Unit
+) : RememberObserver {
+    init { retainFn(peer) }                                    // +1 retain on first composition
+    fun swapFrom(stale: Long) { retainFn(peer); releaseFn(stale) }  // swap on recomposition
+    override fun onRemembered() {}
+    override fun onAbandoned() { releaseFn(peer) }             // composition cancelled before commit
+    override fun onForgotten() { releaseFn(peer) }             // composable leaves tree
+}
 ```
 
-**Retain/release accounting:** Each recomposition creates a new Kotlin View instance (via `toJavaObject`) with a fresh `Swift_peer`. The `Evaluate` override swaps it for the remembered peer. When the old Kotlin instance is GC'd, `finalize()` calls `Swift_release(Swift_peer)` — but `Swift_peer` was reassigned to the remembered peer, so without the extra `Swift_retain`, `finalize()` would decrement the remembered peer's retain count, eventually freeing it while still in use. The `Swift_retain` before the swap ensures balanced reference counting:
+**Why `RememberObserver` over `DisposableEffect`:**
+- Bundles retain/release lifecycle into a single object — self-documenting pairing
+- Handles `onAbandoned` (composition cancelled before commit) — `DisposableEffect` leaks in this edge case
+- No `DisposableEffect` key management needed
+- Idiomatic Compose lifecycle pattern for resource management
+
+**Retain/release accounting:**
 
 ```
-Instance A (first composition): peer1 created (retain=1), remembered
-Instance B (recomposition):     peer2 created (retain=1)
-  Evaluate: Swift_retain(peer1) → retain=2; Swift_release(peer2) → freed; B.Swift_peer = peer1
-  GC of A:  finalize → Swift_release(peer1) → retain=1  ← still alive ✓
-Instance C (recomposition):     peer3 created (retain=1)
-  Evaluate: Swift_retain(peer1) → retain=2; Swift_release(peer3) → freed; C.Swift_peer = peer1
-  GC of B:  finalize → Swift_release(peer1) → retain=1  ← still alive ✓
+K1 created: box refcount=1. SwiftPeerHandle.init retains → 2. K1.Swift_peer=peer1.
+K2 created (recomposition): new_box refcount=1.
+  Evaluate: swapFrom(new_box) → retain(peer1)→3, release(new_box)→0 (freed). K2.Swift_peer=peer1.
+  K1 GC'd: finalize → release(peer1) → 2.
+K3 created (recomposition): new_box2 refcount=1.
+  Evaluate: swapFrom(new_box2) → retain(peer1)→3, release(new_box2)→0. K3.Swift_peer=peer1.
+  K2 GC'd: finalize → release(peer1) → 2.
+  ... pattern: steady-state refcount ≥2 during active composition ...
 Composable leaves tree:
-  GC of C:  finalize → Swift_release(peer1) → retain=0  ← freed ✓
+  SwiftPeerHandle.onForgotten → release(peer1) → 1.
+  K_last GC'd: finalize → release(peer1) → 0. ← freed ✓
 ```
 
-**`Swift_retain` generation:** The transpiler currently generates `Swift_release` as a per-class private external JNI function (`KotlinBridgeToKotlinVisitor.swift:1095`). A matching `Swift_retain` must be generated alongside it:
+**`Swift_retain` generation:** Generated as a per-class private external JNI function alongside the existing `Swift_release` (`KotlinBridgeToKotlinVisitor.swift:~1619`):
 
 ```kotlin
 private external fun Swift_retain(Swift_peer: skip.bridge.SwiftObjectPointer)
@@ -306,26 +324,10 @@ func Swift_retain(peer: SwiftObjectPointer) {
 
 **Compose lifecycle alignment:**
 - `remember {}` key is positional (call-site) — mirrors SwiftUI's structural identity
-- Value is invalidated when the composable leaves the tree — matches SwiftUI View lifecycle
+- `onForgotten()` fires when the composable leaves the tree — matches SwiftUI View lifecycle
 - `key()` wrapper resets `remember` — `.id()` already maps to `key()` in skip-ui (`AdditionalViewModifiers.swift:1412`)
 
 **Scope limitation — `remember` vs `rememberSaveable`:** `remember {}` survives recomposition but NOT Android configuration changes (Activity recreation on rotation, locale change, etc.). On config change, the remembered peer is lost and a fresh one is created. This is acceptable because: (a) `rememberSaveable` cannot safely persist raw native pointers across process death, and (b) TCA's `Store` can be reconstructed from persisted state if needed. This should be documented as a known scope limit — full state preservation across config changes requires app-level state restoration, not peer pointer persistence.
-
-**Alternative lifecycle strategy — `DisposableEffect`:** Instead of relying on `finalize()` for cleanup (GC-based ownership), an alternative is composition-scoped ownership via `DisposableEffect`. `DisposableEffect` is already used in skip-ui (e.g. `AdditionalViewModifiers.swift:908`, `Observable.swift:22`):
-
-```kotlin
-DisposableEffect(Unit) {
-    Swift_retain(rememberedPeer)   // composition owns a reference
-    onDispose {
-        Swift_release(rememberedPeer)  // release when composable leaves tree
-    }
-}
-```
-
-**Important: this is an alternative to the `finalize()`-based approach, not an addition.** If both the `Evaluate` swap block (which retains on each recomposition) AND the `DisposableEffect` (which retains on first composition) are generated together, the retain counts will be inconsistent — `DisposableEffect(Unit)` fires once on first composition, but `finalize()` fires once per GC'd instance, leading to mismatched retain/release pairs. Choose one ownership strategy:
-
-- **`finalize()`-based (recommended for Phase 1):** The `Evaluate` swap block handles retain/release. Each GC'd Kotlin instance's `finalize()` releases its `Swift_peer`. The trace in "Retain/release accounting" above is correct for this approach.
-- **`DisposableEffect`-based:** The composition owns the reference. Simpler mental model but requires careful key management — for Phase 2, the `DisposableEffect` key must track `rememberedPeer.value` (not `Unit`) so that the effect re-fires when the remembered peer changes on input change.
 
 **Phase 1 scope — zero-constructor-parameter views only:**
 
@@ -609,13 +611,65 @@ override fun Evaluate(context: ComposeContext, options: Int): List<Renderable> {
 
 Constructor parameters must be `Hashable` for `Swift_inputsHash` to work. The transpiler should emit a warning if a constructor parameter type is not `Hashable`. In practice, most View constructor parameters are `String`, `Int`, `Bool`, `Binding<T>`, or `Hashable` enums — the coverage is broad.
 
-### Phase 3: Verify `.id()` → `key()` cooperates with peer remembering
+### Phase 3: Verify `.id()` ↔ `key()` cooperates with peer remembering
 
-**Status:** `.id()` already maps to Compose `key()` in skip-ui (`AdditionalViewModifiers.swift:1412-1413`). When `.id()` changes, `key()` resets all `remember`'d values inside its scope — including the remembered peer. This is the correct behaviour (matches SwiftUI discarding and recreating a view when explicit identity changes).
+**Verdict: Cooperates correctly — no code changes needed.**
 
-**What to verify:** The remembered peer is inside the `key()` scope, so it's invalidated when `.id()` changes. A new peer is created for the new identity. Test this interaction explicitly.
+The cooperation is a runtime property of skip-ui's `TagModifier`, not a transpiler codegen concern. The transpiler generates `remember` inside `Evaluate`; `key()` wrapping comes from skip-ui at runtime. No transpiler test can meaningfully verify the actual interaction.
 
-### Phase 4: Performance — input diffing / skippable composables
+**Structural proof:**
+
+1. `.id()` maps to `TagModifier` in skip-ui (`AdditionalViewModifiers.swift:1395-1458`)
+2. `TagModifier.Evaluate` wraps `super.Evaluate(content, context, options)` inside `androidx.compose.runtime.key(value)` (line 1413) — **conditionally**: `key()` only applies when `IdStateSaver` returns non-nil, which requires `role == .id` (line 1435). `.tag()` uses a different role and does NOT trigger `key()` wrapping (line 1418 falls through without it). This is correct — only explicit identity (`.id()`) should invalidate remembered peers.
+3. Call chain when `.id()` wraps a bridged view:
+   ```
+   TagModifier.Evaluate()
+     └─ key(idValue) {
+          RenderModifier.Evaluate() → ModifiedContent.Evaluate() → bridgedView.Evaluate()
+            ├─ remember { SwiftPeerHandle(...) }          // Phase 1
+            └─ remember(hash) { SwiftPeerHandle(...) }    // Phase 2
+        }
+   ```
+4. `remember` is **inside** `key()` scope → when key changes, Compose invalidates all remembered state → `SwiftPeerHandle.onForgotten()` releases old peer → new handle created → new peer retained
+5. Both `Evaluate` and `Render` paths apply `key()` (lines 1413, 1426)
+
+### Phase 4: ForEach identity — non-lazy `key()` wrapping
+
+**Status:** Implemented (2026-02-28)
+
+ForEach's `Evaluate` method has three iteration paths (indexRange, objects, objectsBinding). In the non-lazy path (when items are collected directly rather than delegated to `LazyListScope`), each item's content evaluation is now wrapped in `androidx.compose.runtime.key(identifier)`. This ensures `remember` blocks inside each item (including `SwiftPeerHandle` from Phase 1/2) follow the item's identity rather than its position.
+
+Key design decisions:
+- **nil-ID semantics preserved:** When the identifier closure exists but returns nil, no `key()` wrapping occurs (no fallback to index). This matches the existing behavior where `taggedRenderable` is a no-op for nil tags.
+- **Index-based keying for indexRange without identifier:** When no identifier closure exists, `defaultTag = index` provides positional keying — matching current implicit Compose behavior but making it explicit.
+- **Lazy path unchanged:** `produceLazyItems()` already passes `identifier` as the `key` parameter to `LazyListScope.items()`.
+- **Tag modifiers unchanged:** `.tag()` role for Picker/TabView selection matching is independent of `key()` wrapping.
+
+**File:** `forks/skip-ui/Sources/SkipUI/SkipUI/Containers/ForEach.swift`
+
+### Phase 5: @Stable / skippability exploration (DEFERRED)
+
+**Status:** Investigated, deferred — marginal benefit given SwiftPeerHandle already preserves expensive state
+
+**Investigation findings:**
+
+1. **`@Stable` is already used selectively.** `KotlinObservationTransformer.swift` adds `@Stable` to `@Observable` and `ObservableObject` classes. skip-ui manually annotates `List`, `Table`, `ComposeContext`, `Navigator`, etc.
+
+2. **Bridged view classes do NOT get `@Stable`.** Generated Kotlin classes from `KotlinBridgeToKotlinVisitor` have no stability annotations, so Compose treats them as unstable.
+
+3. **Adding `@Stable` is problematic for bridged views.** Bridged views are recreated each recomposition (new Kotlin instance via `toJavaObject`). Even with `@Stable`, Compose needs `equals()` to return true for skipping. Default class `equals()` is identity-based — fails for new instances. Overriding `equals()` to compare by `Swift_peer` is complex because the peer value changes before `SwiftPeerHandle` swap in Evaluate.
+
+4. **Strong skipping mode status in Skip is unknown.** No evidence of `strongSkipping` configuration found in skip-ui or skipstone codebases. With strong skipping, unstable params use `===` (instance equality), which also fails since new instances are created each recomposition.
+
+5. **SwiftPeerHandle already prevents the most expensive cost.** Phase 1+2 preserves the Swift peer (avoiding struct recreation with `let`-with-default reinitialisation). Compose-level recomposition skipping is a secondary optimisation.
+
+**Recommendation:** Revisit only if profiling shows recomposition is a measurable bottleneck. The path would be:
+1. Add `@Stable` to bridged View classes in `KotlinBridgeToKotlinVisitor.swift`
+2. Override `equals()` and `hashCode()` to compare by current `Swift_peer` value
+3. Verify strong skipping mode configuration in Skip's Gradle setup
+4. Profile before/after to measure actual recomposition reduction
+
+### Former Phase 4: Performance — input diffing / skippable composables (renumbered to Phase 5)
 
 Only if profiling shows unnecessary recompositions. Compose's `@Stable` annotation and function skippability could be leveraged to skip recomposition entirely when inputs haven't changed, but this is an optimisation beyond correctness.
 
@@ -708,11 +762,11 @@ If all four: you've hit the view identity gap. Apply the initial-value-guard pat
 
 | Priority | Phase | What | Where | Dependency |
 |----------|-------|------|-------|------------|
-| **1 (now)** | Phase 1 | `letWithDefault` classification + `remember { Swift_peer }` in Evaluate | `KotlinStatementTypes.swift`, `StatementTypes.swift`, `KotlinBridgeToKotlinVisitor.swift` | None |
-| **2 (next)** | Phase 2 | Input-change detection for mixed views (constructor params + let defaults) | `KotlinBridgeToKotlinVisitor.swift` (add `Swift_inputsHash`) | Phase 1 |
-| **3 (next)** | Phase 3 | Verify `.id()` ↔ `key()` cooperates with peer remembering | skip-ui tests | Phase 1 (`.id()` already maps to `key()` — verify integration) |
-| **4 (when needed)** | — | ForEach identity — `id:` → Compose `key` in `items()` | skip-ui | None (independent) |
-| **5 (when profiling)** | Phase 4 | Input diffing — skip recomposition for unchanged inputs | skipstone | Phase 1 |
+| ~~**1**~~ | Phase 1 | ~~`letWithDefault` classification + `SwiftPeerHandle` in Evaluate~~ | `StatementTypes.swift`, `KotlinBridgeToKotlinVisitor.swift` | **DONE** (2026-02-27) |
+| ~~**2**~~ | Phase 2 | ~~Input-change detection for mixed views (constructor params + let defaults)~~ | `KotlinBridgeToKotlinVisitor.swift` (`Swift_inputsHash` + Phase 2 `SwiftPeerHandle`) | **DONE** (2026-02-27) |
+| ~~**3**~~ | Phase 3 | ~~Verify `.id()` ↔ `key()` cooperates with peer remembering~~ | Documentation only (structural proof) | **DONE** (2026-02-28) |
+| ~~**4**~~ | Phase 4 | ~~ForEach identity — non-lazy `key()` wrapping in Evaluate~~ | `ForEach.swift` (skip-ui) | **DONE** (2026-02-28) |
+| **5** | — | @Stable / skippability — recomposition skipping for bridged views | skipstone | **DEFERRED** — marginal benefit; revisit when profiling shows bottleneck |
 
 Phase 1 delivers ~90% of the practical value. Most views with `let`-with-default properties are root or near-root views with no constructor parameters (the `let store = Store(...)` pattern). The transpiler already generates `Evaluate` overrides with `rememberSaveable` for `@State` — extending this to `remember { Swift_peer }` for `let`-with-default follows the same structural pattern.
 
