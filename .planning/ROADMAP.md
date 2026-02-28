@@ -26,6 +26,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 15: NavigationStack Android Robustness** - Fix binding-driven push, JVM type erasure multi-destination, and dismiss JNI timing — all with test coverage (completed 2026-02-24)
 - [x] **Phase 16: TCA API Parity Completion** - Enable gated Binding+Observation, Alert/Dialog, IfLetStore extensions on Android; resolve TextState CGFloat ambiguity — all with test coverage (completed 2026-02-24)
 - [ ] **Phase 17: Test Evidence & Infrastructure Hardening** - Direct TEST-10/TEST-11 evidence, Robolectric pipeline fix, ObjC warning cleanup, swiftThreadingFatal version guard — all with test coverage
+- [x] **Phase 18: Complete View Identity Layer Implementation** - ForEach key() wrapping for non-lazy Evaluate path, @Stable/skippability investigation and deferral (completed 2026-02-28)
 
 ## Phase Details
 
@@ -147,7 +148,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 -> 18
 Note: Phase 6 (Database) depends only on Phase 1 and can run in parallel with Phases 2-5 if desired.
 Note: Phases 12 and 13 could partially overlap once Phase 11 test infra is working; Phase 14 must come last.
 
@@ -170,6 +171,7 @@ Note: Phases 12 and 13 could partially overlap once Phase 11 test infra is worki
 | 15. NavigationStack Android Robustness | 3/3 | Complete   | 2026-02-24 |
 | 16. TCA API Parity Completion | 2/2 | Complete   | 2026-02-24 |
 | 17. Test Evidence & Infrastructure Hardening | 0/0 | Planned | - |
+| 18. Complete View Identity Layer | 1/1 | Complete | 2026-02-28 |
 
 ### Phase 8: PFW Skill Alignment
 
@@ -359,3 +361,18 @@ Plans:
   4. ObjC duplicate class warnings eliminated from fuse-app macOS test output
   5. `swiftThreadingFatal` stub has version-gated test that asserts presence on Swift <6.3 and absence on Swift ≥6.3
 **Plans:** 0/0 plans
+
+### Phase 18: Complete View Identity Layer Implementation
+
+**Goal:** Complete the view identity layer by adding Compose key() wrapping to ForEach's non-lazy Evaluate path and documenting the @Stable/skippability investigation
+**Depends on:** Phase 15 (SwiftPeerHandle transpiler infrastructure)
+**Requirements:** VIEWID-01, VIEWID-02
+**Success Criteria** (what must be TRUE):
+  1. ForEach items in non-lazy contexts (VStack, HStack) get Compose key() wrapping based on their identifier
+  2. ForEach items in lazy contexts (List, LazyVStack) continue to work unchanged via LazyListScope.items(key:)
+  3. ForEach .tag modifiers for Picker/TabView selection matching remain unchanged
+  4. @Stable/skippability analysis is documented with a clear recommendation and rationale
+**Plans:** 1/1 plans complete
+
+Plans:
+- [x] 18-01-PLAN.md -- ForEach key() wrapping in non-lazy Evaluate path + @Stable investigation documentation (VIEWID-01, VIEWID-02) ✓ 2026-02-28

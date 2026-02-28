@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 16 in progress — API parity completion (withTransaction, guard removal, animation paths).
+**Current focus:** Phase 18 complete — view identity layer implementation (ForEach key() wrapping, @Stable investigation).
 
 ## Current Position
 
-Phase: 16 of 17 (API Parity Completion)
-Plan: 2 of 2 in current phase -- 16-02 complete (phase complete)
-Status: Plan 16-02 complete. All removable Android guards removed from TCA fork (16 files). BindingLocal deduplicated. Animation chain fully enabled. 6 enablement tests passing.
-Last activity: 2026-02-24 -- Completed 16-02 (TCA guard removal and enablement tests)
+Phase: 18 of 18 (Complete View Identity Layer Implementation)
+Plan: 1 of 1 in current phase -- 18-01 complete (phase complete)
+Status: Plan 18-01 complete. ForEach non-lazy Evaluate wraps items in key(identifier) for identity-based remember scoping. @Stable/skippability investigated and deferred.
+Last activity: 2026-02-28 -- Completed 18-01 (ForEach key() wrapping + @Stable investigation)
 
-Progress: [########=-] 87%
+Progress: [##########] 100%
 
 ## Performance Metrics
 
@@ -70,6 +70,7 @@ Progress: [########=-] 87%
 | Phase 15 P03 | 15min | 1 tasks | 2 files |
 | Phase 16 P01 | 1min | 2 tasks | 3 files |
 | Phase 16 P02 | 9min | 2 tasks | 19 files |
+| Phase 18 P01 | 3min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -198,6 +199,8 @@ Recent decisions affecting current work:
 - [Phase 16]: BindingLocal deduplicated: Core.swift (#if !canImport(SwiftUI)) and ViewStore.swift (inside #if canImport(SwiftUI)) -- mutually exclusive definitions
 - [Phase 16]: ViewAction.swift Android no-op fallback removed entirely -- withTransaction now works on Android
 - [Phase 16]: Deprecated file-level guards (SwitchStore, NavigationLinkStore, LegacyAlert, ActionSheet) left as-is -- entire deprecated files
+- [Phase 18]: ForEach key() wrapping only when identifier is non-nil -- nil-ID semantics preserved exactly (no fallback to index)
+- [Phase 18]: @Stable/skippability deferred -- SwiftPeerHandle already prevents most expensive cost (peer recreation); @Stable requires equals()/hashCode() overrides that conflict with peer swap timing
 
 ### Pending Todos
 
@@ -223,6 +226,7 @@ Recent decisions affecting current work:
 
 - Phase 8 added: PFW skill alignment
 - Phase 9 added: Post-audit cleanup (test fixes, documentation sync, Android verification)
+- Phase 18 added: Complete view identity layer implementation
 
 ### Blockers/Concerns
 
@@ -232,6 +236,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-02-24
-Stopped at: Completed 16-02-PLAN.md (TCA guard removal and enablement tests)
-Resume file: .planning/phases/16-api-parity-completion/
+Last session: 2026-02-28
+Stopped at: Completed 18-01-PLAN.md (ForEach key() wrapping + @Stable investigation)
+Resume file: .planning/phases/18-complete-view-identity-layer-implementation/
