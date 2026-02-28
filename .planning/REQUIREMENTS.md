@@ -486,15 +486,17 @@ Which phases cover which requirements. Updated during roadmap creation. Evidence
 | TEST-11 | Phase 11, 17 | Complete | INDIRECT: Android emulator validation (Phase 11); Phase 17: upgrading to direct un-gated Android test |
 | TEST-12 | Phase 11 | Complete | DIRECT: Android emulator validation (Phase 11) |
 | DOC-01 | Phase 7 | Complete | N/A: Documentation requirement |
+| VIEWID-01 | Phase 18 | Complete | DIRECT: ForEach non-lazy Evaluate wraps items in `key(identifier)` for all three iteration paths (indexRange, objects, objectsBinding) |
+| VIEWID-02 | Phase 18 | Complete | DIRECT: @Stable/skippability investigation documented with DEFERRED recommendation and rationale in compose-view-identity-gap.md |
 
 **Coverage:**
-- v1 requirements: 182 total
-- Sections: OBS (30), TCA (35), DEP (11), SHR (14), NAV (15), CP (8), IC (6), SQL (15), SD (12), CD (5), IR (4), UI (8), TEST (12), SPM (6), DOC (1)
-- Mapped to phases: 182
+- v1 requirements: 184 total
+- Sections: OBS (30), TCA (35), DEP (11), SHR (14), NAV (15), CP (8), IC (6), SQL (15), SD (12), CD (5), IR (4), UI (8), TEST (12), SPM (6), DOC (1), VIEWID (2)
+- Mapped to phases: 184
 - Unmapped: 0
-- **Complete (evidence-backed):** 182/182
-- **Pending/Unverified:** 0/182
+- **Complete (evidence-backed):** 184/184
+- **Pending/Unverified:** 0/184
 
 ---
 *Requirements defined: 2026-02-21*
-*Last updated: 2026-02-24 -- DEP-05 and NAV-16 removed (N/A on Android by design); 182/182 complete with evidence*
+*Last updated: 2026-02-28 -- Added VIEWID-01, VIEWID-02 for Phase 18 view identity layer; 184/184 complete with evidence*
