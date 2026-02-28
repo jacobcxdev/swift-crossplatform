@@ -171,7 +171,7 @@ Note: Phases 12 and 13 could partially overlap once Phase 11 test infra is worki
 | 15. NavigationStack Android Robustness | 3/3 | Complete   | 2026-02-24 |
 | 16. TCA API Parity Completion | 2/2 | Complete   | 2026-02-24 |
 | 17. Test Evidence & Infrastructure Hardening | 0/0 | Planned | - |
-| 18. Complete View Identity Layer | 1/1 | Complete | 2026-02-28 |
+| 18. Complete View Identity Layer | 1/1 | Complete    | 2026-02-28 |
 
 ### Phase 8: PFW Skill Alignment
 
