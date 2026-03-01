@@ -376,3 +376,34 @@ Plans:
 
 Plans:
 - [x] 18-01-PLAN.md -- ForEach key() wrapping in non-lazy Evaluate path + @Stable investigation documentation (VIEWID-01, VIEWID-02) ✓ 2026-02-28
+
+### Phase 18.1: Implement canonical view identity system (INSERTED)
+
+**Goal:** Implement the canonical view identity system — decouple structural identity (IdentityKeyModifier) from selection tagging (TagModifier), replace fragile composeKeyValue() with structural normalizeKey(), apply uniform container loop keying with duplicate-key protection, normalize AnimatedContent contentKey, and fix transpiler stateVariables.isEmpty guard for mixed-view peer remembering
+**Depends on:** Phase 18
+**Requirements:** VIEWID-03, VIEWID-04, VIEWID-05, VIEWID-06, VIEWID-07, VIEWID-08, VIEWID-09, VIEWID-10
+**Success Criteria** (what must be TRUE):
+  1. normalizeKey() replaces composeKeyValue() for all identity normalization — handles Optional unwrapping structurally, Identifiable/RawRepresentable recursion, String/Int/Long passthrough
+  2. IdentityKeyModifier carries structural identity through ModifiedContent chains, discovered via forEachModifier traversal
+  3. ForEach produces dual wrapping (IdentityKeyModifier + TagModifier(.tag)) for non-lazy paths; lazy paths unchanged
+  4. All eager container loops (VStack, HStack, ZStack) use key(identityKey ?? i) with seenKeys duplicate-key guard
+  5. TagModifier .tag role is pure data annotation (no key() in Render); .id role uses normalizeKey()
+  6. Picker/TabView read selectionTag for selection matching
+  7. AnimatedContent contentKey normalized through normalizeKey()
+  8. Transpiler stateVariables.isEmpty guard removed — mixed @State + let-with-default views get peer remembering
+**Plans:** 3 plans in 2 waves
+
+Plans:
+- [ ] 18.1-01-PLAN.md — Phase 0+1: Core identity architecture (normalizeKey, IdentityKeyModifier, ForEach refactor, container loops, TagModifier simplification, Picker/TabView migration) (VIEWID-03, VIEWID-04, VIEWID-05, VIEWID-06, VIEWID-07, VIEWID-08)
+- [ ] 18.1-02-PLAN.md — Phase 3: Transpiler stateVariables.isEmpty guard fix + mixed-view codegen test (VIEWID-10)
+- [ ] 18.1-03-PLAN.md — Phase 2: AnimatedContent contentKey normalization + animated loop key() wrapping (VIEWID-05, VIEWID-09)
+
+### Phase 19: Complete implementation of the view identity system as outlined by the finalised document
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 18
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 19 to break down)
