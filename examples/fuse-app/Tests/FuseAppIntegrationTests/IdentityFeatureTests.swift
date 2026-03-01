@@ -6,8 +6,9 @@ import Testing
 
 // MARK: - IdentityFeature Tests
 
-/// TCA TestStore tests for Identity tab sections 1, 3, and 4.
+/// TCA TestStore tests for Identity tab sections 1, 3, 4, 5, 6, and 8.
 /// Section 2 (Duplicate Key Guard) uses non-TCA raw arrays — tested via Android integration/manual only.
+/// Section 7 (Peer Remembering) tests transpiler/Compose behavior — Android integration/manual test only.
 @Suite(.serialized) @MainActor
 struct IdentityFeatureTests {
 
@@ -193,6 +194,91 @@ struct IdentityFeatureTests {
         await store.send(.view(.styleSelected("strikethrough"))) {
             $0.selectedStyle = "strikethrough"
         }
+    }
+
+    // MARK: - Section 5: TabView Selection
+
+    @Test func tabSelection() async {
+        let store = TestStore(
+            initialState: IdentityFeature.State()
+        ) {
+            IdentityFeature()
+        }
+
+        #expect(store.state.selectedTab == 0)
+
+        await store.send(.view(.tabSelected(1))) {
+            $0.selectedTab = 1
+        }
+
+        await store.send(.view(.tabSelected(2))) {
+            $0.selectedTab = 2
+        }
+
+        await store.send(.view(.tabSelected(0))) {
+            $0.selectedTab = 0
+        }
+    }
+
+    // MARK: - Section 6: Lazy Container Identity
+
+    @Test func lazyContainerAddAndDelete() async {
+        let store = TestStore(
+            initialState: IdentityFeature.State(
+                cards: [
+                    CardItem(id: Self.idA, title: "Card A"),
+                    CardItem(id: Self.idB, title: "Card B"),
+                ],
+                nextCardLetter: "C"
+            )
+        ) {
+            IdentityFeature()
+        } withDependencies: {
+            $0.uuid = .constant(Self.idNew)
+        }
+
+        // Add a card
+        await store.send(.view(.addCardButtonTapped)) {
+            $0.cards.append(CardItem(id: Self.idNew, title: "Card C"))
+            $0.nextCardLetter = "D"
+        }
+
+        #expect(store.state.cards.count == 3)
+
+        // Delete middle card
+        await store.send(.view(.deleteCardButtonTapped(Self.idB))) {
+            $0.cards.remove(id: Self.idB)
+        }
+
+        #expect(store.state.cards.count == 2)
+        #expect(store.state.cards[id: Self.idA]?.title == "Card A")
+        #expect(store.state.cards[id: Self.idNew]?.title == "Card C")
+    }
+
+    // MARK: - Section 7: Peer Remembering — NO TestStore test
+    // @State retention across recomposition is transpiler/Compose behavior.
+    // Verified via Android integration/manual test only.
+
+    // MARK: - Section 8: .id() State Reset
+
+    @Test func resetTokenChanges() async {
+        let idToken = UUID(uuidString: "00000000-0000-0000-0000-000000000099")!
+        let store = TestStore(
+            initialState: IdentityFeature.State()
+        ) {
+            IdentityFeature()
+        } withDependencies: {
+            $0.uuid = .constant(idToken)
+        }
+
+        let originalToken = store.state.resetToken
+
+        await store.send(.view(.resetTokenButtonTapped)) {
+            $0.resetToken = idToken
+        }
+
+        #expect(store.state.resetToken == idToken)
+        #expect(store.state.resetToken != originalToken)
     }
 }
 #endif
