@@ -8,8 +8,9 @@ import SwiftUI
 struct AppFeature {
     @ObservableState
     struct State: Equatable {
-        var selectedTab = Tab.counter
+        var selectedTab = Tab.identity
         var counter = CounterFeature.State()
+        var identity = IdentityFeature.State()
         var todos = TodosFeature.State()
         var contacts = ContactsFeature.State()
         var database = DatabaseFeature.State()
@@ -17,13 +18,14 @@ struct AppFeature {
         @Shared(.appearance) var appearance: String
 
         enum Tab: String, Equatable {
-            case counter, todos, contacts, database, settings
+            case counter, identity, todos, contacts, database, settings
         }
     }
 
     @CasePathable
     enum Action {
         case counter(CounterFeature.Action)
+        case identity(IdentityFeature.Action)
         case todos(TodosFeature.Action)
         case contacts(ContactsFeature.Action)
         case database(DatabaseFeature.Action)
@@ -34,6 +36,9 @@ struct AppFeature {
     var body: some ReducerOf<Self> {
         Scope(state: \.counter, action: \.counter) {
             CounterFeature()
+        }
+        Scope(state: \.identity, action: \.identity) {
+            IdentityFeature()
         }
         Scope(state: \.todos, action: \.todos) {
             TodosFeature()
@@ -52,7 +57,7 @@ struct AppFeature {
             case let .tabSelected(tab):
                 state.selectedTab = tab
                 return .none
-            case .counter, .todos, .contacts, .database, .settings:
+            case .counter, .identity, .todos, .contacts, .database, .settings:
                 return .none
             }
         }
@@ -71,6 +76,12 @@ struct AppView: View {
             }
             .tabItem { Label("Counter", systemImage: "plus") }
             .tag(AppFeature.State.Tab.counter)
+
+            NavigationStack {
+                IdentityView(store: store.scope(state: \.identity, action: \.identity))
+            }
+            .tabItem { Label("Identity", systemImage: "person.crop.square") }
+            .tag(AppFeature.State.Tab.identity)
 
             NavigationStack {
                 TodosView(store: store.scope(state: \.todos, action: \.todos))
