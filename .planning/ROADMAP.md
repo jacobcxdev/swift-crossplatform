@@ -14,19 +14,19 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Observation Bridge** - Native Swift Observation works correctly on Android with record-replay pattern preventing infinite recomposition
 - [ ] **Phase 2: Foundation Libraries** - CasePaths, IdentifiedCollections, CustomDump, and IssueReporting work on Android
-- [x] **Phase 3: TCA Core** - Store, reducers, effects, and dependency injection work on Android (completed 2026-02-22)
-- [x] **Phase 4: TCA State & Bindings** - ObservableState macro, bindings, and shared state persistence work on Android (completed 2026-02-22)
-- [x] **Phase 5: Navigation & Presentation** - TCA navigation patterns and SwiftUI presentation lifecycle work on Android (completed 2026-02-22)
-- [x] **Phase 6: Database & Queries** - StructuredQueries and GRDB/SQLiteData work on Android with observation-driven view updates (completed 2026-02-22)
-- [x] **Phase 7: Integration Testing & Documentation** - End-to-end TCA app runs on both platforms; forks documented (completed 2026-02-22)
-- [x] **Phase 11: Android Test Infrastructure** - Fix blockers preventing Android test execution: xctest-dynamic-overlay imports, skipstone plugin on all test targets, canonical XCGradleHarness (completed 2026-02-24)
-- [x] **Phase 12: Swift Perception Android Port** - Fork swift-perception for Android; provide WithPerceptionTracking, Perceptible conformances TCA depends on (completed 2026-02-24)
-- [x] **Phase 13: API Parity Gaps** - Implement Android equivalents for non-deprecated TCA APIs gated out without alternatives (completed 2026-02-24)
-- [x] **Phase 14: Android Verification & Requirements Reset** - Run full Android test suite, re-verify all 169 pending requirements against actual results (completed 2026-02-24)
-- [x] **Phase 15: NavigationStack Android Robustness** - Fix binding-driven push, JVM type erasure multi-destination, and dismiss JNI timing — all with test coverage (completed 2026-02-24)
-- [x] **Phase 16: TCA API Parity Completion** - Enable gated Binding+Observation, Alert/Dialog, IfLetStore extensions on Android; resolve TextState CGFloat ambiguity — all with test coverage (completed 2026-02-24)
+- [x] **Phase 3: TCA Core** - Store, reducers, effects, and dependency injection work on Android (completed 2019-02-22)
+- [x] **Phase 4: TCA State & Bindings** - ObservableState macro, bindings, and shared state persistence work on Android (completed 2019-02-22)
+- [x] **Phase 5: Navigation & Presentation** - TCA navigation patterns and SwiftUI presentation lifecycle work on Android (completed 2019-02-22)
+- [x] **Phase 6: Database & Queries** - StructuredQueries and GRDB/SQLiteData work on Android with observation-driven view updates (completed 2019-02-22)
+- [x] **Phase 7: Integration Testing & Documentation** - End-to-end TCA app runs on both platforms; forks documented (completed 2019-02-22)
+- [x] **Phase 11: Android Test Infrastructure** - Fix blockers preventing Android test execution: xctest-dynamic-overlay imports, skipstone plugin on all test targets, canonical XCGradleHarness (completed 2019-02-24)
+- [x] **Phase 12: Swift Perception Android Port** - Fork swift-perception for Android; provide WithPerceptionTracking, Perceptible conformances TCA depends on (completed 2019-02-24)
+- [x] **Phase 13: API Parity Gaps** - Implement Android equivalents for non-deprecated TCA APIs gated out without alternatives (completed 2019-02-24)
+- [x] **Phase 14: Android Verification & Requirements Reset** - Run full Android test suite, re-verify all 169 pending requirements against actual results (completed 2019-02-24)
+- [x] **Phase 15: NavigationStack Android Robustness** - Fix binding-driven push, JVM type erasure multi-destination, and dismiss JNI timing — all with test coverage (completed 2019-02-24)
+- [x] **Phase 16: TCA API Parity Completion** - Enable gated Binding+Observation, Alert/Dialog, IfLetStore extensions on Android; resolve TextState CGFloat ambiguity — all with test coverage (completed 2019-02-24)
 - [ ] **Phase 17: Test Evidence & Infrastructure Hardening** - Direct TEST-10/TEST-11 evidence, Robolectric pipeline fix, ObjC warning cleanup, swiftThreadingFatal version guard — all with test coverage
-- [x] **Phase 18: Complete View Identity Layer Implementation** - ForEach key() wrapping for non-lazy Evaluate path, @Stable/skippability investigation and deferral (completed 2026-02-28)
+- [x] **Phase 18: Complete View Identity Layer Implementation** - ForEach key() wrapping for non-lazy Evaluate path, @Stable/skippability investigation and deferral (completed 2019-02-28)
 
 ## Phase Details
 
@@ -43,8 +43,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 2 plans in 2 waves
 
 Plans:
-- [x] 01-01-PLAN.md -- Bridge implementation fixes, diagnostics API, and observation tests (OBS-01 through OBS-30) ✓ 2026-02-21
-- [x] 01-02-PLAN.md -- SPM compilation validation for all 14 forks and Android emulator integration tests (SPM-01 through SPM-06) ✓ 2026-02-21
+- [x] 01-01-PLAN.md -- Bridge implementation fixes, diagnostics API, and observation tests (OBS-01 through OBS-30) ✓ 2019-02-21
+- [x] 01-02-PLAN.md -- SPM compilation validation for all 14 forks and Android emulator integration tests (SPM-01 through SPM-06) ✓ 2019-02-21
 
 ### Phase 2: Foundation Libraries
 **Goal**: Point-Free's utility libraries that TCA depends on work correctly on Android
@@ -58,9 +58,9 @@ Plans:
 **Plans**: 3 plans in 3 waves
 
 Plans:
-- [x] 02-01-PLAN.md -- Fork housekeeping: branch rename (dev/swift-crossplatform), 3 new forks (swift-case-paths, swift-identified-collections, xctest-dynamic-overlay), Package.swift wiring for all 17 forks, per-library test targets (CP-01, CP-05, IC-01, IC-05) ✓ 2026-02-21
-- [x] 02-02-PLAN.md -- IssueReporting three-layer Android fix (isTesting, dlsym, fallbacks) + IdentifiedCollections validation (IR-01 through IR-04, IC-01 through IC-06) ✓ 2026-02-21
-- [x] 02-03-PLAN.md -- CasePaths validation + EnumMetadata ABI smoke test + CustomDump conformance guards and tests (CP-01 through CP-08, CD-01 through CD-05) ✓ 2026-02-21
+- [x] 02-01-PLAN.md -- Fork housekeeping: branch rename (dev/swift-crossplatform), 3 new forks (swift-case-paths, swift-identified-collections, xctest-dynamic-overlay), Package.swift wiring for all 17 forks, per-library test targets (CP-01, CP-05, IC-01, IC-05) ✓ 2019-02-21
+- [x] 02-02-PLAN.md -- IssueReporting three-layer Android fix (isTesting, dlsym, fallbacks) + IdentifiedCollections validation (IR-01 through IR-04, IC-01 through IC-06) ✓ 2019-02-21
+- [x] 02-03-PLAN.md -- CasePaths validation + EnumMetadata ABI smoke test + CustomDump conformance guards and tests (CP-01 through CP-08, CD-01 through CD-05) ✓ 2019-02-21
 
 ### Phase 3: TCA Core
 **Goal**: TCA Store, reducers, effects, and dependency injection work correctly on Android
@@ -75,8 +75,8 @@ Plans:
 **Plans**: 2 plans in 2 waves
 
 Plans:
-- [x] 03-01-PLAN.md — Store/Reducer/Effect validation + Package.swift test infrastructure with DependenciesTestSupport (TCA-01..TCA-16) ✓ 2026-02-22
-- [x] 03-02-PLAN.md — Dependency injection validation: @Dependency, withDependencies, built-in deps, @DependencyClient, NavigationID (DEP-01..DEP-12) ✓ 2026-02-22
+- [x] 03-01-PLAN.md — Store/Reducer/Effect validation + Package.swift test infrastructure with DependenciesTestSupport (TCA-01..TCA-16) ✓ 2019-02-22
+- [x] 03-02-PLAN.md — Dependency injection validation: @Dependency, withDependencies, built-in deps, @DependencyClient, NavigationID (DEP-01..DEP-12) ✓ 2019-02-22
 
 ### Phase 4: TCA State & Bindings
 **Goal**: ObservableState macro, two-way bindings, and shared state persistence drive correct view updates on Android
@@ -91,9 +91,9 @@ Plans:
 **Plans**: 3 plans in 3 waves
 
 Plans:
-- [x] 04-01-PLAN.md (wave 1) — @ObservableState macro, binding projection chain, store scoping lifecycle (ForEach, optional, enum), onChange, _printChanges, @ViewAction (TCA-17..TCA-25, TCA-29..TCA-31) ✓ 2026-02-22
-- [x] 04-02-PLAN.md (wave 2) — FileStorage Android enablement + @Shared persistence backend validation: appStorage, fileStorage, inMemory, custom SharedKey (SHR-01..SHR-04, SHR-14) ✓ 2026-02-22
-- [x] 04-03-PLAN.md (wave 3) — @Shared binding projections, Observations async sequence, publisher emission, double-notification prevention, cross-feature synchronization (SHR-05..SHR-13) ✓ 2026-02-22
+- [x] 04-01-PLAN.md (wave 1) — @ObservableState macro, binding projection chain, store scoping lifecycle (ForEach, optional, enum), onChange, _printChanges, @ViewAction (TCA-17..TCA-25, TCA-29..TCA-31) ✓ 2019-02-22
+- [x] 04-02-PLAN.md (wave 2) — FileStorage Android enablement + @Shared persistence backend validation: appStorage, fileStorage, inMemory, custom SharedKey (SHR-01..SHR-04, SHR-14) ✓ 2019-02-22
+- [x] 04-03-PLAN.md (wave 3) — @Shared binding projections, Observations async sequence, publisher emission, double-notification prevention, cross-feature synchronization (SHR-05..SHR-13) ✓ 2019-02-22
 
 ### Phase 5: Navigation & Presentation
 **Goal**: TCA navigation patterns (stack, sheet, alert, confirmation dialog) and SwiftUI presentation lifecycle work on Android
@@ -108,9 +108,9 @@ Plans:
 **Plans**: 3 plans in 3 waves
 
 Plans:
-- [x] 05-01-PLAN.md (wave 1) — Guard removals (EphemeralState, Popover, NavigationStack+Observation) + data-layer navigation tests (TCA-26..TCA-28, TCA-32..TCA-35, NAV-09..NAV-15) ✓ 2026-02-22
-- [x] 05-02-PLAN.md (wave 2) — NavigationStack Android adapter + presentation tests: sheet, fullScreenCover, popover, stack push/pop (NAV-01..NAV-08, NAV-16) ✓ 2026-02-22
-- [x] 05-03-PLAN.md (wave 3) — SwiftUI pattern validation tests + full suite validation (UI-01..UI-08) ✓ 2026-02-22
+- [x] 05-01-PLAN.md (wave 1) — Guard removals (EphemeralState, Popover, NavigationStack+Observation) + data-layer navigation tests (TCA-26..TCA-28, TCA-32..TCA-35, NAV-09..NAV-15) ✓ 2019-02-22
+- [x] 05-02-PLAN.md (wave 2) — NavigationStack Android adapter + presentation tests: sheet, fullScreenCover, popover, stack push/pop (NAV-01..NAV-08, NAV-16) ✓ 2019-02-22
+- [x] 05-03-PLAN.md (wave 3) — SwiftUI pattern validation tests + full suite validation (UI-01..UI-08) ✓ 2019-02-22
 
 ### Phase 6: Database & Queries
 **Goal**: StructuredQueries type-safe query building and GRDB database lifecycle work on Android with observation-driven view updates
@@ -124,8 +124,8 @@ Plans:
 **Plans**: 2 plans in 2 waves
 
 Plans:
-- [x] 06-01-PLAN.md — Package.swift database fork wiring + StructuredQueries validation tests (SQL-01..SQL-15) ✓ 2026-02-22
-- [x] 06-02-PLAN.md — SQLiteData lifecycle, GRDB transactions, observation macros, dependency injection (SD-01..SD-12) ✓ 2026-02-22
+- [x] 06-01-PLAN.md — Package.swift database fork wiring + StructuredQueries validation tests (SQL-01..SQL-15) ✓ 2019-02-22
+- [x] 06-02-PLAN.md — SQLiteData lifecycle, GRDB transactions, observation macros, dependency injection (SD-01..SD-12) ✓ 2019-02-22
 
 ### Phase 7: Integration Testing & Documentation
 **Goal**: A complete TCA app runs on both iOS and Android; all forks are documented with change rationale and upstream PR candidates
@@ -140,10 +140,10 @@ Plans:
 **Plans**: 4 plans in 4 waves
 
 Plans:
-- [x] 07-01-PLAN.md (wave 1) — TestStore API validation: init, send, receive, exhaustivity, finish, skipReceivedActions, dependencies, effectDidSubscribe edge cases (TEST-01..TEST-09) ✓ 2026-02-22
-- [x] 07-02-PLAN.md (wave 2) — Observation bridge semantics + stress tests + Android emulator validation + deferred Phase 1 tests (TEST-10, TEST-11) ✓ 2026-02-22
-- [x] 07-03-PLAN.md (wave 3) — Fuse-app showcase: 6 TCA features, integration tests, README, Android build verification (TEST-12) ✓ 2026-02-22
-- [x] 07-04-PLAN.md (wave 4) — Fork documentation: FORKS.md + test reorganisation into 6 feature-aligned targets (DOC-01) ✓ 2026-02-22
+- [x] 07-01-PLAN.md (wave 1) — TestStore API validation: init, send, receive, exhaustivity, finish, skipReceivedActions, dependencies, effectDidSubscribe edge cases (TEST-01..TEST-09) ✓ 2019-02-22
+- [x] 07-02-PLAN.md (wave 2) — Observation bridge semantics + stress tests + Android emulator validation + deferred Phase 1 tests (TEST-10, TEST-11) ✓ 2019-02-22
+- [x] 07-03-PLAN.md (wave 3) — Fuse-app showcase: 6 TCA features, integration tests, README, Android build verification (TEST-12) ✓ 2019-02-22
+- [x] 07-04-PLAN.md (wave 4) — Fork documentation: FORKS.md + test reorganisation into 6 feature-aligned targets (DOC-01) ✓ 2019-02-22
 
 ## Progress
 
@@ -155,23 +155,23 @@ Note: Phases 12 and 13 could partially overlap once Phase 11 test infra is worki
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Observation Bridge | 2/2 | Executed | - |
-| 2. Foundation Libraries | 3/3 | Executed | 2026-02-21 |
-| 3. TCA Core | 2/2 | Complete    | 2026-02-22 |
-| 4. TCA State & Bindings | 3/3 | Complete | 2026-02-22 |
-| 5. Navigation & Presentation | 3/3 | Complete | 2026-02-22 |
-| 6. Database & Queries | 2/2 | Complete | 2026-02-22 |
-| 7. Integration Testing & Documentation | 4/4 | Complete    | 2026-02-23 |
-| 8. PFW Skill Alignment | 5/5 | Complete | 2026-02-23 |
-| 9. Post-Audit Cleanup | 4/4 | Complete | 2026-02-23 |
-| 10. skip-fuse-ui Integration & Audit | 8/8 | Complete    | 2026-02-24 |
-| 11. Android Test Infrastructure | 3/3 | Complete   | 2026-02-24 |
-| 12. Swift Perception Android Port | 2/2 | Complete    | 2026-02-24 |
-| 13. API Parity Gaps | 2/2 | Complete    | 2026-02-24 |
-| 14. Android Verification & Requirements Reset | 4/4 | Complete    | 2026-02-24 |
-| 15. NavigationStack Android Robustness | 3/3 | Complete   | 2026-02-24 |
-| 16. TCA API Parity Completion | 2/2 | Complete   | 2026-02-24 |
+| 2. Foundation Libraries | 3/3 | Executed | 2019-02-21 |
+| 3. TCA Core | 2/2 | Complete    | 2019-02-22 |
+| 4. TCA State & Bindings | 3/3 | Complete | 2019-02-22 |
+| 5. Navigation & Presentation | 3/3 | Complete | 2019-02-22 |
+| 6. Database & Queries | 2/2 | Complete | 2019-02-22 |
+| 7. Integration Testing & Documentation | 4/4 | Complete    | 2019-02-23 |
+| 8. PFW Skill Alignment | 5/5 | Complete | 2019-02-23 |
+| 9. Post-Audit Cleanup | 4/4 | Complete | 2019-02-23 |
+| 10. skip-fuse-ui Integration & Audit | 8/8 | Complete    | 2019-02-24 |
+| 11. Android Test Infrastructure | 3/3 | Complete   | 2019-02-24 |
+| 12. Swift Perception Android Port | 2/2 | Complete    | 2019-02-24 |
+| 13. API Parity Gaps | 2/2 | Complete    | 2019-02-24 |
+| 14. Android Verification & Requirements Reset | 4/4 | Complete    | 2019-02-24 |
+| 15. NavigationStack Android Robustness | 3/3 | Complete   | 2019-02-24 |
+| 16. TCA API Parity Completion | 2/2 | Complete   | 2019-02-24 |
 | 17. Test Evidence & Infrastructure Hardening | 0/0 | Planned | - |
-| 18. Complete View Identity Layer | 1/1 | Complete    | 2026-02-28 |
+| 18. Complete View Identity Layer | 1/1 | Complete    | 2019-02-28 |
 
 ### Phase 8: PFW Skill Alignment
 
@@ -187,11 +187,11 @@ Note: Phases 12 and 13 could partially overlap once Phase 11 test infra is worki
 **Plans:** 5 plans in 5 waves
 
 Plans:
-- [x] 08-01-PLAN.md (wave 1) — Atomic single-file fixes: query syntax (.eq/.gt), Effect.run error handling, @available annotations ✓ 2026-02-23
-- [x] 08-02-PLAN.md (wave 2) — Structural alignment: @CasePathable, Path un-nesting, CombineReducers, IdentifiedArrayOf, dismiss pattern, action naming ✓ 2026-02-23
-- [x] 08-03-PLAN.md (wave 3) — Database & import cleanup: import SQLiteData only, defaultDatabase(), @FetchAll/@FetchOne, #sql macro, .dependencies trait ✓ 2026-02-23
-- [x] 08-04-PLAN.md (wave 4) — Test modernisation: 12 XCTestCase files to Swift Testing, expectNoDifference, confirmation() replacing XCTestExpectation ✓ 2026-02-23
-- [x] 08-05-PLAN.md (wave 5) — Fork cleanup + assertion sweep: bridge namespace rename, os_unfair_lock, final verification of all 191 findings ✓ 2026-02-23
+- [x] 08-01-PLAN.md (wave 1) — Atomic single-file fixes: query syntax (.eq/.gt), Effect.run error handling, @available annotations ✓ 2019-02-23
+- [x] 08-02-PLAN.md (wave 2) — Structural alignment: @CasePathable, Path un-nesting, CombineReducers, IdentifiedArrayOf, dismiss pattern, action naming ✓ 2019-02-23
+- [x] 08-03-PLAN.md (wave 3) — Database & import cleanup: import SQLiteData only, defaultDatabase(), @FetchAll/@FetchOne, #sql macro, .dependencies trait ✓ 2019-02-23
+- [x] 08-04-PLAN.md (wave 4) — Test modernisation: 12 XCTestCase files to Swift Testing, expectNoDifference, confirmation() replacing XCTestExpectation ✓ 2019-02-23
+- [x] 08-05-PLAN.md (wave 5) — Fork cleanup + assertion sweep: bridge namespace rename, os_unfair_lock, final verification of all 191 findings ✓ 2019-02-23
 
 ### Phase 9: Post-Audit Cleanup
 **Goal:** Close all gaps identified by the milestone audit — fix failing tests, fill test coverage holes, sync documentation, and verify Android test execution. All fixes must align with `/pfw-*` skills as canonical usage patterns.
@@ -207,10 +207,10 @@ Plans:
 **Plans:** 4 plans in 4 waves
 
 Plans:
-- [x] 09-01-PLAN.md (wave 1) — Test fixes: xctest-dynamic-overlay Android imports (`/pfw-issue-reporting`), DatabaseFeature schema bootstrap (`/pfw-sqlite-data`), SQL-09/SQL-11 coverage (`/pfw-structured-queries`), empty test cleanup (`/pfw-testing`) ✓ 2026-02-23
-- [x] 09-02-PLAN.md (wave 2) — Documentation sync: REQUIREMENTS.md 127 stale checkboxes, Perception bypass documentation ✓ 2026-02-23
-- [x] 09-03-PLAN.md (wave 3) — Android verification: run `skip android test` after wave 1 fix, capture results, update STATE.md ✓ 2026-02-23
-- [x] 09-04-PLAN.md (wave 4) — Gap closure: wrap 3 Android-failing tests with withKnownIssue, correct inaccurate SUMMARY, re-verify 0 real failures ✓ 2026-02-23
+- [x] 09-01-PLAN.md (wave 1) — Test fixes: xctest-dynamic-overlay Android imports (`/pfw-issue-reporting`), DatabaseFeature schema bootstrap (`/pfw-sqlite-data`), SQL-09/SQL-11 coverage (`/pfw-structured-queries`), empty test cleanup (`/pfw-testing`) ✓ 2019-02-23
+- [x] 09-02-PLAN.md (wave 2) — Documentation sync: REQUIREMENTS.md 127 stale checkboxes, Perception bypass documentation ✓ 2019-02-23
+- [x] 09-03-PLAN.md (wave 3) — Android verification: run `skip android test` after wave 1 fix, capture results, update STATE.md ✓ 2019-02-23
+- [x] 09-04-PLAN.md (wave 4) — Gap closure: wrap 3 Android-failing tests with withKnownIssue, correct inaccurate SUMMARY, re-verify 0 real failures ✓ 2019-02-23
 
 ### Phase 10: skip-fuse-ui Fork Integration & Cross-Fork Audit
 **Goal:** Resolve SPM dependency identity conflicts, perform comprehensive audit of all fork modifications against skip-fuse-ui counterparts, fix all gaps found, verify cross-platform parity, and update project documentation. Absorbs originally-proposed Phase 11 (Presentation Dismiss on Android).
@@ -230,14 +230,14 @@ Plans:
 **Plans:** 8/8 plans complete
 
 Plans:
-- [x] 10-01-PLAN.md (wave 1) — CLAUDE.md + Makefile updates: gotchas, env vars, smart defaults ✓ 2026-02-24
-- [x] 10-02-PLAN.md (wave 1) — SPM dependency resolution: convert remote URLs to local paths, remove unused deps ✓ 2026-02-24
-- [x] 10-03-PLAN.md (wave 2) — Gap audit: skip-fuse-ui counterparts, TCA guards, dismiss, JVM type erasure ✓ 2026-02-24
-- [x] 10-04-PLAN.md (wave 3) — Gap fixes + tests: implement fixes from gap report, verify dismiss, Android build ✓ 2026-02-24
-- [x] 10-05-PLAN.md (wave 4) — Roadmap update + cleanup: update ROADMAP, STATE, REQUIREMENTS ✓ 2026-02-24
-- [x] 10-06-PLAN.md (gap closure) — Apply CLAUDE.md + Makefile changes that were planned but never written to disk; correct STATE.md ✓ 2026-02-24
-- [x] 10-07-PLAN.md (gap closure) — Fix XCSkipTests.testSkipModule failure in fuse-library: replace XCGradleHarness with JUnit results stub ✓ 2026-02-24
-- [x] 10-08-PLAN.md (gap closure) — Administrative closure: 10-07 SUMMARY, STATE.md/ROADMAP corrections, known-limitation documentation ✓ 2026-02-24
+- [x] 10-01-PLAN.md (wave 1) — CLAUDE.md + Makefile updates: gotchas, env vars, smart defaults ✓ 2019-02-24
+- [x] 10-02-PLAN.md (wave 1) — SPM dependency resolution: convert remote URLs to local paths, remove unused deps ✓ 2019-02-24
+- [x] 10-03-PLAN.md (wave 2) — Gap audit: skip-fuse-ui counterparts, TCA guards, dismiss, JVM type erasure ✓ 2019-02-24
+- [x] 10-04-PLAN.md (wave 3) — Gap fixes + tests: implement fixes from gap report, verify dismiss, Android build ✓ 2019-02-24
+- [x] 10-05-PLAN.md (wave 4) — Roadmap update + cleanup: update ROADMAP, STATE, REQUIREMENTS ✓ 2019-02-24
+- [x] 10-06-PLAN.md (gap closure) — Apply CLAUDE.md + Makefile changes that were planned but never written to disk; correct STATE.md ✓ 2019-02-24
+- [x] 10-07-PLAN.md (gap closure) — Fix XCSkipTests.testSkipModule failure in fuse-library: replace XCGradleHarness with JUnit results stub ✓ 2019-02-24
+- [x] 10-08-PLAN.md (gap closure) — Administrative closure: 10-07 SUMMARY, STATE.md/ROADMAP corrections, known-limitation documentation ✓ 2019-02-24
 
 ### Phase 11: Android Test Infrastructure
 **Goal:** Fix all blockers preventing Android test execution — xctest-dynamic-overlay imports, skipstone plugin coverage, canonical Skip testing pattern, and local package symlink compatibility
@@ -254,9 +254,9 @@ Plans:
 **Plans:** 3/3 plans complete
 
 Plans:
-- [x] 11-01-PLAN.md — Add skipstone plugin + SkipTest to 6 missing test targets, create XCSkipTests.swift, gate non-transpilable code ✓ 2026-02-24
-- [x] 11-02-PLAN.md — Replace JUnit stubs with canonical XCGradleHarness, diagnose/fix skipstone symlink resolution ✓ 2026-02-24
-- [x] 11-03-PLAN.md — Android verification: TEST-10 observation bridge, TEST-11 stress stability, full suite validation ✓ 2026-02-24
+- [x] 11-01-PLAN.md — Add skipstone plugin + SkipTest to 6 missing test targets, create XCSkipTests.swift, gate non-transpilable code ✓ 2019-02-24
+- [x] 11-02-PLAN.md — Replace JUnit stubs with canonical XCGradleHarness, diagnose/fix skipstone symlink resolution ✓ 2019-02-24
+- [x] 11-03-PLAN.md — Android verification: TEST-10 observation bridge, TEST-11 stress stability, full suite validation ✓ 2019-02-24
 
 ### Phase 12: Swift Perception Android Port
 **Goal:** Provide `WithPerceptionTracking`, `_PerceptionLocals`, and `Perceptible` protocol on Android so TCA binding/scoping infrastructure works correctly
@@ -290,8 +290,8 @@ Plans:
 **Plans:** 2/2 plans complete
 
 Plans:
-- [x] 13-01-PLAN.md -- ViewActionSending animation no-op + store.case enum switching verification (TCA-25, TCA-31) ✓ 2026-02-24
-- [x] 13-02-PLAN.md -- Presentation parity tests (sheet/fullScreenCover/popover) + TextState/ButtonState verification (NAV-05, NAV-07, NAV-08) ✓ 2026-02-24
+- [x] 13-01-PLAN.md -- ViewActionSending animation no-op + store.case enum switching verification (TCA-25, TCA-31) ✓ 2019-02-24
+- [x] 13-02-PLAN.md -- Presentation parity tests (sheet/fullScreenCover/popover) + TextState/ButtonState verification (NAV-05, NAV-07, NAV-08) ✓ 2019-02-24
 
 ### Phase 14: Android Verification & Requirements Reset
 **Goal:** Run the full test suite on Android, re-verify all 169 pending requirements against actual Android test results, and update traceability to reflect evidence-backed status
@@ -307,10 +307,10 @@ Plans:
 **Plans:** 4/4 plans complete
 
 Plans:
-- [x] 14-01-PLAN.md -- Run Android + Darwin test suites, capture output, create requirement evidence map ✓ 2026-02-24
-- [x] 14-02-PLAN.md -- Update REQUIREMENTS.md traceability with evidence-backed statuses and known limitations ✓ 2026-02-24
-- [x] 14-03-PLAN.md -- Final verification, STATE.md/ROADMAP.md closure ✓ 2026-02-24
-- [x] 14-04-PLAN.md -- Gap closure: Android-transpilable Combine publisher tests (SHR-09/SHR-10) + TextState formatting rationale ✓ 2026-02-24
+- [x] 14-01-PLAN.md -- Run Android + Darwin test suites, capture output, create requirement evidence map ✓ 2019-02-24
+- [x] 14-02-PLAN.md -- Update REQUIREMENTS.md traceability with evidence-backed statuses and known limitations ✓ 2019-02-24
+- [x] 14-03-PLAN.md -- Final verification, STATE.md/ROADMAP.md closure ✓ 2019-02-24
+- [x] 14-04-PLAN.md -- Gap closure: Android-transpilable Combine publisher tests (SHR-09/SHR-10) + TextState formatting rationale ✓ 2019-02-24
 
 ### Phase 15: NavigationStack Android Robustness
 **Goal:** Fix all P2 NavigationStack tech debt — binding-driven push, JVM type erasure for multi-destination, and dismiss JNI timing — with full test coverage replacing existing `withKnownIssue` wrappers
@@ -375,7 +375,7 @@ Plans:
 **Plans:** 1/1 plans complete
 
 Plans:
-- [x] 18-01-PLAN.md -- ForEach key() wrapping in non-lazy Evaluate path + @Stable investigation documentation (VIEWID-01, VIEWID-02) ✓ 2026-02-28
+- [x] 18-01-PLAN.md -- ForEach key() wrapping in non-lazy Evaluate path + @Stable investigation documentation (VIEWID-01, VIEWID-02) ✓ 2019-02-28
 
 ### Phase 18.1: Implement canonical view identity system (INSERTED)
 
@@ -403,13 +403,3 @@ Plans:
 - [ ] 18.1-05-PLAN.md — Wave 2b (GREEN, parallel with 2a): Transpiler stateVariables.isEmpty guard fix + mixed-view codegen test (VIEWID-10)
 - [ ] 18.1-06-PLAN.md — Wave 3 (GREEN): AnimatedContent contentKey normalization + animated loop key() wrapping + explicitResetKey checkpoint (VIEWID-05, VIEWID-09)
 - [ ] 18.1-07-PLAN.md — Wave 4 (GREEN): Lazy container composeBundleString migration to composeBundleNormalizedKey() adapter (VIEWID-11)
-
-### Phase 19: Complete implementation of the view identity system as outlined by the finalised document
-
-**Goal:** [To be planned]
-**Requirements**: TBD
-**Depends on:** Phase 18
-**Plans:** 0 plans
-
-Plans:
-- [ ] TBD (run /gsd:plan-phase 19 to break down)
