@@ -44,6 +44,8 @@ struct LocalCounterFeature {
 
 // MARK: - CounterCard View
 
+/// A view with constructor params (title) + let-with-default (store, instanceID).
+/// Exercises the transpiler's mixed-view peer remembering (Plan 05 fix).
 struct CounterCard: View {
     let title: String
     let store = Store(initialState: LocalCounterFeature.State()) {
@@ -74,17 +76,59 @@ struct CounterCard: View {
     }
 }
 
+// MARK: - PeerRememberTestView
+
+/// A purpose-built view for Section 7 (Transpiler Peer Remembering).
+/// Has @State + let-with-default but NO constructor params.
+/// Exercises the transpiler's unconditional peer remembering (no input hash needed).
+struct PeerRememberTestView: View {
+    @State var tapCount: Int = 0
+    let color: Color = .blue
+
+    var body: some View {
+        Button {
+            tapCount += 1
+        } label: {
+            Text("Taps: \(tapCount)")
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(color.opacity(0.2))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 // MARK: - IdentityFeature Reducer
 
 @Reducer
 struct IdentityFeature {
     @ObservableState
     struct State: Equatable {
+        // Section 1: Eager Container Keying (cards + reorder)
         var cards: IdentifiedArrayOf<CardItem> = [
             CardItem(id: UUID(), title: "Card A"),
             CardItem(id: UUID(), title: "Card B"),
         ]
         var nextCardLetter: Character = "C"
+
+        // Section 2: Duplicate Key Guard — uses raw arrays, NOT TCA state (Plan 02)
+
+        // Section 3: AnimatedContent — uses cards with withAnimation (Plan 02)
+        var isAnimatedDeletion: Bool = false
+
+        // Section 4: Picker Selection
+        var selectedStyle: String = "bold"
+
+        // Section 5: TabView Selection
+        var selectedTab: Int = 0
+
+        // Section 6: Lazy Container Identity — reuses cards (Plan 03)
+
+        // Section 7: Transpiler Peer Remembering — uses PeerRememberTestView (Plan 03, Android-only)
+
+        // Section 8: .id() State Reset
+        var resetToken: UUID = UUID()
     }
 
     @CasePathable
@@ -93,8 +137,22 @@ struct IdentityFeature {
 
         @CasePathable
         enum View {
+            // Section 1: Eager Container Keying
             case addCardButtonTapped
             case deleteCardButtonTapped(CardItem.ID)
+            case reorderCardButtonTapped
+
+            // Section 3: AnimatedContent
+            case toggleAnimatedDeletion
+
+            // Section 4: Picker Selection
+            case styleSelected(String)
+
+            // Section 5: TabView Selection
+            case tabSelected(Int)
+
+            // Section 8: .id() State Reset
+            case resetTokenButtonTapped
         }
     }
 
@@ -119,6 +177,33 @@ struct IdentityFeature {
                 let remaining = state.cards.map { "\($0.title)=\($0.id.uuidString.prefix(8))" }.joined(separator: ", ")
                 idLog("[IdentityFeature] remaining: \(remaining)")
                 return .none
+
+            case .view(.reorderCardButtonTapped):
+                guard state.cards.count > 1 else { return .none }
+                let last = state.cards.removeLast()
+                state.cards.insert(last, at: 0)
+                idLog("[IdentityFeature] reorder: moved \(last.title) to front")
+                return .none
+
+            case .view(.toggleAnimatedDeletion):
+                state.isAnimatedDeletion.toggle()
+                idLog("[IdentityFeature] animatedDeletion: \(state.isAnimatedDeletion)")
+                return .none
+
+            case let .view(.styleSelected(style)):
+                state.selectedStyle = style
+                idLog("[IdentityFeature] styleSelected: \(style)")
+                return .none
+
+            case let .view(.tabSelected(tab)):
+                state.selectedTab = tab
+                idLog("[IdentityFeature] tabSelected: \(tab)")
+                return .none
+
+            case .view(.resetTokenButtonTapped):
+                state.resetToken = uuid()
+                idLog("[IdentityFeature] resetToken: \(state.resetToken.uuidString.prefix(8))")
+                return .none
             }
         }
     }
@@ -131,46 +216,13 @@ struct IdentityView: View {
     @Bindable var store: StoreOf<IdentityFeature>
 
     var body: some View {
-        let _ = idLog("[IdentityView] body: cards=[\(store.cards.map { "\($0.title)=\($0.id.uuidString.prefix(8))" }.joined(separator: ", "))]")
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Each card has its own counter and UUID (let-with-default properties). Add/delete cards to verify identity preservation — remaining cards should keep their count and UUID after mutations.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal)
-
-                VStack(spacing: 0) {
-                    ForEach(store.cards) { card in
-                        CounterCard(title: card.title)
-                            .padding(.horizontal)
-                        if card.id != store.cards.last?.id {
-                            Divider()
-                        }
-                    }
-                }
-
-                VStack(spacing: 8) {
-                    Button {
-                        send(.addCardButtonTapped)
-                    } label: {
-                        Label("Add Card", systemImage: "plus.circle.fill")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.bordered)
-
-                    ForEach(store.cards) { card in
-                        Button(role: .destructive) {
-                            send(.deleteCardButtonTapped(card.id))
-                        } label: {
-                            Label("Delete \(card.title)", systemImage: "trash")
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.bordered)
-                    }
-                }
-                .padding(.horizontal)
+            VStack(spacing: 24) {
+                Text("Identity Tab -- Sections implemented in subsequent plans")
+                    .font(.headline)
+                // Placeholder: full UI comes in Plans 02 + 03
             }
-            .padding(.vertical)
+            .padding()
         }
         .navigationTitle("Identity")
     }
