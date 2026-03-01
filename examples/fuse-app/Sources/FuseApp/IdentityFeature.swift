@@ -453,6 +453,178 @@ struct IdentitySection4View: View {
     }
 }
 
+// MARK: - Section 5: TabView Selection
+
+@ViewAction(for: IdentityFeature.self)
+struct IdentitySection5View: View {
+    @Bindable var store: StoreOf<IdentityFeature>
+
+    var body: some View {
+        SectionHeaderView(
+            number: 5,
+            title: "TabView Selection",
+            description: "Mini TabView with 3 tabs. Tab selection binding should update correctly. Each tab shows its name and a counter."
+        )
+
+        TabView(selection: Binding(
+            get: { store.selectedTab },
+            set: { send(.tabSelected($0)) }
+        )) {
+            IdentitySection5TabContent(label: "Home", tag: 0)
+                .tabItem { Text("Home") }
+                .tag(0)
+            IdentitySection5TabContent(label: "Search", tag: 1)
+                .tabItem { Text("Search") }
+                .tag(1)
+            IdentitySection5TabContent(label: "Profile", tag: 2)
+                .tabItem { Text("Profile") }
+                .tag(2)
+        }
+        .frame(height: 150)
+
+        Text("Selected tab: \(store.selectedTab)")
+            .font(.caption).foregroundStyle(.secondary)
+    }
+}
+
+/// Tab content view with local @State counter for identity retention testing.
+struct IdentitySection5TabContent: View {
+    let label: String
+    let tag: Int
+    @State var counter: Int = 0
+
+    var body: some View {
+        VStack(spacing: 8) {
+            Text(label).font(.headline)
+            HStack {
+                Button("-") { counter -= 1 }.buttonStyle(.borderless)
+                Text("\(counter)").font(.title3).frame(minWidth: 40)
+                Button("+") { counter += 1 }.buttonStyle(.borderless)
+            }
+            Text("Tab \(tag)").font(.caption).foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+// MARK: - Section 6: Lazy Container Identity
+
+@ViewAction(for: IdentityFeature.self)
+struct IdentitySection6View: View {
+    @Bindable var store: StoreOf<IdentityFeature>
+
+    var body: some View {
+        SectionHeaderView(
+            number: 6,
+            title: "Lazy Container Identity",
+            description: "List with ForEach over cards. Scroll down, increment counters, scroll back — counters should be retained. Add/delete items — remaining counters preserved."
+        )
+
+        VStack(spacing: 8) {
+            List {
+                ForEach(store.cards) { card in
+                    HStack {
+                        CounterCard(title: card.title)
+                        Spacer()
+                        Button(role: .destructive) {
+                            send(.deleteCardButtonTapped(card.id))
+                        } label: {
+                            Image(systemName: "trash")
+                        }
+                        .buttonStyle(.borderless)
+                    }
+                }
+            }
+            .frame(height: 250)
+
+            HStack(spacing: 12) {
+                Button("Add Card") { send(.addCardButtonTapped) }
+                Text("Items: \(store.cards.count)")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+            .buttonStyle(.bordered)
+        }
+    }
+}
+
+// MARK: - Section 7: Transpiler Peer Remembering
+
+@ViewAction(for: IdentityFeature.self)
+struct IdentitySection7View: View {
+    @Bindable var store: StoreOf<IdentityFeature>
+
+    var body: some View {
+        SectionHeaderView(
+            number: 7,
+            title: "Transpiler Peer Remembering",
+            description: "Android-only test. PeerRememberTestView uses @State + let-with-default (no constructor params). Tap count should survive parent recomposition on Android."
+        )
+
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Test: @State + let-with-default (no constructor params)")
+                .font(.caption).bold()
+
+            PeerRememberTestView()
+
+            Text("Trigger parent recomposition by adding a card above (Section 1). If peer remembering works, tap count is preserved.")
+                .font(.caption2).foregroundStyle(.secondary)
+
+            Divider()
+
+            Text("CounterCard: mixed view with Store (constructor params + let-with-default)")
+                .font(.caption).bold()
+
+            CounterCard(title: "Peer Test Card")
+        }
+    }
+}
+
+// MARK: - Section 8: .id() State Reset
+
+@ViewAction(for: IdentityFeature.self)
+struct IdentitySection8View: View {
+    @Bindable var store: StoreOf<IdentityFeature>
+
+    var body: some View {
+        SectionHeaderView(
+            number: 8,
+            title: ".id() State Reset",
+            description: "Counter view with .id() tied to reset token. Changing the reset token should destroy and recreate the view, resetting counter to 0."
+        )
+
+        VStack(spacing: 12) {
+            IdentitySection8CounterView()
+                .id(store.resetToken)
+
+            Button("Reset Token") {
+                send(.resetTokenButtonTapped)
+            }
+            .buttonStyle(.bordered)
+
+            Text("Token: \(store.resetToken.uuidString.prefix(8))")
+                .font(.caption).monospaced().foregroundStyle(.secondary)
+        }
+    }
+}
+
+/// A simple counter view for Section 8 that uses local @State.
+/// When the parent's .id() changes, this view is destroyed and recreated, resetting the counter.
+struct IdentitySection8CounterView: View {
+    @State var counter: Int = 0
+
+    var body: some View {
+        HStack {
+            Button("-") { counter -= 1 }.buttonStyle(.borderless)
+            Text("\(counter)")
+                .font(.title2).frame(minWidth: 50)
+            Button("+") { counter += 1 }.buttonStyle(.borderless)
+        }
+        .padding()
+        .background(Color.secondary.opacity(0.1))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+}
+
 // MARK: - IdentityView
 
 @ViewAction(for: IdentityFeature.self)
@@ -470,7 +642,13 @@ struct IdentityView: View {
                 Divider()
                 IdentitySection4View(store: store)
                 Divider()
-                // Sections 5-8 implemented in Plan 03
+                IdentitySection5View(store: store)
+                Divider()
+                IdentitySection6View(store: store)
+                Divider()
+                IdentitySection7View(store: store)
+                Divider()
+                IdentitySection8View(store: store)
             }
             .padding()
         }
