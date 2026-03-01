@@ -209,6 +209,250 @@ struct IdentityFeature {
     }
 }
 
+// MARK: - DuplicateKeyCounterCard (Section 2, non-TCA)
+
+/// A simple counter card using local @State (no TCA).
+/// Used in Section 2 to demonstrate duplicate-key behavior with ForEach(\.self).
+struct DuplicateKeyCounterCard: View {
+    let label: String
+    @State var count: Int = 0
+
+    var body: some View {
+        HStack {
+            Text(label).font(.subheadline)
+            Spacer()
+            Button("-") { count -= 1 }.buttonStyle(.borderless)
+            Text("\(count)").font(.title3).frame(minWidth: 30)
+            Button("+") { count += 1 }.buttonStyle(.borderless)
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+// MARK: - IdentityView
+
+// MARK: - SectionHeaderView
+
+struct SectionHeaderView: View {
+    let number: Int
+    let title: String
+    let description: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Section \(number): \(title)")
+                .font(.headline)
+            Text(description)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+// MARK: - Section 1: Eager Container Keying
+
+@ViewAction(for: IdentityFeature.self)
+struct IdentitySection1View: View {
+    @Bindable var store: StoreOf<IdentityFeature>
+
+    var body: some View {
+        SectionHeaderView(
+            number: 1,
+            title: "Eager Container Keying",
+            description: "VStack, HStack, ZStack with ForEach card deletion and reorder. Remaining cards should preserve counter state and instanceID."
+        )
+
+        section1VStack
+        section1Controls
+        section1HStack
+        section1ZStack
+    }
+
+    private var section1VStack: some View {
+        VStack(spacing: 8) {
+            Text("VStack").font(.subheadline).bold()
+            ForEach(store.cards) { card in
+                HStack {
+                    CounterCard(title: card.title)
+                    Button(role: .destructive) {
+                        send(.deleteCardButtonTapped(card.id))
+                    } label: {
+                        Image(systemName: "trash")
+                    }
+                    .buttonStyle(.borderless)
+                }
+            }
+        }
+    }
+
+    private var section1Controls: some View {
+        HStack(spacing: 12) {
+            Button("Add Card") { send(.addCardButtonTapped) }
+            Button("Reorder") { send(.reorderCardButtonTapped) }
+        }
+        .buttonStyle(.bordered)
+    }
+
+    private var section1HStack: some View {
+        VStack(spacing: 8) {
+            Text("HStack (scroll)").font(.subheadline).bold()
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(store.cards) { card in
+                        VStack(spacing: 4) {
+                            CounterCard(title: card.title)
+                            Button(role: .destructive) {
+                                send(.deleteCardButtonTapped(card.id))
+                            } label: {
+                                Image(systemName: "trash").font(.caption)
+                            }
+                            .buttonStyle(.borderless)
+                        }
+                        .frame(width: 160)
+                        .padding(8)
+                        .background(Color.secondary.opacity(0.1))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                }
+            }
+        }
+    }
+
+    private var section1ZStack: some View {
+        VStack(spacing: 8) {
+            Text("ZStack (overlapping)").font(.subheadline).bold()
+            ZStack(alignment: .topLeading) {
+                ForEach(Array(store.cards.enumerated()), id: \.element.id) { index, card in
+                    VStack(alignment: .leading, spacing: 4) {
+                        CounterCard(title: card.title)
+                        Button(role: .destructive) {
+                            send(.deleteCardButtonTapped(card.id))
+                        } label: {
+                            Image(systemName: "trash").font(.caption)
+                        }
+                        .buttonStyle(.borderless)
+                    }
+                    .frame(width: 180)
+                    .padding(8)
+                    .background(Color.secondary.opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .offset(x: CGFloat(index * 20), y: CGFloat(index * 40))
+                }
+            }
+            .frame(minHeight: CGFloat(store.cards.count * 40 + 80))
+        }
+    }
+}
+
+// MARK: - Section 2: Duplicate Key Guard
+
+struct IdentitySection2View: View {
+    var body: some View {
+        SectionHeaderView(
+            number: 2,
+            title: "Duplicate Key Guard",
+            description: "Non-TCA raw [String] array with ForEach(\\.self) producing duplicate keys. Each card has independent local counter state. Android: verify _dup suffix guard prevents crash."
+        )
+
+        Text("Duplicate keys present: Alpha appears twice")
+            .font(.caption)
+            .foregroundStyle(.orange)
+            .bold()
+
+        VStack(spacing: 4) {
+            ForEach(["Alpha", "Beta", "Alpha", "Gamma"], id: \.self) { item in
+                DuplicateKeyCounterCard(label: item)
+            }
+        }
+    }
+}
+
+// MARK: - Section 3: Animated Content
+
+@ViewAction(for: IdentityFeature.self)
+struct IdentitySection3View: View {
+    @Bindable var store: StoreOf<IdentityFeature>
+
+    var body: some View {
+        SectionHeaderView(
+            number: 3,
+            title: "Animated Content",
+            description: "Toggle withAnimation for deletions. Deleted cards should animate out. Remaining cards should retain counter state through the animation."
+        )
+
+        Toggle("Animated Deletion", isOn: Binding(
+            get: { store.isAnimatedDeletion },
+            set: { _ in send(.toggleAnimatedDeletion) }
+        ))
+
+        VStack(spacing: 8) {
+            ForEach(store.cards) { card in
+                HStack {
+                    CounterCard(title: card.title)
+                    Button(role: .destructive) {
+                        if store.isAnimatedDeletion {
+                            withAnimation {
+                                _ = send(.deleteCardButtonTapped(card.id))
+                            }
+                        } else {
+                            send(.deleteCardButtonTapped(card.id))
+                        }
+                    } label: {
+                        Image(systemName: "trash")
+                    }
+                    .buttonStyle(.borderless)
+                }
+            }
+        }
+
+        Text("Cards: \(store.cards.count)")
+            .font(.caption).foregroundStyle(.secondary)
+    }
+}
+
+// MARK: - Section 4: Picker Selection
+
+private let pickerStyles = ["bold", "italic", "underline", "strikethrough"]
+
+@ViewAction(for: IdentityFeature.self)
+struct IdentitySection4View: View {
+    @Bindable var store: StoreOf<IdentityFeature>
+
+    var body: some View {
+        SectionHeaderView(
+            number: 4,
+            title: "Picker Selection",
+            description: "Segmented and menu picker styles with selectionTag verification. Tapping each option should update the displayed selection."
+        )
+
+        Text("Segmented Picker").font(.subheadline).bold()
+        Picker("Style", selection: Binding(
+            get: { store.selectedStyle },
+            set: { send(.styleSelected($0)) }
+        )) {
+            ForEach(pickerStyles, id: \.self) { style in
+                Text(style).tag(style)
+            }
+        }
+        .pickerStyle(.segmented)
+
+        Text("Menu Picker").font(.subheadline).bold()
+        Picker("Style", selection: Binding(
+            get: { store.selectedStyle },
+            set: { send(.styleSelected($0)) }
+        )) {
+            ForEach(pickerStyles, id: \.self) { style in
+                Text(style).tag(style)
+            }
+        }
+        .pickerStyle(.menu)
+
+        Text("Selected: \(store.selectedStyle)")
+            .font(.caption).foregroundStyle(.secondary)
+    }
+}
+
 // MARK: - IdentityView
 
 @ViewAction(for: IdentityFeature.self)
@@ -216,11 +460,17 @@ struct IdentityView: View {
     @Bindable var store: StoreOf<IdentityFeature>
 
     var body: some View {
-        ScrollView {
+        ScrollView(.vertical) {
             VStack(spacing: 24) {
-                Text("Identity Tab -- Sections implemented in subsequent plans")
-                    .font(.headline)
-                // Placeholder: full UI comes in Plans 02 + 03
+                IdentitySection1View(store: store)
+                Divider()
+                IdentitySection2View()
+                Divider()
+                IdentitySection3View(store: store)
+                Divider()
+                IdentitySection4View(store: store)
+                Divider()
+                // Sections 5-8 implemented in Plan 03
             }
             .padding()
         }
