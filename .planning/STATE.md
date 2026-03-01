@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-01T21:18:19Z"
+last_updated: "2026-03-01T21:28:00Z"
 progress:
   total_phases: 19
   completed_phases: 16
   total_plans: 58
-  completed_plans: 53
+  completed_plans: 54
 ---
 
 # Project State
@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 18.1 of 18.1 (Implement Canonical View Identity System)
-Plan: 4 of 7 in current phase -- 18.1-03 complete
-Status: Plan 18.1-03 complete. All 8 Identity tab sections implemented with UI. TCA TestStore tests for sections 1, 3, 4, 5, 6, 8. RED phase complete.
-Last activity: 2026-03-01 -- Completed 18.1-03 (Identity tab sections 5-8 + tests)
+Plan: 6 of 7 in current phase -- 18.1-05 complete
+Status: Plans 18.1-04 and 18.1-05 complete (parallel Wave 2). Core identity infrastructure (normalizeKey, IdentityKeyModifier, ForEach refactor, container loops, TagModifier, Picker/TabView) and transpiler guard fix both done.
+Last activity: 2026-03-01 -- Completed 18.1-04 (Core identity infrastructure) and 18.1-05 (Transpiler guard fix)
 
-Progress: [####------] 43%
+Progress: [#######---] 71%
 
 ## Performance Metrics
 
@@ -86,6 +86,7 @@ Progress: [####------] 43%
 | Phase 18 P01 | 3min | 2 tasks | 2 files |
 | Phase 18.1 P01 | 2min | 1 tasks | 1 files |
 | Phase 18.1 P03 | 3min | 2 tasks | 2 files |
+| Phase 18.1 P05 | 6min | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -215,7 +216,8 @@ Recent decisions affecting current work:
 - [Phase 16]: ViewAction.swift Android no-op fallback removed entirely -- withTransaction now works on Android
 - [Phase 16]: Deprecated file-level guards (SwitchStore, NavigationLinkStore, LegacyAlert, ActionSheet) left as-is -- entire deprecated files
 - [Phase 18]: ForEach key() wrapping only when identifier is non-nil -- nil-ID semantics preserved exactly (no fallback to index)
-- [Phase 18]: @Stable/skippability deferred -- SwiftPeerHandle already prevents most expensive cost (peer recreation); @Stable requires equals()/hashCode() overrides that conflict with peer swap timing
+- [Phase 18]: @Stable/skippability deferred
+- [Phase 18.1]: Peer remembering Evaluate override (asRenderable) replaces swiftUIEvaluate for mixed @State + let-with-default views -- state sync moved to _ComposeContent to avoid double body evaluation -- SwiftPeerHandle already prevents most expensive cost (peer recreation); @Stable requires equals()/hashCode() overrides that conflict with peer swap timing
 
 ### Pending Todos
 
@@ -253,5 +255,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 18.1-03-PLAN.md (Identity tab sections 5-8 + tests, RED phase complete)
+Stopped at: Completed 18.1-05-PLAN.md (Transpiler guard fix for mixed @State + let-with-default peer remembering)
 Resume file: .planning/phases/18.1-implement-canonical-view-identity-system/
