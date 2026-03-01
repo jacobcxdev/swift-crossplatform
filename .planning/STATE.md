@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-02-28T14:32:42.773Z"
+last_updated: "2026-03-01T21:02:32Z"
 progress:
   total_phases: 19
   completed_phases: 16
-  total_plans: 53
-  completed_plans: 51
+  total_plans: 58
+  completed_plans: 52
 ---
 
 # Project State
@@ -18,16 +18,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 18 complete — view identity layer implementation (ForEach key() wrapping, @Stable investigation).
+**Current focus:** Phase 18.1 in progress — implementing canonical view identity system (TCA reducer scaffolding complete).
 
 ## Current Position
 
-Phase: 18 of 18 (Complete View Identity Layer Implementation)
-Plan: 1 of 1 in current phase -- 18-01 complete (phase complete)
-Status: Plan 18-01 complete. ForEach non-lazy Evaluate wraps items in key(identifier) for identity-based remember scoping. @Stable/skippability investigated and deferred.
-Last activity: 2026-02-28 -- Completed 18-01 (ForEach key() wrapping + @Stable investigation)
+Phase: 18.1 of 18.1 (Implement Canonical View Identity System)
+Plan: 2 of 7 in current phase -- 18.1-01 complete
+Status: Plan 18.1-01 complete. IdentityFeature reducer scaffolded with state/actions/body for all 8 identity tab sections. PeerRememberTestView defined. /pfw alignment verified.
+Last activity: 2026-03-01 -- Completed 18.1-01 (TCA reducer scaffolding)
 
-Progress: [##########] 100%
+Progress: [#---------] 14%
 
 ## Performance Metrics
 
@@ -84,6 +84,7 @@ Progress: [##########] 100%
 | Phase 16 P01 | 1min | 2 tasks | 3 files |
 | Phase 16 P02 | 9min | 2 tasks | 19 files |
 | Phase 18 P01 | 3min | 2 tasks | 2 files |
+| Phase 18.1 P01 | 2min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -240,6 +241,7 @@ Recent decisions affecting current work:
 - Phase 8 added: PFW skill alignment
 - Phase 9 added: Post-audit cleanup (test fixes, documentation sync, Android verification)
 - Phase 18 added: Complete view identity layer implementation
+- Phase 18.1 inserted after Phase 18: Implement canonical view identity system (URGENT)
 
 ### Blockers/Concerns
 
@@ -249,6 +251,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-02-28
-Stopped at: Completed 18-01-PLAN.md (ForEach key() wrapping + @Stable investigation)
-Resume file: .planning/phases/18-complete-view-identity-layer-implementation/
+Last session: 2026-03-01
+Stopped at: Completed 18.1-01-PLAN.md (TCA reducer scaffolding for all 8 identity sections)
+Resume file: .planning/phases/18.1-implement-canonical-view-identity-system/

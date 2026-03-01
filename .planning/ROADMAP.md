@@ -379,9 +379,9 @@ Plans:
 
 ### Phase 18.1: Implement canonical view identity system (INSERTED)
 
-**Goal:** Implement the canonical view identity system — decouple structural identity (IdentityKeyModifier) from selection tagging (TagModifier), replace fragile composeKeyValue() with structural normalizeKey(), apply uniform container loop keying with duplicate-key protection, normalize AnimatedContent contentKey, and fix transpiler stateVariables.isEmpty guard for mixed-view peer remembering
+**Goal:** Implement the canonical view identity system — decouple structural identity (IdentityKeyModifier) from selection tagging (TagModifier), replace fragile composeKeyValue() with structural normalizeKey(), apply uniform container loop keying with duplicate-key protection, normalize AnimatedContent contentKey, fix transpiler stateVariables.isEmpty guard for mixed-view peer remembering, migrate lazy container keys to normalizeKey(), and provide comprehensive Identity tab acceptance surface
 **Depends on:** Phase 18
-**Requirements:** VIEWID-03, VIEWID-04, VIEWID-05, VIEWID-06, VIEWID-07, VIEWID-08, VIEWID-09, VIEWID-10
+**Requirements:** VIEWID-03, VIEWID-04, VIEWID-05, VIEWID-06, VIEWID-07, VIEWID-08, VIEWID-09, VIEWID-10, VIEWID-11
 **Success Criteria** (what must be TRUE):
   1. normalizeKey() replaces composeKeyValue() for all identity normalization — handles Optional unwrapping structurally, Identifiable/RawRepresentable recursion, String/Int/Long passthrough
   2. IdentityKeyModifier carries structural identity through ModifiedContent chains, discovered via forEachModifier traversal
@@ -391,12 +391,18 @@ Plans:
   6. Picker/TabView read selectionTag for selection matching
   7. AnimatedContent contentKey normalized through normalizeKey()
   8. Transpiler stateVariables.isEmpty guard removed — mixed @State + let-with-default views get peer remembering
-**Plans:** 3 plans in 2 waves
+  9. Lazy containers (LazyVStack, LazyHStack, LazyVGrid, LazyHGrid, List, Table) use composeBundleNormalizedKey() adapter wrapping normalizeKey()
+  10. Identity tab in fuse-app provides 8-section acceptance surface covering all identity system facets
+**Plans:** 1/7 plans executed
 
 Plans:
-- [ ] 18.1-01-PLAN.md — Phase 0+1: Core identity architecture (normalizeKey, IdentityKeyModifier, ForEach refactor, container loops, TagModifier simplification, Picker/TabView migration) (VIEWID-03, VIEWID-04, VIEWID-05, VIEWID-06, VIEWID-07, VIEWID-08)
-- [ ] 18.1-02-PLAN.md — Phase 3: Transpiler stateVariables.isEmpty guard fix + mixed-view codegen test (VIEWID-10)
-- [ ] 18.1-03-PLAN.md — Phase 2: AnimatedContent contentKey normalization + animated loop key() wrapping (VIEWID-05, VIEWID-09)
+- [ ] 18.1-01-PLAN.md — Wave 1a (RED): TCA reducer scaffolding + /pfw alignment for Identity tab (VIEWID-03..VIEWID-11)
+- [ ] 18.1-02-PLAN.md — Wave 1b (RED): Identity tab sections 1-4 UI + TCA TestStore tests (VIEWID-03, VIEWID-04, VIEWID-06)
+- [ ] 18.1-03-PLAN.md — Wave 1c (RED): Identity tab sections 5-8 UI + tests — RED phase complete (VIEWID-05, VIEWID-07..VIEWID-11)
+- [ ] 18.1-04-PLAN.md — Wave 2a (GREEN): Core identity architecture — normalizeKey, IdentityKeyModifier, ForEach refactor, container loops, TagModifier simplification, Picker/TabView migration (VIEWID-03..VIEWID-08)
+- [ ] 18.1-05-PLAN.md — Wave 2b (GREEN, parallel with 2a): Transpiler stateVariables.isEmpty guard fix + mixed-view codegen test (VIEWID-10)
+- [ ] 18.1-06-PLAN.md — Wave 3 (GREEN): AnimatedContent contentKey normalization + animated loop key() wrapping + explicitResetKey checkpoint (VIEWID-05, VIEWID-09)
+- [ ] 18.1-07-PLAN.md — Wave 4 (GREEN): Lazy container composeBundleString migration to composeBundleNormalizedKey() adapter (VIEWID-11)
 
 ### Phase 19: Complete implementation of the view identity system as outlined by the finalised document
 
