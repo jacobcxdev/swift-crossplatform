@@ -86,6 +86,7 @@ Progress: [#######---] 71%
 | Phase 18 P01 | 3min | 2 tasks | 2 files |
 | Phase 18.1 P01 | 2min | 1 tasks | 1 files |
 | Phase 18.1 P03 | 3min | 2 tasks | 2 files |
+| Phase 18.1 P04 | 6min | 2 tasks | 8 files |
 | Phase 18.1 P05 | 6min | 1 tasks | 2 files |
 
 ## Accumulated Context
@@ -218,6 +219,9 @@ Recent decisions affecting current work:
 - [Phase 18]: ForEach key() wrapping only when identifier is non-nil -- nil-ID semantics preserved exactly (no fallback to index)
 - [Phase 18]: @Stable/skippability deferred
 - [Phase 18.1]: Peer remembering Evaluate override (asRenderable) replaces swiftUIEvaluate for mixed @State + let-with-default views -- state sync moved to _ComposeContent to avoid double body evaluation -- SwiftPeerHandle already prevents most expensive cost (peer recreation); @Stable requires equals()/hashCode() overrides that conflict with peer swap timing
+- [Phase 18.1]: AnyOptionalProtocol/Optional extension removed -- Skip transpiler cannot extend Optional with new protocols from outside module; Kotlin nullable erasure makes Optional unwrapping unnecessary in normalizeKey()
+- [Phase 18.1]: TagModifier .tag role key() removal gated on exhaustive grep audit (7 sites verified: Picker 5, TabView 1, Menu 1 -- all selection/data only)
+- [Phase 18.1]: taggedRenderable kept deprecated for lazy paths -- produceLazyItems uses own key API, not identityKey
 
 ### Pending Todos
 
@@ -255,5 +259,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 18.1-05-PLAN.md (Transpiler guard fix for mixed @State + let-with-default peer remembering)
+Stopped at: Completed 18.1-04-PLAN.md (Core identity infrastructure) and 18.1-05-PLAN.md (Transpiler guard fix)
 Resume file: .planning/phases/18.1-implement-canonical-view-identity-system/
