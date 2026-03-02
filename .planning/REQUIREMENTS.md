@@ -262,6 +262,22 @@ Package configuration and cross-compilation on Android.
 
 - [x] **DOC-01**: FORKS.md documents every fork: original upstream version, commits ahead, key changes, rationale, and upstream PR candidates
 
+### VIEWID: View Identity
+
+Compose view identity system ensuring stable composition keys, correct peer remembering, and consistent container identity on Android.
+
+- [x] **VIEWID-01**: ForEach non-lazy Evaluate wraps items in `key(identifier)` for all three iteration paths (indexRange, objects, objectsBinding) on Android
+- [x] **VIEWID-02**: @Stable/skippability investigation documented with DEFERRED recommendation and rationale
+- [x] **VIEWID-03**: IdentityFeature reducer scaffolding with 8-section acceptance surface in fuse-app Identity tab on Android
+- [x] **VIEWID-04**: ForEach produces dual wrapping (IdentityKeyModifier for structural identity + TagModifier(.tag) for selection) in non-lazy paths on Android
+- [x] **VIEWID-05**: AnimatedContent contentKey normalized through normalizeKey() — SwiftHashable JNI equality problem bypassed on Android
+- [x] **VIEWID-06**: All eager container loops (VStack, HStack, ZStack) use key(identityKey ?? i) with seenKeys duplicate-key guard on Android
+- [x] **VIEWID-07**: TagModifier .tag role is pure data annotation (no key() in Render); .id role uses normalizeKey() on Android
+- [x] **VIEWID-08**: Picker (5 sites) and TabView (1 site) read selectionTag for selection matching on Android
+- [x] **VIEWID-09**: AnimatedContent render loops use key(identityKey ?? i) with seenKeys guard inside AnimatedContent content lambda on Android
+- [x] **VIEWID-10**: Transpiler stateVariables.isEmpty guard restructured — mixed @State + let-with-default views get peer remembering codegen on Android
+- [x] **VIEWID-11**: Lazy containers (LazyVStack, LazyHStack, LazyVGrid, LazyHGrid, List, Table) use composeBundleNormalizedKey() adapter wrapping normalizeKey() on Android
+
 ## v2 Requirements
 
 Deferred to future release. Tracked but not in current roadmap.
@@ -488,15 +504,24 @@ Which phases cover which requirements. Updated during roadmap creation. Evidence
 | DOC-01 | Phase 7 | Complete | N/A: Documentation requirement |
 | VIEWID-01 | Phase 18 | Complete | DIRECT: ForEach non-lazy Evaluate wraps items in `key(identifier)` for all three iteration paths (indexRange, objects, objectsBinding) |
 | VIEWID-02 | Phase 18 | Complete | DIRECT: @Stable/skippability investigation documented with DEFERRED recommendation and rationale in compose-view-identity-gap.md |
+| VIEWID-03 | Phase 18.1 | Complete | DIRECT: IdentityFeature.swift with 8 section views + IdentityFeatureTests.swift with 10 TCA TestStore tests |
+| VIEWID-04 | Phase 18.1 | Complete | DIRECT: ForEach.swift identifiedRenderable/identifiedIteration dual-wrapping |
+| VIEWID-05 | Phase 18.1 | Complete | DIRECT: normalizeKey() applied to contentKey in VStack/HStack/ZStack AnimatedContent paths |
+| VIEWID-06 | Phase 18.1 | Complete | DIRECT: 10 loop sites across VStack (4), HStack (4), ZStack (2) all use identityKey + seenKeys |
+| VIEWID-07 | Phase 18.1 | Complete | DIRECT: AdditionalViewModifiers.swift TagModifier .tag role has no key() wrapping; .id role normalizes via normalizeKey() |
+| VIEWID-08 | Phase 18.1 | Complete | DIRECT: Picker.swift (5 sites) + TabView.swift (1 site) use selectionTag |
+| VIEWID-09 | Phase 18.1 | Complete | DIRECT: Animated paths in VStack/HStack/ZStack use key(identityKey ?? i) + seenKeys |
+| VIEWID-10 | Phase 18.1 | Complete | DIRECT: KotlinBridgeToKotlinVisitor.swift guard restructured; testStateAndLetWithDefaultCombinedCodegen passes |
+| VIEWID-11 | Phase 18.1 | Complete | DIRECT: composeBundleNormalizedKey() adapter in ComposeStateSaver.swift; 16 closure sites across 6 lazy container files |
 
 **Coverage:**
-- v1 requirements: 184 total
-- Sections: OBS (30), TCA (35), DEP (11), SHR (14), NAV (15), CP (8), IC (6), SQL (15), SD (12), CD (5), IR (4), UI (8), TEST (12), SPM (6), DOC (1), VIEWID (2)
-- Mapped to phases: 184
+- v1 requirements: 193 total
+- Sections: OBS (30), TCA (35), DEP (11), SHR (14), NAV (15), CP (8), IC (6), SQL (15), SD (12), CD (5), IR (4), UI (8), TEST (12), SPM (6), DOC (1), VIEWID (11)
+- Mapped to phases: 193
 - Unmapped: 0
-- **Complete (evidence-backed):** 184/184
-- **Pending/Unverified:** 0/184
+- **Complete (evidence-backed):** 193/193
+- **Pending/Unverified:** 0/193
 
 ---
 *Requirements defined: 2026-02-21*
-*Last updated: 2026-02-28 -- Added VIEWID-01, VIEWID-02 for Phase 18 view identity layer; 184/184 complete with evidence*
+*Last updated: 2026-03-02 -- Added VIEWID-03 through VIEWID-11 for Phase 18.1 canonical view identity system; 193/193 complete with evidence*
