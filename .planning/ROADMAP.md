@@ -393,13 +393,15 @@ Plans:
   8. Transpiler stateVariables.isEmpty guard removed — mixed @State + let-with-default views get peer remembering
   9. Lazy containers (LazyVStack, LazyHStack, LazyVGrid, LazyHGrid, List, Table) use composeBundleNormalizedKey() adapter wrapping normalizeKey()
   10. Identity tab in fuse-app provides 8-section acceptance surface covering all identity system facets
-**Plans:** 7/7 plans complete
+**Plans:** 7/9 plans complete (2 gap closure plans added)
 
 Plans:
-- [ ] 18.1-01-PLAN.md — Wave 1a (RED): TCA reducer scaffolding + /pfw alignment for Identity tab (VIEWID-03..VIEWID-11)
-- [ ] 18.1-02-PLAN.md — Wave 1b (RED): Identity tab sections 1-4 UI + TCA TestStore tests (VIEWID-03, VIEWID-04, VIEWID-06)
-- [ ] 18.1-03-PLAN.md — Wave 1c (RED): Identity tab sections 5-8 UI + tests — RED phase complete (VIEWID-05, VIEWID-07..VIEWID-11)
-- [ ] 18.1-04-PLAN.md — Wave 2a (GREEN): Core identity architecture — normalizeKey, IdentityKeyModifier, ForEach refactor, container loops, TagModifier simplification, Picker/TabView migration (VIEWID-03..VIEWID-08)
-- [ ] 18.1-05-PLAN.md — Wave 2b (GREEN, parallel with 2a): Transpiler stateVariables.isEmpty guard fix + mixed-view codegen test (VIEWID-10)
-- [ ] 18.1-06-PLAN.md — Wave 3 (GREEN): AnimatedContent contentKey normalization + animated loop key() wrapping + explicitResetKey checkpoint (VIEWID-05, VIEWID-09)
-- [ ] 18.1-07-PLAN.md — Wave 4 (GREEN): Lazy container composeBundleString migration to composeBundleNormalizedKey() adapter (VIEWID-11)
+- [x] 18.1-01-PLAN.md — Wave 1a (RED): TCA reducer scaffolding + /pfw alignment for Identity tab (VIEWID-03..VIEWID-11) ✓
+- [x] 18.1-02-PLAN.md — Wave 1b (RED): Identity tab sections 1-4 UI + TCA TestStore tests (VIEWID-03, VIEWID-04, VIEWID-06) ✓
+- [x] 18.1-03-PLAN.md — Wave 1c (RED): Identity tab sections 5-8 UI + tests — RED phase complete (VIEWID-05, VIEWID-07..VIEWID-11) ✓
+- [x] 18.1-04-PLAN.md — Wave 2a (GREEN): Core identity architecture — normalizeKey, IdentityKeyModifier, ForEach refactor, container loops, TagModifier simplification, Picker/TabView migration (VIEWID-03..VIEWID-08) ✓
+- [x] 18.1-05-PLAN.md — Wave 2b (GREEN, parallel with 2a): Transpiler stateVariables.isEmpty guard fix + mixed-view codegen test (VIEWID-10) ✓
+- [x] 18.1-06-PLAN.md — Wave 3 (GREEN): AnimatedContent contentKey normalization + animated loop key() wrapping + explicitResetKey checkpoint (VIEWID-05, VIEWID-09) ✓
+- [x] 18.1-07-PLAN.md — Wave 4 (GREEN): Lazy container composeBundleString migration to composeBundleNormalizedKey() adapter (VIEWID-11) ✓
+- [ ] 18.1-08-PLAN.md — Wave 5 (GAP CLOSURE): Fix AnimatedContent idMap to read identityKey as fallback — activates animated path for ForEach content (VIEWID-05, VIEWID-09)
+- [ ] 18.1-09-PLAN.md — Wave 5 (GAP CLOSURE): UAT expectation updates for lazy disposal + tab switch platform differences; VIEWID-03..VIEWID-11 requirements traceability (VIEWID-03..VIEWID-11)
