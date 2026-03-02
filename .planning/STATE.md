@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-02T20:03:13Z"
+last_updated: "2026-03-02T20:09:33Z"
 progress:
   total_phases: 20
   completed_phases: 17
-  total_plans: 64
-  completed_plans: 64
+  total_plans: 65
+  completed_plans: 65
 ---
 
 # Project State
@@ -18,16 +18,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 18.1 gap closure -- Plan 13 complete (per-section cards + cosmetic fixes). Plan 14 remaining.
+**Current focus:** Phase 18.1 complete -- all 14 plans executed, 196/196 requirements satisfied.
 
 ## Current Position
 
 Phase: 18.1 of 18.1 (Implement Canonical View Identity System)
-Plan: 13 of 14 in current phase -- 18.1-13 complete (per-section card state + cosmetic UI fixes)
-Status: Per-section card arrays eliminate cross-section contamination. Delete buttons visible on Android. Plan 14 remaining.
-Last activity: 2026-03-02 -- Completed 18.1-13 (per-section card state isolation + cosmetic UI fixes)
+Plan: 14 of 14 in current phase -- 18.1-14 complete (tab switch peer survival fix)
+Status: All Phase 18.1 plans complete. VIEWID-13 satisfied. 196/196 v1 requirements done.
+Last activity: 2026-03-02 -- Completed 18.1-14 (manual LocalPeerStoreItemKey for standalone views)
 
-Progress: [#########-] 93%
+Progress: [##########] 100%
 
 ## Performance Metrics
 
@@ -96,6 +96,7 @@ Progress: [#########-] 93%
 | Phase 18.1 P11 | 7min | 5 tasks | 5 files |
 | Phase 18.1 P13 | 6min | 2 tasks | 2 files |
 | Phase 18.1 P12 | 2min | 2 tasks | 4 files |
+| Phase 18.1 P14 | 3min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -237,6 +238,7 @@ Recent decisions affecting current work:
 - [Phase 18.1]: rememberViewPeer() centralised in PeerStore.swift -- transpiler no longer generates per-view SwiftPeerHandle class
 - [Phase 18.1]: Per-section card arrays (eagerCards/animatedCards/lazyCards) with independent letter counters -- eliminates cross-section state contamination
 - [Phase 18.1]: xmark.circle.fill for delete buttons -- maps to Material Icons.Filled.Close on Android (trash unmapped)
+- [Phase 18.1]: Standalone views outside ForEach need manual LocalPeerStoreItemKey via SKIP INSERT CompositionLocalProvider for PeerStore path activation -- without it, rememberViewPeer() falls back to composition-scoped remember which doesn't survive tab disposal
 
 ### Pending Todos
 
@@ -274,5 +276,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 18.1-13-PLAN.md (per-section card state + cosmetic UI fixes)
+Stopped at: Completed 18.1-14-PLAN.md (tab switch peer survival for standalone views)
 Resume file: .planning/phases/18.1-implement-canonical-view-identity-system/
