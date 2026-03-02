@@ -393,7 +393,7 @@ Plans:
   8. Transpiler stateVariables.isEmpty guard removed — mixed @State + let-with-default views get peer remembering
   9. Lazy containers (LazyVStack, LazyHStack, LazyVGrid, LazyHGrid, List, Table) use composeBundleNormalizedKey() adapter wrapping normalizeKey()
   10. Identity tab in fuse-app provides 8-section acceptance surface covering all identity system facets
-**Plans:** 8/9 plans executed
+**Plans:** 9/9 plans executed
 
 Plans:
 - [x] 18.1-01-PLAN.md — Wave 1a (RED): TCA reducer scaffolding + /pfw alignment for Identity tab (VIEWID-03..VIEWID-11) ✓
@@ -403,5 +403,5 @@ Plans:
 - [x] 18.1-05-PLAN.md — Wave 2b (GREEN, parallel with 2a): Transpiler stateVariables.isEmpty guard fix + mixed-view codegen test (VIEWID-10) ✓
 - [x] 18.1-06-PLAN.md — Wave 3 (GREEN): AnimatedContent contentKey normalization + animated loop key() wrapping + explicitResetKey checkpoint (VIEWID-05, VIEWID-09) ✓
 - [x] 18.1-07-PLAN.md — Wave 4 (GREEN): Lazy container composeBundleString migration to composeBundleNormalizedKey() adapter (VIEWID-11) ✓
-- [ ] 18.1-08-PLAN.md — Wave 5 (GAP CLOSURE): Fix AnimatedContent idMap to read identityKey as fallback — activates animated path for ForEach content (VIEWID-05, VIEWID-09)
-- [ ] 18.1-09-PLAN.md — Wave 5 (GAP CLOSURE): UAT expectation updates for lazy disposal + tab switch platform differences; VIEWID-03..VIEWID-11 requirements traceability (VIEWID-03..VIEWID-11)
+- [x] 18.1-08-PLAN.md — Wave 5 (GAP CLOSURE): Fix AnimatedContent idMap to read identityKey as fallback — activates animated path for ForEach content (VIEWID-05, VIEWID-09) ✓ 2026-03-02
+- [x] 18.1-09-PLAN.md — Wave 5 (GAP CLOSURE): UAT expectation updates for lazy disposal + tab switch platform differences; VIEWID-03..VIEWID-11 requirements traceability (VIEWID-03..VIEWID-11) ✓ 2026-03-02
