@@ -277,6 +277,9 @@ Compose view identity system ensuring stable composition keys, correct peer reme
 - [x] **VIEWID-09**: AnimatedContent render loops use key(identityKey ?? i) with seenKeys guard inside AnimatedContent content lambda on Android
 - [x] **VIEWID-10**: Transpiler stateVariables.isEmpty guard restructured — mixed @State + let-with-default views get peer remembering codegen on Android
 - [x] **VIEWID-11**: Lazy containers (LazyVStack, LazyHStack, LazyVGrid, LazyHGrid, List, Table) use composeBundleNormalizedKey() adapter wrapping normalizeKey() on Android
+- [x] **VIEWID-12**: PeerStore parent-scoped peer cache survives LazyColumn composition disposal (scroll-off) for LazyVStack, LazyHStack, LazyVGrid, LazyHGrid, List, and Table on Android
+- [ ] **VIEWID-13**: PeerStore survives TabView tab switch (NavHost popUpTo with saveState) — peers retained across tab composition disposal on Android
+- [x] **VIEWID-14**: RetainedAnimatedItems provides per-item AnimatedVisibility with axis-aware default transitions replacing broken AnimatedContent dual-path on Android
 
 ## v2 Requirements
 
@@ -513,15 +516,18 @@ Which phases cover which requirements. Updated during roadmap creation. Evidence
 | VIEWID-09 | Phase 18.1 | Complete | DIRECT: Animated paths in VStack/HStack/ZStack use key(identityKey ?? i) + seenKeys |
 | VIEWID-10 | Phase 18.1 | Complete | DIRECT: KotlinBridgeToKotlinVisitor.swift guard restructured; testStateAndLetWithDefaultCombinedCodegen passes |
 | VIEWID-11 | Phase 18.1 | Complete | DIRECT: composeBundleNormalizedKey() adapter in ComposeStateSaver.swift; 16 closure sites across 6 lazy container files |
+| VIEWID-12 | Phase 18.1 | Complete | DIRECT: PeerStore + LocalPeerStoreItemKey in LazyVStack, LazyHStack, LazyVGrid, LazyHGrid, List, Table |
+| VIEWID-13 | Phase 18.1 | Pending | Pending: GAP-R2-3 TabView saveState peer survival still open |
+| VIEWID-14 | Phase 18.1 | Complete | DIRECT: RetainedAnimatedItems per-item AnimatedVisibility replaces AnimatedContent dual-path |
 
 **Coverage:**
 - v1 requirements: 193 total
-- Sections: OBS (30), TCA (35), DEP (11), SHR (14), NAV (15), CP (8), IC (6), SQL (15), SD (12), CD (5), IR (4), UI (8), TEST (12), SPM (6), DOC (1), VIEWID (11)
-- Mapped to phases: 193
+- Sections: OBS (30), TCA (35), DEP (11), SHR (14), NAV (15), CP (8), IC (6), SQL (15), SD (12), CD (5), IR (4), UI (8), TEST (12), SPM (6), DOC (1), VIEWID (14)
+- Mapped to phases: 196
 - Unmapped: 0
-- **Complete (evidence-backed):** 193/193
-- **Pending/Unverified:** 0/193
+- **Complete (evidence-backed):** 195/196
+- **Pending/Unverified:** 1/196
 
 ---
 *Requirements defined: 2026-02-21*
-*Last updated: 2026-03-02 -- Added VIEWID-03 through VIEWID-11 for Phase 18.1 canonical view identity system; 193/193 complete with evidence*
+*Last updated: 2026-03-02 -- Added VIEWID-12/13/14 for Phase 18.1 gap closure; 195/196 complete (VIEWID-13 pending GAP-R2-3)*
