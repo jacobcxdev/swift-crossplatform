@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-02T19:59:00Z"
+last_updated: "2026-03-02T20:03:13Z"
 progress:
   total_phases: 20
   completed_phases: 17
   total_plans: 64
-  completed_plans: 63
+  completed_plans: 64
 ---
 
 # Project State
@@ -18,16 +18,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 18.1 gap closure -- Plan 12 complete (GAP-R2-1/R2-2). Plans 13-14 remaining.
+**Current focus:** Phase 18.1 gap closure -- Plan 13 complete (per-section cards + cosmetic fixes). Plan 14 remaining.
 
 ## Current Position
 
 Phase: 18.1 of 18.1 (Implement Canonical View Identity System)
-Plan: 12 of 14 in current phase -- 18.1-12 complete (GAP-R2-1 crash fix + List/Table PeerStore)
-Status: GAP-R2-1 ConcurrentModificationException fixed. GAP-R2-2 List/Table PeerStore committed. VIEWID-12/14 complete, VIEWID-13 pending.
-Last activity: 2026-03-02 -- Completed 18.1-12 (RetainedAnimatedItems crash fix + PeerStore gap closure)
+Plan: 13 of 14 in current phase -- 18.1-13 complete (per-section card state + cosmetic UI fixes)
+Status: Per-section card arrays eliminate cross-section contamination. Delete buttons visible on Android. Plan 14 remaining.
+Last activity: 2026-03-02 -- Completed 18.1-13 (per-section card state isolation + cosmetic UI fixes)
 
-Progress: [#########-] 86%
+Progress: [#########-] 93%
 
 ## Performance Metrics
 
@@ -94,6 +94,7 @@ Progress: [#########-] 86%
 | Phase 18.1 P09 | 5min | 2 tasks | 2 files |
 | Phase 18.1 P10 | 45min | 8 tasks | 10 files |
 | Phase 18.1 P11 | 7min | 5 tasks | 5 files |
+| Phase 18.1 P13 | 6min | 2 tasks | 2 files |
 | Phase 18.1 P12 | 2min | 2 tasks | 4 files |
 
 ## Accumulated Context
@@ -234,6 +235,8 @@ Recent decisions affecting current work:
 - [Phase 18.1]: SKIP INSERT pattern required for CompositionLocalProvider provides calls -- Swift parser validates Kotlin infix syntax inside #if SKIP blocks
 - [Phase 18.1]: Swift_refreshPeer uses whole-value replacement for struct value types -- let properties are immutable, replace entire SwiftValueTypeBox.value
 - [Phase 18.1]: rememberViewPeer() centralised in PeerStore.swift -- transpiler no longer generates per-view SwiftPeerHandle class
+- [Phase 18.1]: Per-section card arrays (eagerCards/animatedCards/lazyCards) with independent letter counters -- eliminates cross-section state contamination
+- [Phase 18.1]: xmark.circle.fill for delete buttons -- maps to Material Icons.Filled.Close on Android (trash unmapped)
 
 ### Pending Todos
 
@@ -271,5 +274,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 18.1-12-PLAN.md (GAP-R2-1 crash fix + List/Table PeerStore gap closure)
+Stopped at: Completed 18.1-13-PLAN.md (per-section card state + cosmetic UI fixes)
 Resume file: .planning/phases/18.1-implement-canonical-view-identity-system/
