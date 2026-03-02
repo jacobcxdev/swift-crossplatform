@@ -647,7 +647,16 @@ struct IdentitySection7View: View {
             Text("Test: @State + let-with-default (no constructor params)")
                 .font(.caption).bold()
 
+            // Provide manual item key so rememberViewPeer() uses PeerStore path
+            // (standalone views outside ForEach have no IdentityKeyModifier)
+            #if SKIP
+            // SKIP INSERT: val providedPeerItemKey = LocalPeerStoreItemKey provides "peer-remember-test-view"
+            CompositionLocalProvider(providedPeerItemKey) {
+                PeerRememberTestView()
+            }
+            #else
             PeerRememberTestView()
+            #endif
 
             Text("Trigger parent recomposition by adding a card above (Section 1). If peer remembering works, tap count is preserved.")
                 .font(.caption2).foregroundStyle(.secondary)
@@ -657,7 +666,14 @@ struct IdentitySection7View: View {
             Text("CounterCard: mixed view with Store (constructor params + let-with-default)")
                 .font(.caption).bold()
 
+            #if SKIP
+            // SKIP INSERT: val providedPeerTestCardKey = LocalPeerStoreItemKey provides "peer-test-counter-card"
+            CompositionLocalProvider(providedPeerTestCardKey) {
+                CounterCard(title: "Peer Test Card")
+            }
+            #else
             CounterCard(title: "Peer Test Card")
+            #endif
         }
         .onAppear { idLog("[Section7] onAppear: instanceID=\(instanceID.uuidString.prefix(8))") }
         .onDisappear { idLog("[Section7] onDisappear: instanceID=\(instanceID.uuidString.prefix(8))") }
