@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-02T16:09:12Z"
+last_updated: "2026-03-02T19:59:00Z"
 progress:
   total_phases: 20
   completed_phases: 17
-  total_plans: 61
-  completed_plans: 62
+  total_plans: 64
+  completed_plans: 63
 ---
 
 # Project State
@@ -18,16 +18,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 18.1 complete -- all 11 plans executed. Awaiting human emulator UAT verification.
+**Current focus:** Phase 18.1 gap closure -- Plan 12 complete (GAP-R2-1/R2-2). Plans 13-14 remaining.
 
 ## Current Position
 
 Phase: 18.1 of 18.1 (Implement Canonical View Identity System)
-Plan: 11 of 11 in current phase -- 18.1-11 complete (RetainedAnimatedItems)
-Status: All plans complete. RetainedAnimatedItems replaces broken AnimatedContent dual-path with per-item AnimatedVisibility. Human UAT testing needed for Section 3 animation verification.
-Last activity: 2026-03-02 -- Completed 18.1-11 (RetainedAnimatedItems per-item animation)
+Plan: 12 of 14 in current phase -- 18.1-12 complete (GAP-R2-1 crash fix + List/Table PeerStore)
+Status: GAP-R2-1 ConcurrentModificationException fixed. GAP-R2-2 List/Table PeerStore committed. VIEWID-12/14 complete, VIEWID-13 pending.
+Last activity: 2026-03-02 -- Completed 18.1-12 (RetainedAnimatedItems crash fix + PeerStore gap closure)
 
-Progress: [##########] 100%
+Progress: [#########-] 86%
 
 ## Performance Metrics
 
@@ -94,6 +94,7 @@ Progress: [##########] 100%
 | Phase 18.1 P09 | 5min | 2 tasks | 2 files |
 | Phase 18.1 P10 | 45min | 8 tasks | 10 files |
 | Phase 18.1 P11 | 7min | 5 tasks | 5 files |
+| Phase 18.1 P12 | 2min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -270,5 +271,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 18.1-11-PLAN.md (RetainedAnimatedItems per-item animation infrastructure)
+Stopped at: Completed 18.1-12-PLAN.md (GAP-R2-1 crash fix + List/Table PeerStore gap closure)
 Resume file: .planning/phases/18.1-implement-canonical-view-identity-system/
