@@ -278,7 +278,7 @@ Compose view identity system ensuring stable composition keys, correct peer reme
 - [x] **VIEWID-10**: Transpiler stateVariables.isEmpty guard restructured — mixed @State + let-with-default views get peer remembering codegen on Android
 - [x] **VIEWID-11**: Lazy containers (LazyVStack, LazyHStack, LazyVGrid, LazyHGrid, List, Table) use composeBundleNormalizedKey() adapter wrapping normalizeKey() on Android
 - [x] **VIEWID-12**: PeerStore parent-scoped peer cache survives LazyColumn composition disposal (scroll-off) for LazyVStack, LazyHStack, LazyVGrid, LazyHGrid, List, and Table on Android
-- [ ] **VIEWID-13**: PeerStore survives TabView tab switch (NavHost popUpTo with saveState) — peers retained across tab composition disposal on Android
+- [x] **VIEWID-13**: PeerStore survives TabView tab switch (NavHost popUpTo with saveState) — peers retained across tab composition disposal on Android
 - [x] **VIEWID-14**: RetainedAnimatedItems provides per-item AnimatedVisibility with axis-aware default transitions replacing broken AnimatedContent dual-path on Android
 
 ## v2 Requirements
@@ -517,7 +517,7 @@ Which phases cover which requirements. Updated during roadmap creation. Evidence
 | VIEWID-10 | Phase 18.1 | Complete | DIRECT: KotlinBridgeToKotlinVisitor.swift guard restructured; testStateAndLetWithDefaultCombinedCodegen passes |
 | VIEWID-11 | Phase 18.1 | Complete | DIRECT: composeBundleNormalizedKey() adapter in ComposeStateSaver.swift; 16 closure sites across 6 lazy container files |
 | VIEWID-12 | Phase 18.1 | Complete | DIRECT: PeerStore + LocalPeerStoreItemKey in LazyVStack, LazyHStack, LazyVGrid, LazyHGrid, List, Table |
-| VIEWID-13 | Phase 18.1 | Pending | Pending: GAP-R2-3 TabView saveState peer survival still open |
+| VIEWID-13 | Phase 18.1 | Complete | DIRECT: Manual LocalPeerStoreItemKey for standalone views + app-level TabView PeerStore from Plan 10 |
 | VIEWID-14 | Phase 18.1 | Complete | DIRECT: RetainedAnimatedItems per-item AnimatedVisibility replaces AnimatedContent dual-path |
 
 **Coverage:**
@@ -525,9 +525,9 @@ Which phases cover which requirements. Updated during roadmap creation. Evidence
 - Sections: OBS (30), TCA (35), DEP (11), SHR (14), NAV (15), CP (8), IC (6), SQL (15), SD (12), CD (5), IR (4), UI (8), TEST (12), SPM (6), DOC (1), VIEWID (14)
 - Mapped to phases: 196
 - Unmapped: 0
-- **Complete (evidence-backed):** 195/196
-- **Pending/Unverified:** 1/196
+- **Complete (evidence-backed):** 196/196
+- **Pending/Unverified:** 0/196
 
 ---
 *Requirements defined: 2026-02-21*
-*Last updated: 2026-03-02 -- Added VIEWID-12/13/14 for Phase 18.1 gap closure; 195/196 complete (VIEWID-13 pending GAP-R2-3)*
+*Last updated: 2026-03-02 -- VIEWID-13 marked complete (manual LocalPeerStoreItemKey fix); 196/196 complete*
