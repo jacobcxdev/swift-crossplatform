@@ -8,7 +8,7 @@ progress:
   total_phases: 20
   completed_phases: 17
   total_plans: 61
-  completed_plans: 60
+  completed_plans: 61
 ---
 
 # Project State
@@ -23,9 +23,9 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 18.1 of 18.1 (Implement Canonical View Identity System)
-Plan: 9 of 9 in current phase -- 18.1-09 complete (GAP CLOSURE COMPLETE)
-Status: Phase 18.1 gap closure complete. Plans 08-09 closed UAT gaps. UAT: 7/8 pass (5 clean + 2 known limitation), 1 issue pending (animated deletion). 193/193 requirements complete.
-Last activity: 2026-03-02 -- Completed 18.1-09 (UAT expectations and requirements traceability)
+Plan: 10 of 11 in current phase -- 18.1-10 complete (PeerStore Integration)
+Status: Plan 10 complete. PeerStore runtime infrastructure and transpiler mechanical replacement done. Plans 08-09 closed UAT gaps. Plan 10 closes GAP-2 (lazy scroll) and GAP-3 (tab switch). Plan 11 remaining (RetainedAnimatedItems).
+Last activity: 2026-03-02 -- Completed 18.1-10 (PeerStore Integration for peer survival)
 
 Progress: [##########] 100%
 
@@ -92,6 +92,7 @@ Progress: [##########] 100%
 | Phase 18.1 P07 | 2min | 2 tasks | 7 files |
 | Phase 18.1 P08 | 4min | 1 tasks | 3 files |
 | Phase 18.1 P09 | 5min | 2 tasks | 2 files |
+| Phase 18.1 P10 | 45min | 8 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -228,6 +229,9 @@ Recent decisions affecting current work:
 - [Phase 18.1]: taggedRenderable kept deprecated for lazy paths -- produceLazyItems uses own key API, not identityKey
 - [Phase 18.1]: explicitResetKey not needed -- nested key-group approach (outer identityKey + inner contentKey) provides sufficient separation for AnimatedContent
 - [Phase 18.1]: key() inside AnimatedContent content lambda does not break animateEnterExit scope chain (Outcome A confirmed)
+- [Phase 18.1]: SKIP INSERT pattern required for CompositionLocalProvider provides calls -- Swift parser validates Kotlin infix syntax inside #if SKIP blocks
+- [Phase 18.1]: Swift_refreshPeer uses whole-value replacement for struct value types -- let properties are immutable, replace entire SwiftValueTypeBox.value
+- [Phase 18.1]: rememberViewPeer() centralised in PeerStore.swift -- transpiler no longer generates per-view SwiftPeerHandle class
 
 ### Pending Todos
 
@@ -265,5 +269,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 18.1-09-PLAN.md (UAT expectations and requirements traceability - gap closure complete)
+Stopped at: Completed 18.1-10-PLAN.md (PeerStore Integration for peer survival across composition disposal)
 Resume file: .planning/phases/18.1-implement-canonical-view-identity-system/
