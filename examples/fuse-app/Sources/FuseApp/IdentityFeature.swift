@@ -84,12 +84,14 @@ struct CounterCard: View {
 struct PeerRememberTestView: View {
     @State var tapCount: Int = 0
     let color: Color = .blue
+    let instanceID = UUID()
 
     var body: some View {
+        let _ = idLog("[PeerRememberTestView] body: tapCount=\(tapCount) instanceID=\(instanceID.uuidString.prefix(8))")
         Button {
             tapCount += 1
         } label: {
-            Text("Taps: \(tapCount)")
+            Text("Taps: \(tapCount) (id: \(instanceID.uuidString.prefix(8)))")
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
                 .background(color.opacity(0.2))
@@ -105,16 +107,22 @@ struct PeerRememberTestView: View {
 struct IdentityFeature {
     @ObservableState
     struct State: Equatable {
-        // Section 1: Eager Container Keying (cards + reorder)
-        var cards: IdentifiedArrayOf<CardItem> = [
+        // Section 1 & 2: Eager Container Keying (cards + reorder)
+        var eagerCards: IdentifiedArrayOf<CardItem> = [
             CardItem(id: UUID(), title: "Card A"),
             CardItem(id: UUID(), title: "Card B"),
         ]
-        var nextCardLetter: Character = "C"
+        var nextEagerCardLetter: Character = "C"
 
         // Section 2: Duplicate Key Guard — uses raw arrays, NOT TCA state (Plan 02)
 
-        // Section 3: AnimatedContent — uses cards with withAnimation (Plan 02)
+        // Section 3: AnimatedContent — independent card array
+        var animatedCards: IdentifiedArrayOf<CardItem> = [
+            CardItem(id: UUID(), title: "Card A"),
+            CardItem(id: UUID(), title: "Card B"),
+            CardItem(id: UUID(), title: "Card C"),
+        ]
+        var nextAnimatedCardLetter: Character = "D"
         var isAnimatedDeletion: Bool = false
 
         // Section 4: Picker Selection
@@ -123,7 +131,13 @@ struct IdentityFeature {
         // Section 5: TabView Selection
         var selectedTab: Int = 0
 
-        // Section 6: Lazy Container Identity — reuses cards (Plan 03)
+        // Section 6: Lazy Container Identity — independent card array
+        var lazyCards: IdentifiedArrayOf<CardItem> = [
+            CardItem(id: UUID(), title: "Card A"),
+            CardItem(id: UUID(), title: "Card B"),
+            CardItem(id: UUID(), title: "Card C"),
+        ]
+        var nextLazyCardLetter: Character = "D"
 
         // Section 7: Transpiler Peer Remembering — uses PeerRememberTestView (Plan 03, Android-only)
 
@@ -138,11 +152,13 @@ struct IdentityFeature {
         @CasePathable
         enum View {
             // Section 1: Eager Container Keying
-            case addCardButtonTapped
-            case deleteCardButtonTapped(CardItem.ID)
-            case reorderCardButtonTapped
+            case addEagerCardButtonTapped
+            case deleteEagerCardButtonTapped(CardItem.ID)
+            case reorderEagerCardButtonTapped
 
             // Section 3: AnimatedContent
+            case addAnimatedCardButtonTapped
+            case deleteAnimatedCardButtonTapped(CardItem.ID)
             case toggleAnimatedDeletion
 
             // Section 4: Picker Selection
@@ -150,6 +166,10 @@ struct IdentityFeature {
 
             // Section 5: TabView Selection
             case tabSelected(Int)
+
+            // Section 6: Lazy Container Identity
+            case addLazyCardButtonTapped
+            case deleteLazyCardButtonTapped(CardItem.ID)
 
             // Section 8: .id() State Reset
             case resetTokenButtonTapped
@@ -161,28 +181,47 @@ struct IdentityFeature {
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .view(.addCardButtonTapped):
-                let title = "Card \(state.nextCardLetter)"
+            // Section 1: Eager Container Keying
+            case .view(.addEagerCardButtonTapped):
+                let title = "Card \(state.nextEagerCardLetter)"
                 let id = uuid()
-                idLog("[IdentityFeature] addCard: id=\(id.uuidString.prefix(8)) title=\(title)")
-                state.cards.append(CardItem(id: id, title: title))
-                let next = Unicode.Scalar(state.nextCardLetter.asciiValue! + 1)
-                state.nextCardLetter = Character(next)
+                idLog("[IdentityFeature] addEagerCard: id=\(id.uuidString.prefix(8)) title=\(title)")
+                state.eagerCards.append(CardItem(id: id, title: title))
+                let next = Unicode.Scalar(state.nextEagerCardLetter.asciiValue! + 1)
+                state.nextEagerCardLetter = Character(next)
                 return .none
 
-            case let .view(.deleteCardButtonTapped(id)):
-                let title = state.cards[id: id]?.title ?? "?"
-                idLog("[IdentityFeature] deleteCard: id=\(id.uuidString.prefix(8)) title=\(title)")
-                state.cards.remove(id: id)
-                let remaining = state.cards.map { "\($0.title)=\($0.id.uuidString.prefix(8))" }.joined(separator: ", ")
-                idLog("[IdentityFeature] remaining: \(remaining)")
+            case let .view(.deleteEagerCardButtonTapped(id)):
+                let title = state.eagerCards[id: id]?.title ?? "?"
+                idLog("[IdentityFeature] deleteEagerCard: id=\(id.uuidString.prefix(8)) title=\(title)")
+                state.eagerCards.remove(id: id)
+                let remaining = state.eagerCards.map { "\($0.title)=\($0.id.uuidString.prefix(8))" }.joined(separator: ", ")
+                idLog("[IdentityFeature] remaining eager: \(remaining)")
                 return .none
 
-            case .view(.reorderCardButtonTapped):
-                guard state.cards.count > 1 else { return .none }
-                let last = state.cards.removeLast()
-                state.cards.insert(last, at: 0)
-                idLog("[IdentityFeature] reorder: moved \(last.title) to front")
+            case .view(.reorderEagerCardButtonTapped):
+                guard state.eagerCards.count > 1 else { return .none }
+                let last = state.eagerCards.removeLast()
+                state.eagerCards.insert(last, at: 0)
+                idLog("[IdentityFeature] reorder eager: moved \(last.title) to front")
+                return .none
+
+            // Section 3: AnimatedContent
+            case .view(.addAnimatedCardButtonTapped):
+                let title = "Card \(state.nextAnimatedCardLetter)"
+                let id = uuid()
+                idLog("[IdentityFeature] addAnimatedCard: id=\(id.uuidString.prefix(8)) title=\(title)")
+                state.animatedCards.append(CardItem(id: id, title: title))
+                let next = Unicode.Scalar(state.nextAnimatedCardLetter.asciiValue! + 1)
+                state.nextAnimatedCardLetter = Character(next)
+                return .none
+
+            case let .view(.deleteAnimatedCardButtonTapped(id)):
+                let title = state.animatedCards[id: id]?.title ?? "?"
+                idLog("[IdentityFeature] deleteAnimatedCard: id=\(id.uuidString.prefix(8)) title=\(title)")
+                state.animatedCards.remove(id: id)
+                let remaining = state.animatedCards.map { "\($0.title)=\($0.id.uuidString.prefix(8))" }.joined(separator: ", ")
+                idLog("[IdentityFeature] remaining animated: \(remaining)")
                 return .none
 
             case .view(.toggleAnimatedDeletion):
@@ -190,16 +229,37 @@ struct IdentityFeature {
                 idLog("[IdentityFeature] animatedDeletion: \(state.isAnimatedDeletion)")
                 return .none
 
+            // Section 4: Picker Selection
             case let .view(.styleSelected(style)):
                 state.selectedStyle = style
                 idLog("[IdentityFeature] styleSelected: \(style)")
                 return .none
 
+            // Section 5: TabView Selection
             case let .view(.tabSelected(tab)):
                 state.selectedTab = tab
                 idLog("[IdentityFeature] tabSelected: \(tab)")
                 return .none
 
+            // Section 6: Lazy Container Identity
+            case .view(.addLazyCardButtonTapped):
+                let title = "Card \(state.nextLazyCardLetter)"
+                let id = uuid()
+                idLog("[IdentityFeature] addLazyCard: id=\(id.uuidString.prefix(8)) title=\(title)")
+                state.lazyCards.append(CardItem(id: id, title: title))
+                let next = Unicode.Scalar(state.nextLazyCardLetter.asciiValue! + 1)
+                state.nextLazyCardLetter = Character(next)
+                return .none
+
+            case let .view(.deleteLazyCardButtonTapped(id)):
+                let title = state.lazyCards[id: id]?.title ?? "?"
+                idLog("[IdentityFeature] deleteLazyCard: id=\(id.uuidString.prefix(8)) title=\(title)")
+                state.lazyCards.remove(id: id)
+                let remaining = state.lazyCards.map { "\($0.title)=\($0.id.uuidString.prefix(8))" }.joined(separator: ", ")
+                idLog("[IdentityFeature] remaining lazy: \(remaining)")
+                return .none
+
+            // Section 8: .id() State Reset
             case .view(.resetTokenButtonTapped):
                 state.resetToken = uuid()
                 idLog("[IdentityFeature] resetToken: \(state.resetToken.uuidString.prefix(8))")
@@ -263,22 +323,31 @@ struct IdentitySection1View: View {
             description: "VStack, HStack, ZStack with ForEach card deletion and reorder. Remaining cards should preserve counter state and instanceID."
         )
 
-        section1VStack
         section1Controls
+        section1VStack
         section1HStack
         section1ZStack
+    }
+
+    private var section1Controls: some View {
+        HStack(spacing: 12) {
+            Button("Add Card") { send(.addEagerCardButtonTapped) }
+            Button("Reorder") { send(.reorderEagerCardButtonTapped) }
+        }
+        .buttonStyle(.bordered)
     }
 
     private var section1VStack: some View {
         VStack(spacing: 8) {
             Text("VStack").font(.subheadline).bold()
-            ForEach(store.cards) { card in
+            ForEach(store.eagerCards) { card in
                 HStack {
                     CounterCard(title: card.title)
                     Button(role: .destructive) {
-                        send(.deleteCardButtonTapped(card.id))
+                        send(.deleteEagerCardButtonTapped(card.id))
                     } label: {
-                        Image(systemName: "trash")
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(.red)
                     }
                     .buttonStyle(.borderless)
                 }
@@ -286,26 +355,20 @@ struct IdentitySection1View: View {
         }
     }
 
-    private var section1Controls: some View {
-        HStack(spacing: 12) {
-            Button("Add Card") { send(.addCardButtonTapped) }
-            Button("Reorder") { send(.reorderCardButtonTapped) }
-        }
-        .buttonStyle(.bordered)
-    }
-
     private var section1HStack: some View {
         VStack(spacing: 8) {
             Text("HStack (scroll)").font(.subheadline).bold()
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
-                    ForEach(store.cards) { card in
+                    ForEach(store.eagerCards) { card in
                         VStack(spacing: 4) {
                             CounterCard(title: card.title)
                             Button(role: .destructive) {
-                                send(.deleteCardButtonTapped(card.id))
+                                send(.deleteEagerCardButtonTapped(card.id))
                             } label: {
-                                Image(systemName: "trash").font(.caption)
+                                Image(systemName: "xmark.circle.fill")
+                                    .font(.caption)
+                                    .foregroundStyle(.red)
                             }
                             .buttonStyle(.borderless)
                         }
@@ -323,13 +386,15 @@ struct IdentitySection1View: View {
         VStack(spacing: 8) {
             Text("ZStack (overlapping)").font(.subheadline).bold()
             ZStack(alignment: .topLeading) {
-                ForEach(Array(store.cards.enumerated()), id: \.element.id) { index, card in
+                ForEach(Array(store.eagerCards.enumerated()), id: \.element.id) { index, card in
                     VStack(alignment: .leading, spacing: 4) {
                         CounterCard(title: card.title)
                         Button(role: .destructive) {
-                            send(.deleteCardButtonTapped(card.id))
+                            send(.deleteEagerCardButtonTapped(card.id))
                         } label: {
-                            Image(systemName: "trash").font(.caption)
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.caption)
+                                .foregroundStyle(.red)
                         }
                         .buttonStyle(.borderless)
                     }
@@ -340,7 +405,7 @@ struct IdentitySection1View: View {
                     .offset(x: CGFloat(index * 20), y: CGFloat(index * 40))
                 }
             }
-            .frame(minHeight: CGFloat(store.cards.count * 40 + 80))
+            .frame(minHeight: CGFloat(store.eagerCards.count * 40 + 80))
         }
     }
 }
@@ -375,38 +440,47 @@ struct IdentitySection3View: View {
     @Bindable var store: StoreOf<IdentityFeature>
 
     var body: some View {
+        let _ = idLog("[Section3] body: cards=\(store.animatedCards.count) animated=\(store.isAnimatedDeletion) ids=\(store.animatedCards.map { $0.id.uuidString.prefix(8) }.joined(separator: ","))")
         SectionHeaderView(
             number: 3,
             title: "Animated Content",
             description: "Toggle withAnimation for deletions. Deleted cards should animate out. Remaining cards should retain counter state through the animation."
         )
 
-        Toggle("Animated Deletion", isOn: Binding(
-            get: { store.isAnimatedDeletion },
-            set: { _ in send(.toggleAnimatedDeletion) }
-        ))
+        HStack(spacing: 12) {
+            Button("Add Card") { send(.addAnimatedCardButtonTapped) }
+                .buttonStyle(.bordered)
+            Toggle("Animated Deletion", isOn: Binding(
+                get: { store.isAnimatedDeletion },
+                set: { _ in send(.toggleAnimatedDeletion) }
+            ))
+        }
 
         VStack(spacing: 8) {
-            ForEach(store.cards) { card in
+            ForEach(store.animatedCards) { card in
+                let _ = idLog("[Section3] ForEach item: card=\(card.title) id=\(card.id.uuidString.prefix(8))")
                 HStack {
                     CounterCard(title: card.title)
                     Button(role: .destructive) {
                         if store.isAnimatedDeletion {
+                            idLog("[Section3] deleteCard WITH animation: card=\(card.title) id=\(card.id.uuidString.prefix(8))")
                             withAnimation {
-                                _ = send(.deleteCardButtonTapped(card.id))
+                                _ = send(.deleteAnimatedCardButtonTapped(card.id))
                             }
                         } else {
-                            send(.deleteCardButtonTapped(card.id))
+                            idLog("[Section3] deleteCard WITHOUT animation: card=\(card.title) id=\(card.id.uuidString.prefix(8))")
+                            send(.deleteAnimatedCardButtonTapped(card.id))
                         }
                     } label: {
-                        Image(systemName: "trash")
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(.red)
                     }
                     .buttonStyle(.borderless)
                 }
             }
         }
 
-        Text("Cards: \(store.cards.count)")
+        Text("Cards: \(store.animatedCards.count)")
             .font(.caption).foregroundStyle(.secondary)
     }
 }
@@ -480,7 +554,7 @@ struct IdentitySection5View: View {
                 .tabItem { Text("Profile") }
                 .tag(2)
         }
-        .frame(height: 150)
+        .frame(height: 200)
 
         Text("Selected tab: \(store.selectedTab)")
             .font(.caption).foregroundStyle(.secondary)
@@ -492,8 +566,10 @@ struct IdentitySection5TabContent: View {
     let label: String
     let tag: Int
     @State var counter: Int = 0
+    let instanceID = UUID()
 
     var body: some View {
+        let _ = idLog("[Section5Tab] body: label=\(label) tag=\(tag) counter=\(counter) instanceID=\(instanceID.uuidString.prefix(8))")
         VStack(spacing: 8) {
             Text(label).font(.headline)
             HStack {
@@ -501,9 +577,11 @@ struct IdentitySection5TabContent: View {
                 Text("\(counter)").font(.title3).frame(minWidth: 40)
                 Button("+") { counter += 1 }.buttonStyle(.borderless)
             }
-            Text("Tab \(tag)").font(.caption).foregroundStyle(.secondary)
+            Text("Tab \(tag) (id: \(instanceID.uuidString.prefix(8)))").font(.caption).foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear { idLog("[Section5Tab] onAppear: label=\(label) instanceID=\(instanceID.uuidString.prefix(8))") }
+        .onDisappear { idLog("[Section5Tab] onDisappear: label=\(label) instanceID=\(instanceID.uuidString.prefix(8))") }
     }
 }
 
@@ -514,35 +592,38 @@ struct IdentitySection6View: View {
     @Bindable var store: StoreOf<IdentityFeature>
 
     var body: some View {
+        let _ = idLog("[Section6] body: cards=\(store.lazyCards.count) ids=\(store.lazyCards.map { $0.id.uuidString.prefix(8) }.joined(separator: ","))")
         SectionHeaderView(
             number: 6,
             title: "Lazy Container Identity",
             description: "List with ForEach over cards. Scroll down, increment counters, scroll back — counters should be retained. Add/delete items — remaining counters preserved."
         )
 
+        HStack(spacing: 12) {
+            Button("Add Card") { send(.addLazyCardButtonTapped) }
+            Text("Items: \(store.lazyCards.count)")
+                .font(.caption).foregroundStyle(.secondary)
+        }
+        .buttonStyle(.bordered)
+
         VStack(spacing: 8) {
             List {
-                ForEach(store.cards) { card in
+                ForEach(store.lazyCards) { card in
+                    let _ = idLog("[Section6] ForEach item: card=\(card.title) id=\(card.id.uuidString.prefix(8))")
                     HStack {
                         CounterCard(title: card.title)
                         Spacer()
                         Button(role: .destructive) {
-                            send(.deleteCardButtonTapped(card.id))
+                            send(.deleteLazyCardButtonTapped(card.id))
                         } label: {
-                            Image(systemName: "trash")
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundStyle(.red)
                         }
                         .buttonStyle(.borderless)
                     }
                 }
             }
             .frame(height: 250)
-
-            HStack(spacing: 12) {
-                Button("Add Card") { send(.addCardButtonTapped) }
-                Text("Items: \(store.cards.count)")
-                    .font(.caption).foregroundStyle(.secondary)
-            }
-            .buttonStyle(.bordered)
         }
     }
 }
@@ -552,8 +633,10 @@ struct IdentitySection6View: View {
 @ViewAction(for: IdentityFeature.self)
 struct IdentitySection7View: View {
     @Bindable var store: StoreOf<IdentityFeature>
+    let instanceID = UUID()
 
     var body: some View {
+        let _ = idLog("[Section7] body: instanceID=\(instanceID.uuidString.prefix(8))")
         SectionHeaderView(
             number: 7,
             title: "Transpiler Peer Remembering",
@@ -576,6 +659,8 @@ struct IdentitySection7View: View {
 
             CounterCard(title: "Peer Test Card")
         }
+        .onAppear { idLog("[Section7] onAppear: instanceID=\(instanceID.uuidString.prefix(8))") }
+        .onDisappear { idLog("[Section7] onDisappear: instanceID=\(instanceID.uuidString.prefix(8))") }
     }
 }
 

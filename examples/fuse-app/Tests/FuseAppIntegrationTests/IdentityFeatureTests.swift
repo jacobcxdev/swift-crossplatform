@@ -22,64 +22,64 @@ struct IdentityFeatureTests {
 
     // MARK: - Section 1: Eager Container Keying
 
-    @Test func deleteCardPreservesRemaining() async {
+    @Test func deleteEagerCardPreservesRemaining() async {
         let store = TestStore(
             initialState: IdentityFeature.State(
-                cards: [
+                eagerCards: [
                     CardItem(id: Self.idA, title: "Card A"),
                     CardItem(id: Self.idB, title: "Card B"),
                     CardItem(id: Self.idC, title: "Card C"),
                 ],
-                nextCardLetter: "D"
+                nextEagerCardLetter: "D"
             )
         ) {
             IdentityFeature()
         }
 
         // Delete middle card (Card B)
-        await store.send(.view(.deleteCardButtonTapped(Self.idB))) {
-            $0.cards.remove(id: Self.idB)
+        await store.send(.view(.deleteEagerCardButtonTapped(Self.idB))) {
+            $0.eagerCards.remove(id: Self.idB)
         }
 
         // Verify remaining cards are unchanged
-        #expect(store.state.cards.count == 2)
-        #expect(store.state.cards[id: Self.idA]?.title == "Card A")
-        #expect(store.state.cards[id: Self.idC]?.title == "Card C")
+        #expect(store.state.eagerCards.count == 2)
+        #expect(store.state.eagerCards[id: Self.idA]?.title == "Card A")
+        #expect(store.state.eagerCards[id: Self.idC]?.title == "Card C")
     }
 
     @Test func reorderMovesLastToFirst() async {
         let store = TestStore(
             initialState: IdentityFeature.State(
-                cards: [
+                eagerCards: [
                     CardItem(id: Self.idA, title: "Card A"),
                     CardItem(id: Self.idB, title: "Card B"),
                     CardItem(id: Self.idC, title: "Card C"),
                 ],
-                nextCardLetter: "D"
+                nextEagerCardLetter: "D"
             )
         ) {
             IdentityFeature()
         }
 
-        await store.send(.view(.reorderCardButtonTapped)) {
-            let last = $0.cards.removeLast()
-            $0.cards.insert(last, at: 0)
+        await store.send(.view(.reorderEagerCardButtonTapped)) {
+            let last = $0.eagerCards.removeLast()
+            $0.eagerCards.insert(last, at: 0)
         }
 
         // All cards retained, just reordered
-        #expect(store.state.cards.count == 3)
-        #expect(store.state.cards[0].title == "Card C")
-        #expect(store.state.cards[1].title == "Card A")
-        #expect(store.state.cards[2].title == "Card B")
+        #expect(store.state.eagerCards.count == 3)
+        #expect(store.state.eagerCards[0].title == "Card C")
+        #expect(store.state.eagerCards[1].title == "Card A")
+        #expect(store.state.eagerCards[2].title == "Card B")
     }
 
-    @Test func addCardAppendsAndIncrementsLetter() async {
+    @Test func addEagerCardAppendsAndIncrementsLetter() async {
         let store = TestStore(
             initialState: IdentityFeature.State(
-                cards: [
+                eagerCards: [
                     CardItem(id: Self.idA, title: "Card A"),
                 ],
-                nextCardLetter: "B"
+                nextEagerCardLetter: "B"
             )
         ) {
             IdentityFeature()
@@ -87,44 +87,44 @@ struct IdentityFeatureTests {
             $0.uuid = .constant(Self.idNew)
         }
 
-        await store.send(.view(.addCardButtonTapped)) {
-            $0.cards.append(CardItem(id: Self.idNew, title: "Card B"))
-            $0.nextCardLetter = "C"
+        await store.send(.view(.addEagerCardButtonTapped)) {
+            $0.eagerCards.append(CardItem(id: Self.idNew, title: "Card B"))
+            $0.nextEagerCardLetter = "C"
         }
 
-        #expect(store.state.cards.count == 2)
-        #expect(store.state.cards.last?.title == "Card B")
+        #expect(store.state.eagerCards.count == 2)
+        #expect(store.state.eagerCards.last?.title == "Card B")
     }
 
-    @Test func multipleDeletions() async {
+    @Test func multipleEagerDeletions() async {
         let store = TestStore(
             initialState: IdentityFeature.State(
-                cards: [
+                eagerCards: [
                     CardItem(id: Self.idA, title: "Card A"),
                     CardItem(id: Self.idB, title: "Card B"),
                     CardItem(id: Self.idC, title: "Card C"),
                     CardItem(id: Self.idD, title: "Card D"),
                 ],
-                nextCardLetter: "E"
+                nextEagerCardLetter: "E"
             )
         ) {
             IdentityFeature()
         }
 
         // Delete first
-        await store.send(.view(.deleteCardButtonTapped(Self.idA))) {
-            $0.cards.remove(id: Self.idA)
+        await store.send(.view(.deleteEagerCardButtonTapped(Self.idA))) {
+            $0.eagerCards.remove(id: Self.idA)
         }
 
         // Delete third (Card C)
-        await store.send(.view(.deleteCardButtonTapped(Self.idC))) {
-            $0.cards.remove(id: Self.idC)
+        await store.send(.view(.deleteEagerCardButtonTapped(Self.idC))) {
+            $0.eagerCards.remove(id: Self.idC)
         }
 
         // Verify B and D remain
-        #expect(store.state.cards.count == 2)
-        #expect(store.state.cards[id: Self.idB]?.title == "Card B")
-        #expect(store.state.cards[id: Self.idD]?.title == "Card D")
+        #expect(store.state.eagerCards.count == 2)
+        #expect(store.state.eagerCards[id: Self.idB]?.title == "Card B")
+        #expect(store.state.eagerCards[id: Self.idD]?.title == "Card D")
     }
 
     // MARK: - Section 3: Animated Content
@@ -150,12 +150,12 @@ struct IdentityFeatureTests {
     @Test func animatedDeletionPreservesRemainingCards() async {
         let store = TestStore(
             initialState: IdentityFeature.State(
-                cards: [
+                animatedCards: [
                     CardItem(id: Self.idA, title: "Card A"),
                     CardItem(id: Self.idB, title: "Card B"),
                     CardItem(id: Self.idC, title: "Card C"),
                 ],
-                nextCardLetter: "D",
+                nextAnimatedCardLetter: "D",
                 isAnimatedDeletion: true
             )
         ) {
@@ -163,13 +163,13 @@ struct IdentityFeatureTests {
         }
 
         // Animation is visual only — reducer logic is identical
-        await store.send(.view(.deleteCardButtonTapped(Self.idB))) {
-            $0.cards.remove(id: Self.idB)
+        await store.send(.view(.deleteAnimatedCardButtonTapped(Self.idB))) {
+            $0.animatedCards.remove(id: Self.idB)
         }
 
-        #expect(store.state.cards.count == 2)
-        #expect(store.state.cards[id: Self.idA]?.title == "Card A")
-        #expect(store.state.cards[id: Self.idC]?.title == "Card C")
+        #expect(store.state.animatedCards.count == 2)
+        #expect(store.state.animatedCards[id: Self.idA]?.title == "Card A")
+        #expect(store.state.animatedCards[id: Self.idC]?.title == "Card C")
     }
 
     // MARK: - Section 4: Picker Selection
@@ -225,11 +225,11 @@ struct IdentityFeatureTests {
     @Test func lazyContainerAddAndDelete() async {
         let store = TestStore(
             initialState: IdentityFeature.State(
-                cards: [
+                lazyCards: [
                     CardItem(id: Self.idA, title: "Card A"),
                     CardItem(id: Self.idB, title: "Card B"),
                 ],
-                nextCardLetter: "C"
+                nextLazyCardLetter: "C"
             )
         ) {
             IdentityFeature()
@@ -238,21 +238,21 @@ struct IdentityFeatureTests {
         }
 
         // Add a card
-        await store.send(.view(.addCardButtonTapped)) {
-            $0.cards.append(CardItem(id: Self.idNew, title: "Card C"))
-            $0.nextCardLetter = "D"
+        await store.send(.view(.addLazyCardButtonTapped)) {
+            $0.lazyCards.append(CardItem(id: Self.idNew, title: "Card C"))
+            $0.nextLazyCardLetter = "D"
         }
 
-        #expect(store.state.cards.count == 3)
+        #expect(store.state.lazyCards.count == 3)
 
         // Delete middle card
-        await store.send(.view(.deleteCardButtonTapped(Self.idB))) {
-            $0.cards.remove(id: Self.idB)
+        await store.send(.view(.deleteLazyCardButtonTapped(Self.idB))) {
+            $0.lazyCards.remove(id: Self.idB)
         }
 
-        #expect(store.state.cards.count == 2)
-        #expect(store.state.cards[id: Self.idA]?.title == "Card A")
-        #expect(store.state.cards[id: Self.idNew]?.title == "Card C")
+        #expect(store.state.lazyCards.count == 2)
+        #expect(store.state.lazyCards[id: Self.idA]?.title == "Card A")
+        #expect(store.state.lazyCards[id: Self.idNew]?.title == "Card C")
     }
 
     // MARK: - Section 7: Peer Remembering — NO TestStore test
