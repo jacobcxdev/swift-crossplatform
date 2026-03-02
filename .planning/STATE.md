@@ -7,8 +7,8 @@ last_updated: "2026-03-01T23:16:07.459Z"
 progress:
   total_phases: 20
   completed_phases: 17
-  total_plans: 60
-  completed_plans: 58
+  total_plans: 61
+  completed_plans: 59
 ---
 
 # Project State
@@ -18,14 +18,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Any TCA app built with Point-Free's tools must run correctly on both iOS and Android via Skip's Fuse mode, with identical observation semantics and no infinite recomposition loops.
-**Current focus:** Phase 18.1 COMPLETE — canonical view identity system fully implemented (all 7 plans executed).
+**Current focus:** Phase 18.1 gap closure -- executing plans 08-09 for UAT gap fixes.
 
 ## Current Position
 
 Phase: 18.1 of 18.1 (Implement Canonical View Identity System)
-Plan: 7 of 7 in current phase -- 18.1-07 complete (PHASE COMPLETE)
-Status: Phase 18.1 COMPLETE. All 7 plans executed. Lazy container identity migration done -- composeBundleNormalizedKey() adapter unifies eager and lazy containers on normalizeKey() pipeline.
-Last activity: 2026-03-01 -- Completed 18.1-07 (Lazy container identity migration)
+Plan: 8 of 9 in current phase -- 18.1-08 complete (gap closure)
+Status: 18.1-08 complete. idMap in VStack/HStack/ZStack reads identityKey as fallback -- AnimatedContent path now reachable for ForEach items.
+Last activity: 2026-03-02 -- Completed 18.1-08 (AnimatedContent idMap fix)
 
 Progress: [##########] 100%
 
@@ -90,6 +90,7 @@ Progress: [##########] 100%
 | Phase 18.1 P05 | 6min | 1 tasks | 2 files |
 | Phase 18.1 P06 | 5min | 1 tasks | 3 files |
 | Phase 18.1 P07 | 2min | 2 tasks | 7 files |
+| Phase 18.1 P08 | 4min | 1 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -262,6 +263,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-01
-Stopped at: Completed 18.1-07-PLAN.md (Lazy container identity migration - Phase 18.1 COMPLETE)
+Last session: 2026-03-02
+Stopped at: Completed 18.1-08-PLAN.md (AnimatedContent idMap fix - gap closure)
 Resume file: .planning/phases/18.1-implement-canonical-view-identity-system/
