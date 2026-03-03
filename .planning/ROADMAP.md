@@ -393,7 +393,7 @@ Plans:
   8. Transpiler stateVariables.isEmpty guard removed — mixed @State + let-with-default views get peer remembering
   9. Lazy containers (LazyVStack, LazyHStack, LazyVGrid, LazyHGrid, List, Table) use composeBundleNormalizedKey() adapter wrapping normalizeKey()
   10. Identity tab in fuse-app provides 8-section acceptance surface covering all identity system facets
-**Plans:** 14/14 plans complete
+**Plans:** 17 plans
 
 Plans:
 - [x] 18.1-01-PLAN.md — Wave 1a (RED): TCA reducer scaffolding + /pfw alignment for Identity tab (VIEWID-03..VIEWID-11) ✓
@@ -407,3 +407,5 @@ Plans:
 - [x] 18.1-09-PLAN.md — Wave 5 (GAP CLOSURE): UAT expectation updates for lazy disposal + tab switch platform differences; VIEWID-03..VIEWID-11 requirements traceability (VIEWID-03..VIEWID-11) ✓ 2026-03-02
 - [x] 18.1-10-PLAN.md — Wave 6 (GAP CLOSURE): PeerStore integration — parent-scoped peer cache for survival across LazyColumn scroll-off and TabView tab switch (VIEWID-12, VIEWID-13) ✓ 2026-03-02
 - [ ] 18.1-11-PLAN.md — Wave 7 (GAP CLOSURE): RetainedAnimatedItems — replace AnimatedContent dual-path with unified per-item AnimatedVisibility
+- [ ] 18.1-16-PLAN.md — Wave 8 (GAP CLOSURE): Fix PeerNamespacePath structural equality — normalise namespace to String (VIEWID-12)
+- [ ] 18.1-17-PLAN.md — Wave 9 (GAP CLOSURE): Fix Section 7 LocalPeerStoreItemKey propagation + diagnostic logging (VIEWID-13)
