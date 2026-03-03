@@ -341,7 +341,7 @@ struct IdentitySection1View: View {
         VStack(spacing: 8) {
             Text("VStack").font(.subheadline).bold()
             ForEach(store.eagerCards) { card in
-                HStack {
+                HStack(spacing: 8) {
                     CounterCard(title: card.title)
                     Button(role: .destructive) {
                         send(.deleteEagerCardButtonTapped(card.id))
@@ -350,6 +350,7 @@ struct IdentitySection1View: View {
                             .foregroundStyle(.red)
                     }
                     .buttonStyle(.borderless)
+                    .frame(width: 44)
                 }
             }
         }
@@ -459,7 +460,7 @@ struct IdentitySection3View: View {
         VStack(spacing: 8) {
             ForEach(store.animatedCards) { card in
                 let _ = idLog("[Section3] ForEach item: card=\(card.title) id=\(card.id.uuidString.prefix(8))")
-                HStack {
+                HStack(spacing: 8) {
                     CounterCard(title: card.title)
                     Button(role: .destructive) {
                         if store.isAnimatedDeletion {
@@ -476,6 +477,7 @@ struct IdentitySection3View: View {
                             .foregroundStyle(.red)
                     }
                     .buttonStyle(.borderless)
+                    .frame(width: 44)
                 }
             }
         }
@@ -606,25 +608,23 @@ struct IdentitySection6View: View {
         }
         .buttonStyle(.bordered)
 
-        VStack(spacing: 8) {
-            List {
-                ForEach(store.lazyCards) { card in
-                    let _ = idLog("[Section6] ForEach item: card=\(card.title) id=\(card.id.uuidString.prefix(8))")
-                    HStack {
-                        CounterCard(title: card.title)
-                        Spacer()
-                        Button(role: .destructive) {
-                            send(.deleteLazyCardButtonTapped(card.id))
-                        } label: {
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundStyle(.red)
-                        }
-                        .buttonStyle(.borderless)
+        List {
+            ForEach(store.lazyCards) { card in
+                let _ = idLog("[Section6] ForEach item: card=\(card.title) id=\(card.id.uuidString.prefix(8))")
+                HStack(spacing: 8) {
+                    CounterCard(title: card.title)
+                    Button(role: .destructive) {
+                        send(.deleteLazyCardButtonTapped(card.id))
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(.red)
                     }
+                    .buttonStyle(.borderless)
+                    .frame(width: 44)
                 }
             }
-            .frame(height: 250)
         }
+        .frame(height: 250)
     }
 }
 
@@ -637,20 +637,21 @@ struct IdentitySection7View: View {
 
     var body: some View {
         let _ = idLog("[Section7] body: instanceID=\(instanceID.uuidString.prefix(8))")
-        SectionHeaderView(
-            number: 7,
-            title: "Transpiler Peer Remembering",
-            description: "Android-only test. PeerRememberTestView uses @State + let-with-default (no constructor params). Tap count should survive parent recomposition on Android."
-        )
-
         VStack(alignment: .leading, spacing: 12) {
+            SectionHeaderView(
+                number: 7,
+                title: "Transpiler Peer Remembering",
+                description: "Android-only test. PeerRememberTestView uses @State + let-with-default (no constructor params). Tap count should survive parent recomposition on Android."
+            )
+
             Text("Test: @State + let-with-default (no constructor params)")
                 .font(.caption).bold()
 
             // Provide manual item key so rememberViewPeer() uses PeerStore path
             // (standalone views outside ForEach have no IdentityKeyModifier)
             #if SKIP
-            // SKIP INSERT: val providedPeerItemKey = LocalPeerStoreItemKey provides "peer-remember-test-view"
+            let peerRememberItemKey: String = "peer-remember-test-view"
+            // SKIP INSERT: val providedPeerItemKey = LocalPeerStoreItemKey provides peerRememberItemKey
             CompositionLocalProvider(providedPeerItemKey) {
                 PeerRememberTestView()
             }
@@ -667,7 +668,8 @@ struct IdentitySection7View: View {
                 .font(.caption).bold()
 
             #if SKIP
-            // SKIP INSERT: val providedPeerTestCardKey = LocalPeerStoreItemKey provides "peer-test-counter-card"
+            let peerTestCardItemKey: String = "peer-test-counter-card"
+            // SKIP INSERT: val providedPeerTestCardKey = LocalPeerStoreItemKey provides peerTestCardItemKey
             CompositionLocalProvider(providedPeerTestCardKey) {
                 CounterCard(title: "Peer Test Card")
             }
