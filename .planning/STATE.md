@@ -266,6 +266,7 @@ Recent decisions affecting current work:
 - Phase 9 added: Post-audit cleanup (test fixes, documentation sync, Android verification)
 - Phase 18 added: Complete view identity layer implementation
 - Phase 18.1 inserted after Phase 18: Implement canonical view identity system (URGENT)
+- Phase 19 added: Reimplement skipapp-showcase-fuse showcases in fuse-app with TCA and SkipUI API validation
 
 ### Blockers/Concerns
 
