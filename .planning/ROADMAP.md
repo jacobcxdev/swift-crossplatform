@@ -409,3 +409,31 @@ Plans:
 - [ ] 18.1-11-PLAN.md — Wave 7 (GAP CLOSURE): RetainedAnimatedItems — replace AnimatedContent dual-path with unified per-item AnimatedVisibility
 - [ ] 18.1-16-PLAN.md — Wave 8 (GAP CLOSURE): Fix PeerNamespacePath structural equality — normalise namespace to String (VIEWID-12)
 - [ ] 18.1-17-PLAN.md — Wave 9 (GAP CLOSURE): Fix Section 7 LocalPeerStoreItemKey propagation + diagnostic logging (VIEWID-13)
+
+### Phase 19: Reimplement skipapp-showcase-fuse showcases in fuse-app with TCA and SkipUI API validation
+
+**Goal:** Port all 84 playgrounds from skipapp-showcase-fuse into fuse-app wrapped in TCA architecture, validating SkipUI's full API surface through the TCA observation bridge on Android. Remove Phase 18.1 test harness files. Provide ScenarioEngine infrastructure for on-demand debugging.
+**Requirements**: SHOWCASE-01 through SHOWCASE-11
+**Depends on:** Phase 18.1
+**Success Criteria** (what must be TRUE):
+  1. All 84 upstream playgrounds ported to fuse-app (30 visual, 10 platform stubs, 44 interactive)
+  2. TCA NavigationStack with 84 destinations and searchable list validates NAV requirements
+  3. Phase 18.1 test files (ForEachNS, PeerSurvival, Identity, ScenarioEngine settings) deleted
+  4. 2-tab structure (Showcase + Control) replaces 4-tab test harness
+  5. ScenarioEngine infrastructure retained for on-demand scenario creation
+  6. All tests pass on iOS after restructuring
+**Plans:** 12 plans in 3 waves
+
+Plans:
+- [ ] 19-01-PLAN.md — Wave 1: Delete Phase 18.1 files (ForEachNamespaceSetting, PeerSurvivalSetting, IdentityComponents, ScenarioEngineSetting) and associated tests (SHOWCASE-01)
+- [ ] 19-02-PLAN.md — Wave 1: Create PlaygroundType enum (84 cases) + ShowcaseFeature reducer + ShowcasePath navigation skeleton (SHOWCASE-02)
+- [ ] 19-03-PLAN.md — Wave 2: Restructure TestHarnessFeature to 2 tabs (Showcase + Control), compose ShowcaseFeature (SHOWCASE-03)
+- [ ] 19-04-PLAN.md — Wave 2: Port PlatformHelper + 10 platform stub playgrounds (SHOWCASE-04, SHOWCASE-05)
+- [ ] 19-05-PLAN.md — Wave 2: Port visual playgrounds A-G: Background, BlendMode, Blur, Border, Color, ColorEffects, Divider, Frame, Gradient, Graphics (SHOWCASE-06)
+- [ ] 19-06-PLAN.md — Wave 2: Port visual playgrounds I-S: Icon, Image, Label, LineSpacing, Link, Mask, OffsetPosition, Overlay, Redacted, SafeArea (SHOWCASE-06)
+- [ ] 19-07-PLAN.md — Wave 2: Port visual playgrounds S-Z: Shadow, Shape, Spacer, Stack, Symbol, Text, Transform, ZIndex, MinimumScaleFactor, ColorScheme (SHOWCASE-07)
+- [ ] 19-08-PLAN.md — Wave 2: Port interactive playgrounds A-F: Accessibility, Alert, Button, ConfirmationDialog, DatePicker, DisclosureGroup, Environment, FocusState, Form (SHOWCASE-08)
+- [ ] 19-09-PLAN.md — Wave 2: Port interactive playgrounds G-N: Gesture, GeometryReader, Grid, Keyboard, List, Localization, Menu, Modifier, NavigationStack, Notification (SHOWCASE-08)
+- [ ] 19-10-PLAN.md — Wave 2: Port interactive playgrounds O-S: Observable, OnSubmit, Picker, Preference, ProgressView, ScrollView, Searchable, SecureField, Sheet, State + StatePlaygroundModel (SHOWCASE-09)
+- [ ] 19-11-PLAN.md — Wave 2: Port remaining interactive playgrounds: Animation, ScenePhase, Slider, SQL, Stepper, Storage, TabView, TextEditor, TextField, Timer, Toggle, Toolbar, Tracking, Transition, ViewThatFits (SHOWCASE-09)
+- [ ] 19-12-PLAN.md — Wave 3: Wire all 84 playgrounds in ShowcasePath navigation + integration test cleanup (SHOWCASE-10, SHOWCASE-11)
