@@ -279,3 +279,12 @@ Recent decisions affecting current work:
 Last session: 2026-03-04
 Stopped at: Phase 18.1 VERIFIED -- Android ForEach NS checkpoint validation complete (5/5 scenarios)
 Resume file: .planning/phases/18.1-implement-canonical-view-identity-system/
+
+### Phase 19 Plan Verification — Deferred Findings
+
+**Triple verification:** Claude PASSED, Gemini PASSED, Codex ISSUES FOUND (3 minor).
+
+Dismissed findings (TODO for future planning):
+- TODO: Plans 19-04, 19-10 have 11 files per task (borderline scope) — monitor during execution
+- TODO: Some must_haves in plans are implementation-focused rather than user-observable — improve wording in future phases
+- TODO: Consider adding SHOWCASE-* entries to REQUIREMENTS.md for traceability
