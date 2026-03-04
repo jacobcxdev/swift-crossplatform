@@ -222,6 +222,23 @@ A private app consuming these forks:
 - Run `skip test` (not just `swift test`) to catch platform divergence — it runs both Darwin and Android/Robolectric
 - Filter: `just ios-test fuse-library` or `cd examples/fuse-library && swift test --filter Obs`
 
+## Skipstone Transpiler Design Principles
+
+When generating Kotlin bridge code in `KotlinBridgeToKotlinVisitor`:
+
+- **Lean on Compose primitives** — express intent through `remember`, `remember(key)`, `RememberObserver`, etc. rather than reimplementing their logic manually. If Compose has a built-in mechanism for what you need (lifecycle callbacks, key-based cache invalidation), use it.
+- **Peer remembering uses one pattern with one variable** — `SwiftPeerHandle` wraps retain/release into a `RememberObserver`; the only difference between view types is the `remember` key: absent for views with no constructor params (never invalidate), present with `Swift_inputsHash` for mixed views (invalidate when inputs change).
+- **`Swift_inputsHash` runs on the Swift side** — constructor params don't need to be bridged to Kotlin for hashing. Both bridgable Kotlin members and unbridged Swift-only properties (tracked via `uninitializedStructProperty(name)`) are accessible through the peer pointer.
+
+## SPM Mirror Configuration
+
+Non-forked transitive dependencies (`skip-model`, `skip-bridge`, `skip-foundation`, etc.) reference `source.skip.tools/skip.git` via remote URL, which conflicts with our local `forks/skip` path dependency. SPM mirrors redirect the remote URL to the local fork, eliminating identity warnings that would otherwise become errors in future SPM versions.
+
+- `just init` sets up mirrors automatically (calls `just setup-mirrors`)
+- `just doctor` verifies mirrors are configured
+- `just setup-mirrors` can be run independently to (re)configure mirrors
+- Mirror config lives in `examples/*/.swiftpm/configuration/mirrors.json` (gitignored — must be set up per-clone)
+
 ## Gotchas
 
 - **`swiftThreadingFatal` stub**: Required in skip-android-bridge for `libswiftObservation.so` to load on Android until Swift 6.3 ([swiftlang/swift#77890](https://github.com/swiftlang/swift/pull/77890))

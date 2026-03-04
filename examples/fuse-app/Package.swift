@@ -15,7 +15,6 @@ let package = Package(
         .package(path: "../../forks/skip-android-bridge"),
         .package(path: "../../forks/skip-ui"),
         .package(path: "../../forks/swift-composable-architecture"),
-        .package(path: "../../forks/sqlite-data"),
     ],
     targets: [
         .target(name: "FuseApp", dependencies: [
@@ -24,8 +23,6 @@ let package = Package(
             .product(name: "SkipAndroidBridge", package: "skip-android-bridge"),
             // TCA
             .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-            // Database
-            .product(name: "SQLiteData", package: "sqlite-data"),
         ], resources: [.process("Resources")], plugins: [.plugin(name: "skipstone", package: "skip")]),
         .target(name: "TestUtilities", path: "Tests/TestUtilities"),
         .testTarget(name: "FuseAppTests", dependencies: [
@@ -37,8 +34,6 @@ let package = Package(
             "FuseApp",
             "TestUtilities",
             .product(name: "SkipTest", package: "skip"),
-            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-            .product(name: "SQLiteData", package: "sqlite-data"),
         ], plugins: [.plugin(name: "skipstone", package: "skip")]),
     ]
 )

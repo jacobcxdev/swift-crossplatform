@@ -27,6 +27,11 @@ do +words="build":
       case "$w" in
         ios|android) platform="$w" ;;
         build|test|run|clean) actions="$actions $w" ;;
+        # Handle compound names: ios-build, android-run, etc.
+        ios-*|android-*)
+          platform="${w%%-*}"
+          actions="$actions ${w#*-}"
+          ;;
         *) targets="$targets $w" ;;
       esac
     done
@@ -72,6 +77,12 @@ do +words="build":
           ;;
       esac
     done
+
+# List available example targets
+targets:
+    @echo "Examples:  {{ examples }}"
+    @echo "Fuse only: {{ fuse_examples }}"
+    @echo "Showcases: {{ showcases }}"
 
 # ── Build ────────────────────────────────────────────────────────
 
@@ -127,18 +138,25 @@ android-run target:
     fi
     # Export APK
     export_dir="examples/{{ target }}/.build/export"
-    apk=$(ls "$export_dir"/*-debug.apk 2>/dev/null | head -1)
+    apk=$(ls "$export_dir"/*-debug.apk 2>/dev/null | head -1 || true)
     if [ -z "$apk" ] || [ -n "$(find "examples/{{ target }}/Sources" "examples/{{ target }}/Package.swift" forks/ -newer "$apk" -name '*.swift' -print -quit 2>/dev/null)" ]; then
       echo "Source changed — rebuilding APK..."
       rm -rf "$export_dir"
       (cd "examples/{{ target }}" && "{{ skip }}" export --debug --android --no-ios -d .build/export)
-      apk=$(ls "$export_dir"/*-debug.apk 2>/dev/null | head -1)
+      apk=$(ls "$export_dir"/*-debug.apk 2>/dev/null | head -1 || true)
       if [ -z "$apk" ]; then echo "Error: no APK found in $export_dir" >&2; exit 1; fi
     else
       echo "APK up to date — skipping export"
     fi
     # Find aapt
-    aapt_bin=$(ls -d "$HOME/Library/Android/sdk/build-tools"/*/ 2>/dev/null | sort -V | tail -1)aapt
+    sdk_home="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+    if [ -z "$sdk_home" ]; then
+      for candidate in "$HOME/Library/Android/sdk" /opt/homebrew/share/android-commandlinetools; do
+        if [ -d "$candidate/build-tools" ]; then sdk_home="$candidate"; break; fi
+      done
+    fi
+    aapt_bin=$(ls -d "$sdk_home/build-tools"/*/ 2>/dev/null | sort -V | tail -1 || true)
+    aapt_bin="${aapt_bin}aapt"
     if [ ! -x "$aapt_bin" ]; then echo "Error: aapt not found — install Android SDK build-tools" >&2; exit 1; fi
     # Install and launch
     pkg=$($aapt_bin dump badging "$apk" | awk -F"'" '/^package:/{print $2}')
@@ -148,18 +166,24 @@ android-run target:
     adb shell am force-stop "$pkg" 2>/dev/null || true
     echo "Launching $pkg/$activity..."
     adb shell am start -n "$pkg/$activity"
-    sleep 1
-    # Stream logs
-    app_pid=$(adb shell pidof "$pkg" 2>/dev/null || true)
+    # Stream logs (kill stale logcat sessions first)
+    pkill -f 'adb.*logcat' 2>/dev/null || true
+    app_pid=""
+    for i in $(seq 1 10); do
+      sleep 1
+      app_pid=$(adb shell pidof "$pkg" 2>/dev/null || true)
+      if [ -n "$app_pid" ]; then break; fi
+      echo "Waiting for app to start... (attempt $i)"
+    done
     if [ -n "$app_pid" ]; then
       trap 'exit 0' INT TERM
       echo "=== Streaming logs (PID $app_pid, Ctrl+C to stop) ==="
       adb logcat --pid=$app_pid
     else
-      echo "Warning: could not find PID for $pkg" >&2
+      echo "Warning: could not find PID for $pkg — falling back to tag filter" >&2
       trap 'exit 0' INT TERM
-      echo "=== Streaming logs (Ctrl+C to stop) ==="
-      adb logcat
+      echo "=== Streaming logs (tag: swift, Ctrl+C to stop) ==="
+      adb logcat -s swift
     fi
 
 # ── Test ─────────────────────────────────────────────────────────
@@ -205,9 +229,25 @@ clean:
 
 # ── Setup & Diagnostics ─────────────────────────────────────────
 
-# First-time setup: initialise all submodules recursively
+# First-time setup: initialise all submodules recursively + configure SPM mirrors
 init:
     git submodule update --init --recursive
+    just setup-mirrors
+
+# Configure SPM mirrors so transitive deps resolve forks/skip locally (eliminates identity warnings)
+setup-mirrors:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    root="$(cd "{{ justfile_directory() }}" && pwd)"
+    skip_path="file://$root/forks/skip"
+    for dir in examples/fuse-app examples/fuse-library; do
+      if [ -d "$root/$dir" ]; then
+        echo "=== Setting skip mirror for $dir ==="
+        (cd "$root/$dir" && swift package config set-mirror \
+          --original "https://source.skip.tools/skip.git" \
+          --mirror "$skip_path")
+      fi
+    done
 
 # Preflight checks — verify environment is ready to build
 doctor:
@@ -228,7 +268,7 @@ doctor:
       "Install Xcode from App Store"
     check "JDK ≥ 21" "java --version 2>&1 | head -1 | grep -qE '(2[1-9]|[3-9][0-9])'" \
       "Install: brew install openjdk"
-    check "Android SDK" "test -d ${ANDROID_HOME:-$HOME/Library/Android/sdk}/platforms" \
+    check "Android SDK" "test -d ${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/Library/Android/sdk}}/platforms || test -d /opt/homebrew/share/android-commandlinetools/platforms" \
       "Run: skip android sdk install"
     check "adb" "adb --version" \
       "Included in Android SDK platform-tools"
@@ -242,6 +282,9 @@ doctor:
       "Run: git checkout dev/swift-crossplatform in affected forks"
     check "Upstream purity (skip/skipstone)" "just check-upstream-purity" \
       "skip/skipstone Package.swift diverged from pinned upstream — see .planning/upstream-pins.md"
+    check "SPM mirrors (skip identity)" \
+      "test -f examples/fuse-app/.swiftpm/configuration/mirrors.json && test -f examples/fuse-library/.swiftpm/configuration/mirrors.json" \
+      "Run: just setup-mirrors"
     echo "---"
     echo "$pass passed, $fail failed"
     test $fail -eq 0

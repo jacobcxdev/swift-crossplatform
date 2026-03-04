@@ -2,9 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import ComposableArchitecture
-import Dependencies
 import Foundation
-import IssueReporting
 import SkipFuse
 import SwiftUI
 
@@ -12,31 +10,26 @@ import SwiftUI
 let logger: Logger = Logger(subsystem: "dev.jacobcx.fuseApp", category: "FuseApp")
 
 /// The shared top-level view for the app, loaded from the platform-specific App delegates below.
-///
-/// The default implementation merely loads the `AppView` for the app and logs a message.
 /* SKIP @bridge */public struct FuseAppRootView : View {
-    let store: StoreOf<AppFeature> = {
+    let store: StoreOf<TestHarnessFeature> = {
         #if DEBUG
-        Store(initialState: AppFeature.State()) { AppFeature()._printChanges() }
+        Store(initialState: TestHarnessFeature.State()) { TestHarnessFeature()._printChanges() }
         #else
-        Store(initialState: AppFeature.State()) { AppFeature() }
+        Store(initialState: TestHarnessFeature.State()) { TestHarnessFeature() }
         #endif
     }()
 
-    /* SKIP @bridge */public init() {
-        prepareDependencies {
-            do {
-                try $0.bootstrapDatabase()
-            } catch {
-                reportIssue(error)
-            }
-        }
-    }
+    /* SKIP @bridge */public init() { }
 
     public var body: some View {
-        AppView(store: store)
+        TestHarnessView(store: store)
             .task {
                 logger.info("Skip app logs are viewable in the Xcode console for iOS; Android logs can be viewed in Studio or using adb logcat")
+                guard let scenarioID = LaunchConfig.autoRunScenario else { return }
+                try? await Task.sleep(for: LaunchConfig.autoRunDelay)
+                if let scenario = ScenarioRegistry.all.first(where: { $0.id == scenarioID }) {
+                    await runScenario(scenario, store: store)
+                }
             }
     }
 }
