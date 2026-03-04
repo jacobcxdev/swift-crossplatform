@@ -1,4 +1,6 @@
 {
+  "mode": "interactive",
+  "granularity": "fine",
   "model_profile": "quality",
   "commit_docs": true,
   "search_gitignored": false,
@@ -9,7 +11,8 @@
     "research": true,
     "plan_check": true,
     "verifier": true,
-    "auto_advance": false
+    "auto_advance": false,
+    "nyquist_validation": true
   },
   "git": {
     "branching_strategy": "none"

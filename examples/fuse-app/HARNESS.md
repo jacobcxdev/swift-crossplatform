@@ -7,10 +7,12 @@ Developer reference for extending the fuse-app test harness with new settings, s
 ```
 FuseAppRootView (FuseApp.swift)
  └── TestHarnessView (TestHarnessFeature.swift)
-      ├── Tab: ForEachNamespaceSettingView (ForEachNamespaceSetting.swift)
-      ├── Tab: PeerSurvivalSettingView    (PeerSurvivalSetting.swift)
-      └── Tab: ControlPanelView           (ControlPanelView.swift)
-                └── ScenarioRegistry      (ScenarioEngine.swift)
+      ├── Tab: ForEachNamespaceSettingView  (ForEachNamespaceSetting.swift)
+      ├── Tab: PeerSurvivalSettingView      (PeerSurvivalSetting.swift)
+      ├── Tab: ScenarioEngineSettingView    (ScenarioEngineSetting.swift)
+      ├── Tab: ControlPanelView             (ControlPanelView.swift)
+      │         └── ScenarioRegistry        (ScenarioEngine.swift)
+      └── DebugBar (overlay when scenario running)
 
 Tests/FuseAppIntegrationTests/
  ├── FuseAppIntegrationTests.swift   # TestHarness + ForEachNamespace tests
@@ -43,12 +45,13 @@ ScenarioRunner                  TestHarnessFeature              SettingView
 
 | File | Purpose |
 |------|---------|
-| `Sources/FuseApp/TestHarnessFeature.swift` | Root reducer + view: tab state, UICommand forwarding, child composition |
+| `Sources/FuseApp/TestHarnessFeature.swift` | Root reducer + view: tab state, UICommand forwarding, child composition, debug bar overlay |
 | `Sources/FuseApp/ForEachNamespaceSetting.swift` | Setting: ForEach namespace UUID stability (R5 Issue 1) |
-| `Sources/FuseApp/PeerSurvivalSetting.swift` | Setting: peer survival across tab switches (Sections 6/7) |
-| `Sources/FuseApp/ControlPanelView.swift` | Control panel: scenario runner UI, status display |
+| `Sources/FuseApp/PeerSurvivalSetting.swift` | Setting: peer survival across tab switches (Sections 6/7), external trigger pattern |
+| `Sources/FuseApp/ScenarioEngineSetting.swift` | Setting: engine test tab with counter/flag state, scroll targets for UICommand testing |
+| `Sources/FuseApp/ControlPanelView.swift` | Control panel: scenario selection, event log, status display, reset + play toolbar |
 | `Sources/FuseApp/ScenarioEngine.swift` | UICommand enum, ScenarioStep primitives, Scenario struct, runner, registry |
-| `Sources/FuseApp/IdentityComponents.swift` | Shared: `idLog()`, `CardItem`, `CounterCard`, `PeerRememberTestView`, `SectionHeaderView` |
+| `Sources/FuseApp/IdentityComponents.swift` | Shared: `idLog()`, `CardItem`, `LocalCounterFeature`, `CounterCard`, `PeerRememberTestView`, `SectionHeaderView` |
 | `Sources/FuseApp/FuseApp.swift` | App entry: creates root store, auto-run on launch |
 
 ## Adding a Setting
@@ -131,7 +134,7 @@ In `TestHarnessFeature.swift`, add to `State.Tab`:
 
 ```swift
 enum Tab: String, Equatable, CaseIterable {
-    case forEachNamespace, peerSurvival, control, myNew  // ← add
+    case forEachNamespace, peerSurvival, engineTest, control, myNew  // ← add
 }
 ```
 
@@ -181,10 +184,28 @@ Scenarios are sequences of `ScenarioStep` primitives that automate testing flows
 | Primitive | Purpose | Example |
 |-----------|---------|---------|
 | `.send(action)` | Dispatch a TCA action to the harness store | `.send(.tabSelected(.forEachNamespace))` |
-| `.uiCommand(cmd)` | Execute a view-layer command (scroll, gesture) | `.uiCommand(.scrollToBottom)` |
+| `.uiCommand(cmd)` | Execute a view-layer command (scroll, gesture, tap) | `.uiCommand(.scrollToBottom)` |
 | `.wait(duration)` | Pause between steps | `.wait(.milliseconds(500))` |
 | `.log(msg)` | Emit a debug log message | `.log("About to mutate")` |
 | `.checkpoint(marker)` | Emit a structured checkpoint for log correlation | `.checkpoint("PRE_ADD_CARD")` |
+
+### UICommand Reference
+
+| Command | Purpose | Tabs that handle it |
+|---------|---------|---------------------|
+| `.scrollTo(itemID:)` | Scroll to a specific item by ID | ForEachNamespace, EngineTest |
+| `.scrollToTop` | Scroll to the top of the list | ForEachNamespace, EngineTest |
+| `.scrollToBottom` | Scroll to the bottom of the list | ForEachNamespace, EngineTest |
+| `.tapButton(id:)` | Trigger a button tap via external trigger pattern | PeerSurvival (mapped IDs below) |
+
+**tapButton IDs for PeerSurvival tab:**
+
+| ID | Target | Effect |
+|----|--------|--------|
+| `"peer-tap-button"` | PeerRememberTestView | Increments `@State tapCount` |
+| `"peer-card-plus"` | CounterCard | Sends `.incrementButtonTapped` to local store |
+
+Tabs that don't handle a command acknowledge it as a no-op (send `.uiCommandCompleted` immediately) to prevent scenario timeout.
 
 ### Checkpoint Convention
 
@@ -211,6 +232,7 @@ Add to `ScenarioEngine.swift` as a static property on `ScenarioRegistry`:
 ```swift
 static let myNewScenario = Scenario(
     id: "my-new-scenario",           // Unique kebab-case ID
+    tab: .myNew,                     // Tab this scenario targets (for grouping in Control Panel)
     name: "My New: Description",      // Human-readable name
     description: "What this tests",   // Shown in Control Panel
     resetFirst: true,                 // true = reset harness state before running
@@ -239,6 +261,7 @@ static let all: [Scenario] = [
 ```swift
 static let foreachNamespaceAddCard = Scenario(
     id: "foreach-ns-add-card",
+    tab: .forEachNamespace,
     name: "ForEach NS: Add Card",
     description: "Verify namespace UUID and peer identity stable after adding a card",
     resetFirst: true,
@@ -404,10 +427,12 @@ In `ScenarioEngine.swift`:
 
 ```swift
 enum UICommand: Equatable, Sendable {
+    // Scroll
     case scrollTo(itemID: String)
     case scrollToTop
     case scrollToBottom
-    case scrollByOffset(CGFloat)
+    // Interaction
+    case tapButton(id: String)
     case myNewCommand  // ← add
 }
 ```
@@ -443,6 +468,57 @@ Then call `send(.uiCommandCompleted)` so the scenario runner doesn't timeout.
 ```
 
 The scenario runner handles the full request→poll→timeout cycle automatically. If the view doesn't acknowledge within 1 second, the runner aborts the scenario and sends `.cancelUICommand`.
+
+## External Trigger Pattern
+
+For testing compose-level state (view-local `@State` or local TCA stores) that is unreachable from the parent reducer, use the **external trigger pattern**:
+
+1. Add an `externalTapTrigger: Int = 0` (or similar) parameter to the child view with a default value
+2. Add `.onChange(of: externalTapTrigger) { _, _ in /* mutate local state */ }` in the child's body
+3. In the parent view, add `@State var childTrigger: Int = 0` and pass it to the child
+4. The parent's `onChange(of: store.pendingUICommand)` handler increments the trigger for `.tapButton` commands
+
+**Reset triggers** follow the same pattern: add `externalResetTrigger: Int = 0` to children, wired to a `resetCount` in the parent reducer's state that increments on `.reset`.
+
+**Timing on Android:** The parent `onChange` fires and acks before the child `onChange` processes the new trigger value (Compose recomposition is async). For `tapButton` commands, delay the ack by ~300ms to allow child recomposition:
+
+```swift
+case .tapButton(let id):
+    switch id {
+    case "my-button": childTrigger += 1
+    default: break
+    }
+    Task { @MainActor in
+        try? await Task.sleep(for: .milliseconds(300))
+        send(.uiCommandCompleted)
+    }
+```
+
+Existing call sites are unaffected — default parameter values mean `onChange` never fires when triggers aren't passed.
+
+## Event Log
+
+The scenario engine captures events to an in-memory log displayed in the Control Panel's collapsible "Event Log" section.
+
+**Event kinds:** `send`, `uiCommand`, `uiAck`, `reset`, `log`, `checkpoint`, `wait`
+
+Events are appended by the scenario runner via `.eventLogAppend(EngineEvent(...))`. The log captures events from all tabs — it lives on `TestHarnessFeature.State.eventLog`, not on individual settings.
+
+Clear the log via the "Clear Log" button or `.clearEventLog` action.
+
+## Debugger Controls
+
+When a scenario is running, a debug bar overlay appears at the bottom of the screen with transport controls:
+
+| Button | Action | When available |
+|--------|--------|----------------|
+| Stop | Abort scenario | Always |
+| Pause | Pause execution | When playing |
+| Step | Execute one step then pause | When paused |
+| Skip | Execute one step (skip waits) then pause | When paused |
+| Play | Resume continuous playback | When paused/stepping |
+
+**Breakpoints:** Toggle "Pause on all checkpoints" in the Control Panel Status section. When enabled, execution pauses before each `.checkpoint` step and at the start of the scenario.
 
 ## Android Verification Loop
 

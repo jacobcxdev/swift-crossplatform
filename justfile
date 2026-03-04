@@ -50,11 +50,17 @@ do +words="build":
           done
           ;;
         build)
-          for p in $platforms; do
-            case "$p" in
-              ios)     just ios-build $targets ;;
-              android) just android-build $targets ;;
-            esac
+          for ex in $targets; do
+            if [ -z "$platform" ]; then
+              just build "$ex"
+            else
+              for p in $platforms; do
+                case "$p" in
+                  ios)     just ios-build "$ex" ;;
+                  android) just android-build "$ex" ;;
+                esac
+              done
+            fi
           done
           ;;
         test)
@@ -67,12 +73,16 @@ do +words="build":
           ;;
         run)
           for ex in $targets; do
-            for p in $platforms; do
-              case "$p" in
-                ios)     just ios-run "$ex" ;;
-                android) just android-run "$ex" ;;
-              esac
-            done
+            if [ -z "$platform" ]; then
+              just run "$ex"
+            else
+              for p in $platforms; do
+                case "$p" in
+                  ios)     just ios-run "$ex" ;;
+                  android) just android-run "$ex" ;;
+                esac
+              done
+            fi
           done
           ;;
       esac
@@ -86,10 +96,11 @@ targets:
 
 # ── Build ────────────────────────────────────────────────────────
 
-# Build example(s) for iOS (default: all examples)
+# Build example(s) for iOS via SPM (default: all examples)
 ios-build *targets:
     #!/usr/bin/env bash
     set -euo pipefail
+    trap 'kill 0' INT TERM
     targets="{{ targets }}"
     targets="${targets:-{{ examples }}}"
     for ex in $targets; do
@@ -101,12 +112,34 @@ ios-build *targets:
 android-build *targets:
     #!/usr/bin/env bash
     set -euo pipefail
+    trap 'kill 0' INT TERM
     targets="{{ targets }}"
     targets="${targets:-{{ fuse_examples }}}"
     for ex in $targets; do
       echo "=== Building $ex (Android) ==="
       (cd "examples/$ex" && "{{ skip }}" android build)
     done
+
+# Build app for both platforms via xcodebuild (SKIP_ACTION=build triggers Android build phase)
+build target:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    trap 'kill 0' INT TERM
+    product_name=$(grep '^PRODUCT_NAME' "examples/{{ target }}/Skip.env" | sed 's/.*= *//')
+    xcodeproj="examples/{{ target }}/Darwin/${product_name}.xcodeproj"
+    scheme="${product_name} App"
+    if [ ! -d "$xcodeproj" ]; then
+      echo "Error: no Xcode project at $xcodeproj — build only works for app targets" >&2
+      exit 1
+    fi
+    echo "=== Building {{ target }} (iOS + Android) ==="
+    xcodebuild \
+      -project "$xcodeproj" \
+      -scheme "$scheme" \
+      -destination 'generic/platform=iOS Simulator' \
+      SKIP_ACTION=build \
+      build 2>&1 | tail -5
+    echo "=== {{ target }} built for both platforms ==="
 
 # Build showcase apps for iOS (requires iOS SDK — these target iOS, not macOS)
 showcase-build:
@@ -120,16 +153,157 @@ showcase-build:
       fi
     done
 
-# Run on iOS — prints Xcode guidance (use Cmd+R in Xcode)
+# ── Run ──────────────────────────────────────────────────────────
+
+# Run on iOS simulator via xcodebuild (builds + launches the app)
 ios-run target:
-    @echo "=== Running {{ target }} (iOS) ==="
-    @echo "Use Xcode to run iOS apps (Cmd+R), or:"
-    @echo "  open examples/{{ target }}"
+    #!/usr/bin/env bash
+    set -euo pipefail
+    trap 'kill 0' INT TERM
+    product_name=$(grep '^PRODUCT_NAME' "examples/{{ target }}/Skip.env" | sed 's/.*= *//')
+    xcodeproj="examples/{{ target }}/Darwin/${product_name}.xcodeproj"
+    scheme="${product_name} App"
+    if [ ! -d "$xcodeproj" ]; then
+      echo "Error: no Xcode project at $xcodeproj — ios-run only works for app targets" >&2
+      exit 1
+    fi
+    # Find a booted iPhone simulator, or boot the first available one
+    sim_id=$(xcrun simctl list devices booted -j | python3 -c "
+    import sys, json
+    data = json.load(sys.stdin)
+    for runtime, devices in data.get('devices', {}).items():
+        if 'iOS' not in runtime: continue
+        for d in devices:
+            if d.get('state') == 'Booted' and 'iPhone' in d.get('name', ''):
+                print(d['udid']); sys.exit(0)
+    " 2>/dev/null || true)
+    if [ -z "$sim_id" ]; then
+      echo "No booted iPhone simulator — booting one..."
+      sim_id=$(xcrun simctl list devices available -j | python3 -c "
+    import sys, json
+    data = json.load(sys.stdin)
+    for runtime, devices in sorted(data.get('devices', {}).items(), reverse=True):
+        if 'iOS' not in runtime: continue
+        for d in devices:
+            if d.get('isAvailable') and 'iPhone' in d.get('name', ''):
+                print(d['udid']); sys.exit(0)
+    print('', end='')
+    " 2>/dev/null || true)
+      if [ -z "$sim_id" ]; then
+        echo "Error: no available iPhone simulator found" >&2
+        exit 1
+      fi
+      xcrun simctl boot "$sim_id"
+      open -a Simulator
+    fi
+    sim_name=$(xcrun simctl list devices -j | python3 -c "
+    import sys, json
+    data = json.load(sys.stdin)
+    for devices in data.get('devices', {}).values():
+        for d in devices:
+            if d['udid'] == '$sim_id':
+                print(d['name']); sys.exit(0)
+    " 2>/dev/null)
+    echo "=== Building & running {{ target }} (iOS) on $sim_name ==="
+    xcodebuild \
+      -project "$xcodeproj" \
+      -scheme "$scheme" \
+      -destination "id=$sim_id" \
+      SKIP_ACTION=none \
+      build 2>&1 | tail -5
+    # Install and launch
+    app_path=$(find "$(xcodebuild -project "$xcodeproj" -scheme "$scheme" -destination "id=$sim_id" -showBuildSettings SKIP_ACTION=none 2>/dev/null \
+      | grep '^\s*BUILT_PRODUCTS_DIR' | sed 's/.*= //')" -name "*.app" -maxdepth 1 2>/dev/null | head -1)
+    if [ -z "$app_path" ]; then
+      echo "Error: could not find built .app bundle" >&2
+      exit 1
+    fi
+    bundle_id=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$app_path/Info.plist" 2>/dev/null)
+    xcrun simctl install "$sim_id" "$app_path"
+    echo "Launching $bundle_id..."
+    xcrun simctl launch "$sim_id" "$bundle_id"
+    echo "=== {{ target }} running on $sim_name ==="
+
+# Run on both platforms (xcodebuild with SKIP_ACTION=launch builds + launches Android; simctl launches iOS)
+run target:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    trap 'kill 0' INT TERM
+    product_name=$(grep '^PRODUCT_NAME' "examples/{{ target }}/Skip.env" | sed 's/.*= *//')
+    xcodeproj="examples/{{ target }}/Darwin/${product_name}.xcodeproj"
+    scheme="${product_name} App"
+    if [ ! -d "$xcodeproj" ]; then
+      echo "Error: no Xcode project at $xcodeproj — run only works for app targets" >&2
+      exit 1
+    fi
+    # Ensure Android emulator is running for SKIP_ACTION=launch
+    if ! adb devices 2>/dev/null | grep -q 'emulator.*device$'; then
+      echo "No Android emulator running — launching one..."
+      skip android emulator launch &
+      adb wait-for-device
+    fi
+    # Find a booted iPhone simulator, or boot the first available one
+    sim_id=$(xcrun simctl list devices booted -j | python3 -c "
+    import sys, json
+    data = json.load(sys.stdin)
+    for runtime, devices in data.get('devices', {}).items():
+        if 'iOS' not in runtime: continue
+        for d in devices:
+            if d.get('state') == 'Booted' and 'iPhone' in d.get('name', ''):
+                print(d['udid']); sys.exit(0)
+    " 2>/dev/null || true)
+    if [ -z "$sim_id" ]; then
+      echo "No booted iPhone simulator — booting one..."
+      sim_id=$(xcrun simctl list devices available -j | python3 -c "
+    import sys, json
+    data = json.load(sys.stdin)
+    for runtime, devices in sorted(data.get('devices', {}).items(), reverse=True):
+        if 'iOS' not in runtime: continue
+        for d in devices:
+            if d.get('isAvailable') and 'iPhone' in d.get('name', ''):
+                print(d['udid']); sys.exit(0)
+    print('', end='')
+    " 2>/dev/null || true)
+      if [ -z "$sim_id" ]; then
+        echo "Error: no available iPhone simulator found" >&2
+        exit 1
+      fi
+      xcrun simctl boot "$sim_id"
+      open -a Simulator
+    fi
+    sim_name=$(xcrun simctl list devices -j | python3 -c "
+    import sys, json
+    data = json.load(sys.stdin)
+    for devices in data.get('devices', {}).values():
+        for d in devices:
+            if d['udid'] == '$sim_id':
+                print(d['name']); sys.exit(0)
+    " 2>/dev/null)
+    echo "=== Building & running {{ target }} on both platforms ($sim_name + Android) ==="
+    xcodebuild \
+      -project "$xcodeproj" \
+      -scheme "$scheme" \
+      -destination "id=$sim_id" \
+      SKIP_ACTION=launch \
+      build 2>&1 | tail -5
+    # Install and launch on iOS
+    app_path=$(find "$(xcodebuild -project "$xcodeproj" -scheme "$scheme" -destination "id=$sim_id" -showBuildSettings SKIP_ACTION=launch 2>/dev/null \
+      | grep '^\s*BUILT_PRODUCTS_DIR' | sed 's/.*= //')" -name "*.app" -maxdepth 1 2>/dev/null | head -1)
+    if [ -z "$app_path" ]; then
+      echo "Error: could not find built .app bundle" >&2
+      exit 1
+    fi
+    bundle_id=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$app_path/Info.plist" 2>/dev/null)
+    xcrun simctl install "$sim_id" "$app_path"
+    echo "Launching $bundle_id on iOS..."
+    xcrun simctl launch "$sim_id" "$bundle_id"
+    echo "=== {{ target }} running on $sim_name (iOS) + Android emulator ==="
 
 # Run on Android (full pipeline: emulator → export → install → launch → logcat)
 android-run target:
     #!/usr/bin/env bash
     set -euo pipefail
+    trap 'kill 0' INT TERM
     # Ensure emulator is running
     if ! adb devices 2>/dev/null | grep -q 'emulator.*device$'; then
       echo "No emulator running — launching one..."
@@ -166,7 +340,11 @@ android-run target:
     adb shell am force-stop "$pkg" 2>/dev/null || true
     echo "Launching $pkg/$activity..."
     adb shell am start -n "$pkg/$activity"
-    # Stream logs (kill stale logcat sessions first)
+    # Stream logs (unless NO_LOGCAT is set)
+    if [ "${NO_LOGCAT:-}" = "1" ]; then
+      echo "NO_LOGCAT=1 — skipping log streaming. App launched."
+      exit 0
+    fi
     pkill -f 'adb.*logcat' 2>/dev/null || true
     app_pid=""
     for i in $(seq 1 10); do
@@ -176,12 +354,10 @@ android-run target:
       echo "Waiting for app to start... (attempt $i)"
     done
     if [ -n "$app_pid" ]; then
-      trap 'exit 0' INT TERM
       echo "=== Streaming logs (PID $app_pid, Ctrl+C to stop) ==="
       adb logcat --pid=$app_pid
     else
       echo "Warning: could not find PID for $pkg — falling back to tag filter" >&2
-      trap 'exit 0' INT TERM
       echo "=== Streaming logs (tag: swift, Ctrl+C to stop) ==="
       adb logcat -s swift
     fi
@@ -192,6 +368,7 @@ android-run target:
 ios-test *targets:
     #!/usr/bin/env bash
     set -euo pipefail
+    trap 'kill 0' INT TERM
     targets="{{ targets }}"
     targets="${targets:-{{ examples }}}"
     filter_arg=""
@@ -207,6 +384,7 @@ ios-test *targets:
 android-test *targets:
     #!/usr/bin/env bash
     set -euo pipefail
+    trap 'kill 0' INT TERM
     targets="{{ targets }}"
     targets="${targets:-{{ fuse_examples }}}"
     for ex in $targets; do
@@ -240,12 +418,16 @@ setup-mirrors:
     set -euo pipefail
     root="$(cd "{{ justfile_directory() }}" && pwd)"
     skip_path="file://$root/forks/skip"
-    for dir in examples/fuse-app examples/fuse-library; do
+    skip_ui_path="file://$root/forks/skip-ui"
+    for dir in examples/fuse-app examples/fuse-library examples/skipapp-showcase examples/skipapp-showcase-fuse; do
       if [ -d "$root/$dir" ]; then
-        echo "=== Setting skip mirror for $dir ==="
+        echo "=== Setting SPM mirrors for $dir ==="
         (cd "$root/$dir" && swift package config set-mirror \
           --original "https://source.skip.tools/skip.git" \
           --mirror "$skip_path")
+        (cd "$root/$dir" && swift package config set-mirror \
+          --original "https://source.skip.tools/skip-ui.git" \
+          --mirror "$skip_ui_path")
       fi
     done
 
@@ -283,7 +465,9 @@ doctor:
     check "Upstream purity (skip/skipstone)" "just check-upstream-purity" \
       "skip/skipstone Package.swift diverged from pinned upstream — see .planning/upstream-pins.md"
     check "SPM mirrors (skip identity)" \
-      "test -f examples/fuse-app/.swiftpm/configuration/mirrors.json && test -f examples/fuse-library/.swiftpm/configuration/mirrors.json" \
+      "test -f examples/fuse-app/.swiftpm/configuration/mirrors.json && \
+       test -f examples/fuse-library/.swiftpm/configuration/mirrors.json && \
+       test -f examples/skipapp-showcase-fuse/.swiftpm/configuration/mirrors.json" \
       "Run: just setup-mirrors"
     echo "---"
     echo "$pass passed, $fail failed"

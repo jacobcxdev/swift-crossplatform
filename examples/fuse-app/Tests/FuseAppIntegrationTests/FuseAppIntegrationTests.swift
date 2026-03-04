@@ -33,26 +33,30 @@ struct TestHarnessFeatureTests {
     }
 
     @Test func resetAllClearsState() async {
-        let testUUID = UUID(uuidString: "00000000-0000-0000-0000-000000000042")!
+        let uuids = (0..<10).map { UUID(uuidString: "00000000-0000-0000-0000-\(String(format: "%012d", $0))")! }
+        let counter = LockIsolated(0)
         let store = TestStore(initialState: TestHarnessFeature.State()) {
             TestHarnessFeature()
         } withDependencies: {
-            $0.uuid = .constant(testUUID)
+            $0.uuid = .init {
+                let i = counter.value
+                counter.withValue { $0 += 1 }
+                return uuids[i]
+            }
         }
 
-        // Add a card to ForEachNamespace
-        await store.send(.forEachNamespace(.view(.addCard))) {
-            $0.forEachNamespace.cards.append(CardItem(id: testUUID, title: "Card D"))
-            $0.forEachNamespace.nextLetter = "E"
+        // Add a card to ForEachNamespace (state starts empty, so first card is "Card A")
+        await store.send(.forEachNamespace(.view(.addCardButtonTapped))) {
+            $0.forEachNamespace.cards.append(LocalCounterFeature.State(id: uuids[0], title: "Card A"))
+            $0.forEachNamespace.nextLetter = "B"
         }
 
-        // Reset all — verify structurally (default init creates new UUIDs)
+        // Reset all — clears state then seeds initial cards via effects
         store.exhaustivity = .off
-        await store.send(.resetAll) {
-            $0.pendingUICommand = nil
-            $0.peerSurvival = .init()
-        }
-        // Verify the reset produced fresh default state
+        await store.send(.resetAll)
+        await store.receive(\.forEachNamespace.seedInitialCards)
+        await store.receive(\.peerSurvival.reset)
+        // seedInitialCards creates 3 cards via the UUID dependency
         #expect(store.state.forEachNamespace.cards.count == 3)
         #expect(store.state.forEachNamespace.nextLetter == "D")
         #expect(store.state.pendingUICommand == nil)
@@ -136,7 +140,7 @@ struct ForEachNamespaceSettingTests {
     @Test func addCardAppendsAndIncrementsLetter() async {
         let store = TestStore(
             initialState: ForEachNamespaceSetting.State(
-                cards: [CardItem(id: Self.idA, title: "Card A")],
+                cards: [LocalCounterFeature.State(id: Self.idA, title: "Card A")],
                 nextLetter: "B"
             )
         ) {
@@ -145,8 +149,8 @@ struct ForEachNamespaceSettingTests {
             $0.uuid = .constant(Self.idNew)
         }
 
-        await store.send(.view(.addCard)) {
-            $0.cards.append(CardItem(id: Self.idNew, title: "Card B"))
+        await store.send(.view(.addCardButtonTapped)) {
+            $0.cards.append(LocalCounterFeature.State(id: Self.idNew, title: "Card B"))
             $0.nextLetter = "C"
         }
 
@@ -157,9 +161,9 @@ struct ForEachNamespaceSettingTests {
         let store = TestStore(
             initialState: ForEachNamespaceSetting.State(
                 cards: [
-                    CardItem(id: Self.idA, title: "Card A"),
-                    CardItem(id: Self.idB, title: "Card B"),
-                    CardItem(id: Self.idC, title: "Card C"),
+                    LocalCounterFeature.State(id: Self.idA, title: "Card A"),
+                    LocalCounterFeature.State(id: Self.idB, title: "Card B"),
+                    LocalCounterFeature.State(id: Self.idC, title: "Card C"),
                 ],
                 nextLetter: "D"
             )
@@ -167,7 +171,7 @@ struct ForEachNamespaceSettingTests {
             ForEachNamespaceSetting()
         }
 
-        await store.send(.view(.deleteCard(Self.idB))) {
+        await store.send(.view(.deleteCardButtonTapped(Self.idB))) {
             $0.cards.remove(id: Self.idB)
         }
 
@@ -179,7 +183,7 @@ struct ForEachNamespaceSettingTests {
     @Test func nextLetterWrapsAtZ() async {
         let store = TestStore(
             initialState: ForEachNamespaceSetting.State(
-                cards: [CardItem(id: Self.idA, title: "Card Z")],
+                cards: [LocalCounterFeature.State(id: Self.idA, title: "Card Z")],
                 nextLetter: "Z"
             )
         ) {
@@ -188,35 +192,36 @@ struct ForEachNamespaceSettingTests {
             $0.uuid = .constant(Self.idNew)
         }
 
-        await store.send(.view(.addCard)) {
-            $0.cards.append(CardItem(id: Self.idNew, title: "Card Z"))
+        await store.send(.view(.addCardButtonTapped)) {
+            $0.cards.append(LocalCounterFeature.State(id: Self.idNew, title: "Card Z"))
             $0.nextLetter = "A"
         }
     }
 
-    @Test func resetRestoredDefaultState() async {
+    @Test func resetClearsState() async {
         let store = TestStore(
             initialState: ForEachNamespaceSetting.State(
-                cards: [CardItem(id: Self.idA, title: "Card A")],
+                cards: [LocalCounterFeature.State(id: Self.idA, title: "Card A")],
                 nextLetter: "B"
             )
         ) {
             ForEachNamespaceSetting()
         }
 
-        store.exhaustivity = .off
-        await store.send(.reset)
-        #expect(store.state.cards.count == 3)
-        #expect(store.state.nextLetter == "D")
+        await store.send(.reset) {
+            $0 = .init()
+        }
+        #expect(store.state.cards.isEmpty)
+        #expect(store.state.nextLetter == "A")
     }
 
     @Test func deleteFirstCardRemovesFirst() async {
         let store = TestStore(
             initialState: ForEachNamespaceSetting.State(
                 cards: [
-                    CardItem(id: Self.idA, title: "Card A"),
-                    CardItem(id: Self.idB, title: "Card B"),
-                    CardItem(id: Self.idC, title: "Card C"),
+                    LocalCounterFeature.State(id: Self.idA, title: "Card A"),
+                    LocalCounterFeature.State(id: Self.idB, title: "Card B"),
+                    LocalCounterFeature.State(id: Self.idC, title: "Card C"),
                 ],
                 nextLetter: "D"
             )
@@ -225,7 +230,7 @@ struct ForEachNamespaceSettingTests {
         }
 
         await store.send(.view(.deleteFirstCard))
-        await store.receive(\.view.deleteCard) {
+        await store.receive(\.view.deleteCardButtonTapped) {
             $0.cards.remove(id: Self.idA)
         }
 
@@ -238,9 +243,9 @@ struct ForEachNamespaceSettingTests {
         let store = TestStore(
             initialState: ForEachNamespaceSetting.State(
                 cards: [
-                    CardItem(id: Self.idA, title: "Card A"),
-                    CardItem(id: Self.idB, title: "Card B"),
-                    CardItem(id: Self.idC, title: "Card C"),
+                    LocalCounterFeature.State(id: Self.idA, title: "Card A"),
+                    LocalCounterFeature.State(id: Self.idB, title: "Card B"),
+                    LocalCounterFeature.State(id: Self.idC, title: "Card C"),
                 ],
                 nextLetter: "D"
             )
@@ -249,7 +254,7 @@ struct ForEachNamespaceSettingTests {
         }
 
         await store.send(.view(.deleteLastCard))
-        await store.receive(\.view.deleteCard) {
+        await store.receive(\.view.deleteCardButtonTapped) {
             $0.cards.remove(id: Self.idC)
         }
 
@@ -262,7 +267,7 @@ struct ForEachNamespaceSettingTests {
         let store = TestStore(
             initialState: ForEachNamespaceSetting.State(
                 cards: [
-                    CardItem(id: Self.idA, title: "Card A"),
+                    LocalCounterFeature.State(id: Self.idA, title: "Card A"),
                 ],
                 nextLetter: "B"
             )
@@ -273,14 +278,14 @@ struct ForEachNamespaceSettingTests {
         }
 
         // Add a card
-        await store.send(.view(.addCard)) {
-            $0.cards.append(CardItem(id: Self.idNew, title: "Card B"))
+        await store.send(.view(.addCardButtonTapped)) {
+            $0.cards.append(LocalCounterFeature.State(id: Self.idNew, title: "Card B"))
             $0.nextLetter = "C"
         }
 
         // Delete the newly added card (last)
         await store.send(.view(.deleteLastCard))
-        await store.receive(\.view.deleteCard) {
+        await store.receive(\.view.deleteCardButtonTapped) {
             $0.cards.remove(id: Self.idNew)
         }
 

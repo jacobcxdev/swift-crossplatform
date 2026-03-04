@@ -20,10 +20,10 @@ struct ForEachNamespaceExtendedTests {
         let store = TestStore(
             initialState: ForEachNamespaceSetting.State(
                 cards: [
-                    CardItem(id: Self.idA, title: "Card A"),
-                    CardItem(id: Self.idB, title: "Card B"),
-                    CardItem(id: Self.idC, title: "Card C"),
-                    CardItem(id: Self.idD, title: "Card D"),
+                    LocalCounterFeature.State(id: Self.idA, title: "Card A"),
+                    LocalCounterFeature.State(id: Self.idB, title: "Card B"),
+                    LocalCounterFeature.State(id: Self.idC, title: "Card C"),
+                    LocalCounterFeature.State(id: Self.idD, title: "Card D"),
                 ],
                 nextLetter: "E"
             )
@@ -31,11 +31,11 @@ struct ForEachNamespaceExtendedTests {
             ForEachNamespaceSetting()
         }
 
-        await store.send(.view(.deleteCard(Self.idA))) {
+        await store.send(.view(.deleteCardButtonTapped(Self.idA))) {
             $0.cards.remove(id: Self.idA)
         }
 
-        await store.send(.view(.deleteCard(Self.idC))) {
+        await store.send(.view(.deleteCardButtonTapped(Self.idC))) {
             $0.cards.remove(id: Self.idC)
         }
 
@@ -62,18 +62,18 @@ struct ForEachNamespaceExtendedTests {
             }
         }
 
-        await store.send(.view(.addCard)) {
-            $0.cards.append(CardItem(id: Self.idA, title: "Card A"))
+        await store.send(.view(.addCardButtonTapped)) {
+            $0.cards.append(LocalCounterFeature.State(id: Self.idA, title: "Card A"))
             $0.nextLetter = "B"
         }
 
-        await store.send(.view(.addCard)) {
-            $0.cards.append(CardItem(id: Self.idB, title: "Card B"))
+        await store.send(.view(.addCardButtonTapped)) {
+            $0.cards.append(LocalCounterFeature.State(id: Self.idB, title: "Card B"))
             $0.nextLetter = "C"
         }
 
-        await store.send(.view(.addCard)) {
-            $0.cards.append(CardItem(id: Self.idC, title: "Card C"))
+        await store.send(.view(.addCardButtonTapped)) {
+            $0.cards.append(LocalCounterFeature.State(id: Self.idC, title: "Card C"))
             $0.nextLetter = "D"
         }
 

@@ -44,18 +44,23 @@ swift-crossplatform/
 Run `just` or `just --list` to see all available recipes.
 
 ```bash
-# Build
-just ios-build                         # build all examples for iOS
+# Build (both platforms via xcodebuild — app targets only)
+just build fuse-app                    # build for iOS + Android (SKIP_ACTION=build)
+
+# Build (single platform via SPM / Skip CLI)
+just ios-build                         # build all examples for iOS (swift build)
 just ios-build fuse-app                # build fuse-app for iOS
 just android-build fuse-app            # build fuse-app for Android (uses local skipstone)
+
+# Run
+just run fuse-app                      # build + launch on iOS simulator + Android emulator
+just ios-run fuse-app                  # build + launch on iOS simulator only
+just android-run fuse-app              # emulator → export APK → install → launch → logcat
 
 # Test
 just ios-test                          # test all examples on iOS
 just ios-test fuse-library             # test fuse-library on iOS
 just android-test fuse-app             # test fuse-app on Android
-
-# Run (Android — iOS: use Xcode Cmd+R)
-just android-run fuse-app              # emulator → export APK → install → launch → logcat
 
 # Clean
 just clean                             # clean all examples
@@ -67,6 +72,8 @@ just status                            # git status across all submodules
 just check-branches                    # verify fork branches
 just check-upstream-purity             # verify skip/skipstone match upstream
 ```
+
+The `build`, `ios-run`, and `run` recipes require an Xcode project (`Darwin/<ProductName>.xcodeproj`), so they only work for app targets (e.g. `fuse-app`, `lite-app`). Library targets use `ios-build`/`android-build` instead.
 
 ### Direct commands (from example directory)
 
@@ -97,12 +104,12 @@ cd forks/skipstone && ./scripts/skip version
 
 ### Xcode integration
 
-To run iOS, use Xcode (Cmd+R). Set `SKIP_ACTION` in `.xcconfig` to control Android during Xcode builds:
-- `launch` (default) — build + run both platforms
-- `build` — build Android but don't launch
-- `none` — skip Android entirely for faster iOS iteration
+`SKIP_ACTION` controls the Android build phase in xcodebuild (used by both Xcode and justfile):
+- `launch` — build + run both platforms (`just run`, Xcode Cmd+R default)
+- `build` — build Android but don't launch (`just build`)
+- `none` — skip Android entirely (`just ios-run`, or set in `.xcconfig` for faster Xcode iteration)
 
-The justfile and Xcode are independent pipelines — `SKIP_ACTION` has no effect on `just` commands.
+The justfile's `build`/`ios-run`/`run` recipes pass `SKIP_ACTION` to xcodebuild directly. When using Xcode manually (Cmd+R), `SKIP_ACTION` is read from `Darwin/<ProductName>.xcconfig`.
 
 ### Android debugging
 
@@ -232,11 +239,11 @@ When generating Kotlin bridge code in `KotlinBridgeToKotlinVisitor`:
 
 ## SPM Mirror Configuration
 
-Non-forked transitive dependencies (`skip-model`, `skip-bridge`, `skip-foundation`, etc.) reference `source.skip.tools/skip.git` via remote URL, which conflicts with our local `forks/skip` path dependency. SPM mirrors redirect the remote URL to the local fork, eliminating identity warnings that would otherwise become errors in future SPM versions.
+Non-forked transitive dependencies (`skip-model`, `skip-bridge`, `skip-foundation`, etc.) reference `source.skip.tools/skip.git` and `source.skip.tools/skip-ui.git` via remote URLs, which conflict with our local `forks/skip` and `forks/skip-ui` path dependencies. SPM mirrors redirect the remote URLs to the local forks, eliminating identity warnings that would otherwise become errors in future SPM versions. This is especially important for showcase apps (`skipapp-showcase`, `skipapp-showcase-fuse`) whose Package.swift files mix local fork paths with remote dependencies that transitively depend on `skip` and `skip-ui`.
 
 - `just init` sets up mirrors automatically (calls `just setup-mirrors`)
 - `just doctor` verifies mirrors are configured
-- `just setup-mirrors` can be run independently to (re)configure mirrors
+- `just setup-mirrors` can be run independently to (re)configure mirrors for all example dirs (fuse-app, fuse-library, skipapp-showcase, skipapp-showcase-fuse)
 - Mirror config lives in `examples/*/.swiftpm/configuration/mirrors.json` (gitignored — must be set up per-clone)
 
 ## Gotchas
@@ -252,4 +259,5 @@ Non-forked transitive dependencies (`skip-model`, `skip-bridge`, `skip-foundatio
 - **SF Symbol mapping on Android**: skip-ui maps ~60 SF Symbol names to Material Design icons. Unmapped names display a warning triangle. Check the mapping table in `forks/skip-ui/Sources/SkipUI/SkipUI/Components/Image.swift` (~line 431).
 - **@Shared reactivity on Android**: `@Shared` properties are reactive on Android via `BridgeObservationRegistrar` integration in swift-perception. If reactivity issues resurface, check that `PerceptionRegistrar` on Android is using `BridgeObservationRegistrar`.
 - **Nested submodule must be initialised**: `forks/skipstone/skip/` is a nested submodule. If `SkipDriveExternal` symlink is broken, run `just init` (which uses `--recursive`).
+- **`just android-run` streams logcat indefinitely**: The recipe tails `adb logcat` after launching the app — it will never "complete". Do not treat it as a finite task or poll for completion. The build/install/launch phase finishes when logcat output starts streaming; the command itself runs until manually interrupted (Ctrl+C).
 - **Skip.env files**: `examples/*/Skip.env` contains app metadata (bundle ID, version) shared between iOS (xcconfig) and Android (Gradle). These are standard upstream configuration — do not modify as part of infrastructure work.

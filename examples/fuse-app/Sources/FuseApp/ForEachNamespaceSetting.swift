@@ -8,27 +8,26 @@ import SwiftUI
 struct ForEachNamespaceSetting {
     @ObservableState
     struct State: Equatable {
-        var cards: IdentifiedArrayOf<CardItem> = [
-            CardItem(id: UUID(), title: "Card A"),
-            CardItem(id: UUID(), title: "Card B"),
-            CardItem(id: UUID(), title: "Card C"),
-        ]
-        var nextLetter: Character = "D"
+        var cards: IdentifiedArrayOf<LocalCounterFeature.State> = []
+        var nextLetter: Character = "A"
         var pendingUICommand: UICommand? = nil
     }
 
     @CasePathable
     enum Action: ViewAction {
-        case view(View)
-        case reset
+        case cards(IdentifiedActionOf<LocalCounterFeature>)
         case executeUICommand(UICommand)
+        case reset
+        case seedInitialCards
+        case view(View)
 
         @CasePathable
         enum View {
-            case addCard
-            case deleteCard(CardItem.ID)
+            case addCardButtonTapped
+            case deleteCardButtonTapped(LocalCounterFeature.State.ID)
             case deleteFirstCard
             case deleteLastCard
+            case onAppear
             case uiCommandCompleted
         }
     }
@@ -38,40 +37,7 @@ struct ForEachNamespaceSetting {
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .view(.addCard):
-                let title = "Card \(state.nextLetter)"
-                let id = uuid()
-                idLog("[ForEachNS] addCard: id=\(id.uuidString.prefix(8)) title=\(title)")
-                state.cards.append(CardItem(id: id, title: title))
-                let next: Character
-                if let ascii = state.nextLetter.asciiValue {
-                    next = ascii >= Character("Z").asciiValue!
-                        ? Character("A")
-                        : Character(Unicode.Scalar(ascii + 1))
-                } else {
-                    next = Character("A")
-                }
-                state.nextLetter = next
-                return .none
-
-            case .view(.deleteCard(let id)):
-                let title = state.cards[id: id]?.title ?? "?"
-                idLog("[ForEachNS] deleteCard: id=\(id.uuidString.prefix(8)) title=\(title)")
-                state.cards.remove(id: id)
-                let remaining = state.cards.map { "\($0.title)=\($0.id.uuidString.prefix(8))" }.joined(separator: ", ")
-                idLog("[ForEachNS] remaining: \(remaining)")
-                return .none
-
-            case .view(.deleteFirstCard):
-                guard let first = state.cards.first else { return .none }
-                return .send(.view(.deleteCard(first.id)))
-
-            case .view(.deleteLastCard):
-                guard let last = state.cards.last else { return .none }
-                return .send(.view(.deleteCard(last.id)))
-
-            case .view(.uiCommandCompleted):
-                state.pendingUICommand = nil
+            case .cards:
                 return .none
 
             case .executeUICommand(let cmd):
@@ -81,8 +47,52 @@ struct ForEachNamespaceSetting {
             case .reset:
                 state = .init()
                 return .none
+
+            case .seedInitialCards, .view(.onAppear):
+                guard state.cards.isEmpty else { return .none }
+                for letter in ["A", "B", "C"] {
+                    state.cards.append(LocalCounterFeature.State(id: uuid(), title: "Card \(letter)"))
+                }
+                state.nextLetter = "D"
+                return .none
+
+            case .view(.addCardButtonTapped):
+                let title = "Card \(state.nextLetter)"
+                let id = uuid()
+                idLog("[ForEachNS] addCard: id=\(id.uuidString.prefix(8)) title=\(title)")
+                state.cards.append(LocalCounterFeature.State(id: id, title: title))
+                state.nextLetter = nextLetter(after: state.nextLetter)
+                return .none
+
+            case .view(.deleteCardButtonTapped(let id)):
+                let title = state.cards[id: id]?.title ?? "?"
+                idLog("[ForEachNS] deleteCard: id=\(id.uuidString.prefix(8)) title=\(title)")
+                state.cards.remove(id: id)
+                return .none
+
+            case .view(.deleteFirstCard):
+                guard let first = state.cards.first else { return .none }
+                return .send(.view(.deleteCardButtonTapped(first.id)))
+
+            case .view(.deleteLastCard):
+                guard let last = state.cards.last else { return .none }
+                return .send(.view(.deleteCardButtonTapped(last.id)))
+
+            case .view(.uiCommandCompleted):
+                state.pendingUICommand = nil
+                return .none
             }
         }
+        .forEach(\.cards, action: \.cards) {
+            LocalCounterFeature()
+        }
+    }
+
+    private func nextLetter(after current: Character) -> Character {
+        guard let ascii = current.asciiValue else { return "A" }
+        return ascii >= Character("Z").asciiValue!
+            ? "A"
+            : Character(Unicode.Scalar(ascii + 1))
     }
 }
 
@@ -90,44 +100,45 @@ struct ForEachNamespaceSetting {
 
 @ViewAction(for: ForEachNamespaceSetting.self)
 struct ForEachNamespaceSettingView: View {
-    @Bindable var store: StoreOf<ForEachNamespaceSetting>
+    let store: StoreOf<ForEachNamespaceSetting>
 
     var body: some View {
-        let _ = idLog("[ForEachNS] body: cards=\(store.cards.count) ids=\(store.cards.map { $0.id.uuidString.prefix(8) }.joined(separator: ","))")
+        let _ = idLog("[ForEachNS] body: cards=\(store.cards.count)")
         ScrollViewReader { proxy in
-            List {
-                Section {
-                    HStack(spacing: 12) {
-                        Button("Add Card") { send(.addCard) }
-                        Text("Items: \(store.cards.count)")
-                            .font(.caption).foregroundStyle(.secondary)
-                    }
-                    .buttonStyle(.bordered)
-                }
-
-                Section {
-                    ForEach(store.cards) { card in
-                        let _ = idLog("[ForEachNS] ForEach item: card=\(card.title) id=\(card.id.uuidString.prefix(8))")
+            ScrollView {
+                LazyVStack(spacing: 12) {
+                    ForEach(
+                        store.scope(state: \.cards, action: \.cards),
+                        id: \.state.id
+                    ) { cardStore in
+                        let _ = idLog("[ForEachNS] ForEach item: card=\(cardStore.state.title) id=\(cardStore.state.id.uuidString.prefix(8))")
                         HStack(spacing: 8) {
-                            CounterCard(title: card.title)
+                            CounterCardView(store: cardStore)
                             Button(role: .destructive) {
-                                send(.deleteCard(card.id))
+                                send(.deleteCardButtonTapped(cardStore.state.id))
                             } label: {
-                                Image(systemName: "xmark.circle.fill")
+                                Image(systemName: "trash")
                                     .foregroundStyle(.red)
                             }
                             .buttonStyle(.borderless)
                             .frame(width: 44)
                         }
-                        .tag(card.id.uuidString)
+                        .padding(.horizontal)
+                        .id(cardStore.state.id)
                     }
                 }
             }
             .navigationTitle("ForEach Namespace")
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button { send(.addCardButtonTapped) } label: {
+                        Image(systemName: "plus")
+                    }
+                }
+            }
             .onChange(of: store.cards.count) { oldCount, newCount in
-                // Only auto-scroll on insertions, not deletions
                 if newCount > oldCount, let last = store.cards.last {
-                    proxy.scrollTo(last.id.uuidString, anchor: .bottom)
+                    proxy.scrollTo(last.id)
                 }
             }
             .onChange(of: store.pendingUICommand) {
@@ -135,21 +146,20 @@ struct ForEachNamespaceSettingView: View {
                 switch cmd {
                 case .scrollToTop:
                     if let first = store.cards.first {
-                        proxy.scrollTo(first.id.uuidString, anchor: .top)
+                        proxy.scrollTo(first.id)
                     }
                 case .scrollToBottom:
                     if let last = store.cards.last {
-                        proxy.scrollTo(last.id.uuidString, anchor: .bottom)
+                        proxy.scrollTo(last.id)
                     }
                 case .scrollTo(let itemID):
                     proxy.scrollTo(itemID)
-                case .scrollByOffset:
-                    // Not supported in List/ScrollViewReader. Acknowledged as no-op so the
-                    // scenario runner / fuzzer can proceed. The log makes non-execution visible.
-                    idLog("[ForEachNS] scrollByOffset not supported in List/ScrollViewReader — no-op")
+                case .tapButton:
+                    break
                 }
                 send(.uiCommandCompleted)
             }
+            .onAppear { send(.onAppear) }
         }
     }
 }
