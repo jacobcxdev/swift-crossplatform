@@ -91,7 +91,7 @@ struct ShowcaseView: View {
         } destination: { pathStore in
             switch pathStore.case {
             case .playground(let playgroundStore):
-                Text("Playground: \(playgroundStore.type.title)")
+                PlaygroundDestinationView(type: playgroundStore.type)
                     .navigationTitle(playgroundStore.type.title)
             }
         }

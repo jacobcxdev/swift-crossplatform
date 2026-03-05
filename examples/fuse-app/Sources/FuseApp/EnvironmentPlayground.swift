@@ -1,17 +1,10 @@
 // Licensed under the GNU General Public License v3.0 or later
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import Observation
 import SwiftUI
 
-// MARK: - Observable model (local copy -- shared with StatePlayground when ported)
-
-@Observable
-class TapCountObservable {
-    var tapCount = 0
-}
-
 // MARK: - Environment key
+// TapCountObservable is defined in StatePlaygroundModel.swift
 
 struct EnvironmentPlaygroundCustomKey: EnvironmentKey {
     static let defaultValue = "default"

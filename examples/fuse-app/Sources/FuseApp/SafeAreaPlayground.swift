@@ -3,7 +3,7 @@
 
 import SwiftUI
 
-private enum SafeAreaPlaygroundType: String, CaseIterable {
+enum SafeAreaPlaygroundType: String, CaseIterable {
     case fullscreenContent
     case fullscreenBackground
     case plainList
@@ -104,7 +104,7 @@ struct SafeAreaPlayground: View {
 
 // MARK: - Sub-views
 
-private struct SafeAreaBackgroundView: View {
+struct SafeAreaBackgroundView: View {
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
@@ -116,7 +116,7 @@ private struct SafeAreaBackgroundView: View {
     }
 }
 
-private struct SafeAreaFullscreenContent: View {
+struct SafeAreaFullscreenContent: View {
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
@@ -131,7 +131,7 @@ private struct SafeAreaFullscreenContent: View {
     }
 }
 
-private struct SafeAreaFullscreenBackground: View {
+struct SafeAreaFullscreenBackground: View {
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
@@ -146,7 +146,7 @@ private struct SafeAreaFullscreenBackground: View {
     }
 }
 
-private struct SafeAreaPlainList: View {
+struct SafeAreaPlainList: View {
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
@@ -165,7 +165,7 @@ private struct SafeAreaPlainList: View {
     }
 }
 
-private struct SafeAreaPlainListNoNavStack: View {
+struct SafeAreaPlainListNoNavStack: View {
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
@@ -179,7 +179,7 @@ private struct SafeAreaPlainListNoNavStack: View {
     }
 }
 
-private struct SafeAreaList: View {
+struct SafeAreaList: View {
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
@@ -199,7 +199,7 @@ private struct SafeAreaList: View {
 
 #if os(macOS)
 #else
-private struct SafeAreaBottomBar: View {
+struct SafeAreaBottomBar: View {
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
