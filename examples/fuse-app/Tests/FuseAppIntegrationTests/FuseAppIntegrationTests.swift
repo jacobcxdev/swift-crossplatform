@@ -94,4 +94,100 @@ struct TestHarnessFeatureTests {
         }
     }
 }
+
+// MARK: - ShowcaseFeature Tests
+
+@Suite(.serialized) @MainActor
+struct ShowcaseFeatureTests {
+
+    @Test func playgroundTapped() async {
+        let store = TestStore(initialState: ShowcaseFeature.State()) {
+            ShowcaseFeature()
+        }
+
+        await store.send(.playgroundTapped(.alert)) {
+            $0.path[id: 0] = .playground(.init(type: .alert))
+        }
+    }
+
+    @Test func searchFiltering() async {
+        let store = TestStore(initialState: ShowcaseFeature.State()) {
+            ShowcaseFeature()
+        }
+
+        await store.send(.searchTextChanged("But")) {
+            $0.searchText = "But"
+        }
+
+        // "But" should match "Button" (word prefix)
+        #expect(store.state.filteredPlaygrounds == [.button])
+    }
+
+    @Test func searchEmptyShowsAll() async {
+        var initialState = ShowcaseFeature.State()
+        initialState.searchText = "But"
+        let store = TestStore(initialState: initialState) {
+            ShowcaseFeature()
+        }
+
+        #expect(store.state.filteredPlaygrounds.count == 1)
+
+        await store.send(.searchTextChanged("")) {
+            $0.searchText = ""
+        }
+
+        #expect(store.state.filteredPlaygrounds.count == 84)
+        #expect(store.state.filteredPlaygrounds == PlaygroundType.allCases)
+    }
+
+    @Test func navigationPopRemovesFromPath() async {
+        var initialState = ShowcaseFeature.State()
+        initialState.path.append(.playground(.init(type: .color)))
+        initialState.path.append(.playground(.init(type: .grid)))
+
+        let store = TestStore(initialState: initialState) {
+            ShowcaseFeature()
+        }
+
+        #expect(store.state.path.count == 2)
+
+        await store.send(.path(.popFrom(id: store.state.path.ids.last!))) {
+            $0.path.removeLast()
+        }
+    }
+
+    @Test func tabSwitching() async {
+        let store = TestStore(initialState: TestHarnessFeature.State()) {
+            TestHarnessFeature()
+        }
+
+        #expect(store.state.selectedTab == .showcase)
+
+        await store.send(.tabSelected(.control)) {
+            $0.selectedTab = .control
+        }
+
+        await store.send(.tabSelected(.showcase)) {
+            $0.selectedTab = .showcase
+        }
+    }
+
+    @Test func resetAllClearsShowcasePath() async {
+        var initialState = TestHarnessFeature.State()
+        initialState.showcase.path.append(.playground(.init(type: .alert)))
+        initialState.showcase.searchText = "test"
+
+        let store = TestStore(initialState: initialState) {
+            TestHarnessFeature()
+        }
+
+        await store.send(.resetAll) {
+            $0.showcase = ShowcaseFeature.State()
+            $0.pendingUICommand = nil
+        }
+
+        #expect(store.state.showcase.path.isEmpty)
+        #expect(store.state.showcase.searchText.isEmpty)
+    }
+}
 #endif
