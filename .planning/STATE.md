@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 19-02-PLAN.md
-last_updated: "2026-03-05T01:37:18.890Z"
+last_updated: "2026-03-05T01:40:24.721Z"
 last_activity: 2026-03-05 -- Plan 19-02 core navigation infrastructure
 progress:
   total_phases: 21
   completed_phases: 16
   total_plans: 82
-  completed_plans: 66
+  completed_plans: 67
   percent: 80
 ---
 
@@ -101,6 +101,7 @@ Progress: [████████░░] 80%
 | Phase 18.1 P12 | 2min | 2 tasks | 4 files |
 | Phase 18.1 P14 | 3min | 2 tasks | 3 files |
 | Phase 19 P02 | 3min | 2 tasks | 2 files |
+| Phase 19 P01 | 5min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -244,6 +245,7 @@ Recent decisions affecting current work:
 - [Phase 18.1]: xmark.circle.fill for delete buttons -- maps to Material Icons.Filled.Close on Android (trash unmapped)
 - [Phase 18.1]: Standalone views outside ForEach need manual LocalPeerStoreItemKey via SKIP INSERT CompositionLocalProvider for PeerStore path activation -- without it, rememberViewPeer() falls back to composition-scoped remember which doesn't survive tab disposal
 - [Phase 19]: Alphabetical PlaygroundType case ordering per plan spec rather than upstream order
+- [Phase 19]: EngineEvent/ScrollTestItem moved to ScenarioEngine.swift; ScenarioRegistry emptied; default tab changed to .control
 
 ### Pending Todos
 
