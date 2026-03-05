@@ -156,23 +156,23 @@ struct PlaygroundDestinationView: View {
         case .textEditor:
             TextEditorPlayground()
         case .textField:
-            Text("TextField playground -- coming soon")
+            TextFieldPlayground()
         case .timer:
-            Text("Timer playground -- coming soon")
+            TimerPlayground()
         case .toggle:
-            Text("Toggle playground -- coming soon")
+            TogglePlayground()
         case .toolbar:
-            Text("Toolbar playground -- coming soon")
+            ToolbarPlayground()
         case .tracking:
-            Text("Tracking playground -- coming soon")
+            TrackingPlayground()
         case .transform:
             TransformPlayground()
         case .transition:
-            Text("Transition playground -- coming soon")
+            TransitionPlayground()
         case .videoPlayer:
             VideoPlayerPlayground()
         case .viewThatFits:
-            Text("ViewThatFits playground -- coming soon")
+            ViewThatFitsPlayground()
         case .webView:
             WebViewPlayground()
         case .zIndex:
