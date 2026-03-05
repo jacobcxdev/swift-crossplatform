@@ -5,10 +5,13 @@ import SwiftUI
 
 struct VideoPlayerPlayground: View {
     var body: some View {
-        ContentUnavailableView(
-            "Not Yet Ported",
-            systemImage: "play.rectangle",
-            description: Text("This playground requires platform-specific APIs.")
-        )
+        VStack(spacing: 12) {
+            Image(systemName: "play.rectangle")
+                .font(.largeTitle)
+            Text("Not Yet Ported")
+                .font(.title2)
+            Text("This playground requires platform-specific APIs.")
+                .foregroundStyle(.secondary)
+        }
     }
 }

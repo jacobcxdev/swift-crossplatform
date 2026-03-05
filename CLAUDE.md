@@ -5,12 +5,13 @@
 ```bash
 git clone --recursive https://github.com/jacobcxdev/swift-crossplatform.git
 cd swift-crossplatform
-just doctor        # verify environment
+just setup-toolchain      # install custom Swift 6.2.4 toolchain + Android SDK
+just doctor               # verify environment
 just ios-build fuse-app   # build for iOS
 just android-run fuse-app # full Android pipeline
 ```
 
-Prerequisites: Swift 6.2+, Xcode, [Skip](https://skip.tools) (`brew install skiptools/skip/skip`), [Just](https://github.com/casey/just) (`brew install just`). Android builds also need JDK 21+, Android SDK/NDK (`skip android sdk install`).
+Prerequisites: Swift 6.2+, Xcode, [Skip](https://skip.tools) (`brew install skiptools/skip/skip`), [Just](https://github.com/casey/just) (`brew install just`), `gh` CLI (for toolchain download). Android builds also need JDK 21+, Android SDK/NDK (`skip android sdk install`).
 
 ## Architecture
 
@@ -209,6 +210,7 @@ A private app consuming these forks:
 | Just | any | `brew install just` |
 | JDK | 21+ | For Android builds |
 | Android SDK | API 36 | `skip android sdk install` |
+| Custom toolchain | 6.2.4 | `just setup-toolchain` (installs toolchain + Android SDK) |
 
 ## Platform Conditionals & Environment Variables
 

@@ -5,10 +5,13 @@ import SwiftUI
 
 struct ShareLinkPlayground: View {
     var body: some View {
-        ContentUnavailableView(
-            "Not Yet Ported",
-            systemImage: "square.and.arrow.up",
-            description: Text("This playground requires platform-specific APIs.")
-        )
+        VStack(spacing: 12) {
+            Image(systemName: "square.and.arrow.up")
+                .font(.largeTitle)
+            Text("Not Yet Ported")
+                .font(.title2)
+            Text("This playground requires platform-specific APIs.")
+                .foregroundStyle(.secondary)
+        }
     }
 }

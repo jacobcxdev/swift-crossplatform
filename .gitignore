@@ -15,6 +15,9 @@ xcuserdata/
 *.xcuserstate
 *.xcworkspace/
 
+# Toolchain symlink directory (created by just setup-toolchain)
+.toolchains/
+
 # Gradle / Android
 .gradle/
 .android/

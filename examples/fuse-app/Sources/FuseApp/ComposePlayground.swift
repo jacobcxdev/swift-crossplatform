@@ -5,10 +5,13 @@ import SwiftUI
 
 struct ComposePlayground: View {
     var body: some View {
-        ContentUnavailableView(
-            "Not Yet Ported",
-            systemImage: "apple.terminal",
-            description: Text("This playground requires platform-specific APIs.")
-        )
+        VStack(spacing: 12) {
+            Image(systemName: "apple.terminal")
+                .font(.largeTitle)
+            Text("Not Yet Ported")
+                .font(.title2)
+            Text("This playground requires platform-specific APIs.")
+                .foregroundStyle(.secondary)
+        }
     }
 }

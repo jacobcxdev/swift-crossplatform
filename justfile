@@ -7,6 +7,10 @@ skip := justfile_directory() / "forks/skipstone/scripts/skip"
 examples := "fuse-library fuse-app lite-library lite-app"
 fuse_examples := "fuse-library fuse-app"
 showcases := "skipapp-showcase skipapp-showcase-fuse"
+toolchain_id := "dev.jacobcx.swift-6.2.4-RELEASE-swift-crossplatform"
+toolchain_name := "swift-6.2.4-RELEASE-swift-crossplatform"
+toolchain_dir := "/Library/Developer/Toolchains" / toolchain_name + ".xctoolchain"
+toolchain_link_dir := justfile_directory() / ".toolchains"
 export FILTER := ""
 
 # ── Default ──────────────────────────────────────────────────────
@@ -117,7 +121,7 @@ android-build *targets:
     targets="${targets:-{{ fuse_examples }}}"
     for ex in $targets; do
       echo "=== Building $ex (Android) ==="
-      (cd "examples/$ex" && "{{ skip }}" android build)
+      (cd "examples/$ex" && "{{ skip }}" android build --toolchain "{{ toolchain_dir }}")
     done
 
 # Build app for both platforms via xcodebuild (SKIP_ACTION=build triggers Android build phase)
@@ -316,7 +320,7 @@ android-run target:
     if [ -z "$apk" ] || [ -n "$(find "examples/{{ target }}/Sources" "examples/{{ target }}/Package.swift" forks/ -newer "$apk" -name '*.swift' -print -quit 2>/dev/null)" ]; then
       echo "Source changed — rebuilding APK..."
       rm -rf "$export_dir"
-      (cd "examples/{{ target }}" && "{{ skip }}" export --debug --android --no-ios -d .build/export)
+      (cd "examples/{{ target }}" && "{{ skip }}" export --debug --android --no-ios --toolchain "{{ toolchain_dir }}" -d .build/export)
       apk=$(ls "$export_dir"/*-debug.apk 2>/dev/null | head -1 || true)
       if [ -z "$apk" ]; then echo "Error: no APK found in $export_dir" >&2; exit 1; fi
     else
@@ -389,12 +393,12 @@ android-test *targets:
     targets="${targets:-{{ fuse_examples }}}"
     for ex in $targets; do
       echo "=== Testing $ex (Android) ==="
-      (cd "examples/$ex" && "{{ skip }}" android test)
+      (cd "examples/$ex" && "{{ skip }}" android test --toolchain "{{ toolchain_dir }}")
     done
 
 # ── Clean ────────────────────────────────────────────────────────
 
-# Clean build artifacts for all examples
+# Clean build artifacts for all examples (SPM .build + Xcode DerivedData)
 clean:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -402,6 +406,16 @@ clean:
       if [ -d "examples/$ex" ]; then
         echo "=== Cleaning $ex ==="
         (cd "examples/$ex" && swift package clean && rm -rf .build/plugins/outputs .build/DerivedData)
+      fi
+    done
+    # Clean Xcode DerivedData for all example projects
+    for dd in ~/Library/Developer/Xcode/DerivedData/FuseApp-* \
+              ~/Library/Developer/Xcode/DerivedData/FuseLibrary-* \
+              ~/Library/Developer/Xcode/DerivedData/LiteApp-* \
+              ~/Library/Developer/Xcode/DerivedData/LiteLibrary-*; do
+      if [ -d "$dd" ]; then
+        echo "=== Removing $(basename "$dd") ==="
+        rm -rf "$dd"
       fi
     done
 
@@ -464,6 +478,12 @@ doctor:
       "Run: git checkout dev/swift-crossplatform in affected forks"
     check "Upstream purity (skip/skipstone)" "just check-upstream-purity" \
       "skip/skipstone Package.swift diverged from pinned upstream — see .planning/upstream-pins.md"
+    check "Custom toolchain (Android)" "test -d '{{ toolchain_dir }}'" \
+      "Run: just setup-toolchain"
+    check "Toolchain symlink dir" "test -L '{{ toolchain_link_dir }}/{{ toolchain_name }}.xctoolchain'" \
+      "Run: just setup-toolchain"
+    check "Swift Android SDK" "'{{ toolchain_dir }}/usr/bin/swift' sdk list 2>/dev/null | grep -q android" \
+      "Run: just setup-toolchain"
     check "SPM mirrors (skip identity)" \
       "test -f examples/fuse-app/.swiftpm/configuration/mirrors.json && \
        test -f examples/fuse-library/.swiftpm/configuration/mirrors.json && \
@@ -545,3 +565,48 @@ sync-upstream:
     echo "  2. Resolve conflicts (always take upstream for skip/skipstone Package.swift)"
     echo "  3. just check-upstream-purity"
     echo "  4. just ios-test && just android-build fuse-app"
+
+# ── Toolchain ──────────────────────────────────────────────────
+
+# Download and install the custom Swift 6.2.4 toolchain + Android SDK (for Android builds)
+setup-toolchain:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    # Install toolchain
+    if [ -d "{{ toolchain_dir }}" ]; then
+      echo "Toolchain already installed at {{ toolchain_dir }}"
+      "{{ toolchain_dir }}/usr/bin/swift" --version
+    else
+      echo "Downloading Swift 6.2.4 toolchain (no assertions)..."
+      tmpdir=$(mktemp -d)
+      trap 'rm -rf "$tmpdir"' EXIT
+      gh release download swift-6.2.4-RELEASE-swift-crossplatform \
+        --repo jacobcxdev/swift \
+        --pattern "swift-LOCAL-*-osx.tar.gz" \
+        --dir "$tmpdir"
+      tarball=$(ls "$tmpdir"/swift-LOCAL-*-osx.tar.gz | head -1)
+      echo "Installing to /Library/Developer/Toolchains/..."
+      sudo tar -xzf "$tarball" -C /
+      # Rename to standard name
+      local_name=$(tar -tzf "$tarball" | head -1 | sed 's|Library/Developer/Toolchains/||;s|/.*||')
+      if [ "$local_name" != "{{ toolchain_name }}.xctoolchain" ]; then
+        sudo mv "/Library/Developer/Toolchains/$local_name" "{{ toolchain_dir }}"
+      fi
+      # Set bundle identifier
+      sudo /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier {{ toolchain_id }}" \
+        "{{ toolchain_dir }}/Info.plist"
+      echo "Toolchain installed:"
+      "{{ toolchain_dir }}/usr/bin/swift" --version
+    fi
+    # Install Android SDK if missing
+    if "{{ toolchain_dir }}/usr/bin/swift" sdk list 2>/dev/null | grep -q android; then
+      echo "Swift Android SDK already installed"
+    else
+      echo "Installing Swift Android SDK..."
+      "{{ toolchain_dir }}/usr/bin/swift" sdk install swift-6.2.4-RELEASE-android-24-0.1
+      echo "Swift Android SDK installed"
+    fi
+    # Create .toolchains/ symlink dir so SWIFT_TOOLCHAIN_DIR finds only our toolchain
+    mkdir -p "{{ toolchain_link_dir }}"
+    ln -sfn "{{ toolchain_dir }}" "{{ toolchain_link_dir }}/{{ toolchain_name }}.xctoolchain"
+    echo "Toolchain symlink created at {{ toolchain_link_dir }}"
