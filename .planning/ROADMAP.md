@@ -422,7 +422,7 @@ Plans:
   4. 2-tab structure (Showcase + Control) replaces 4-tab test harness
   5. ScenarioEngine infrastructure retained for on-demand scenario creation
   6. All tests pass on iOS after restructuring
-**Plans:** 12/12 plans complete
+**Plans:** 17 plans (12 complete, 5 validation)
 
 Plans:
 - [ ] 19-01-PLAN.md — Wave 1: Delete Phase 18.1 files (ForEachNamespaceSetting, PeerSurvivalSetting, IdentityComponents, ScenarioEngineSetting) and associated tests (SHOWCASE-01)
@@ -437,3 +437,8 @@ Plans:
 - [ ] 19-10-PLAN.md — Wave 2: Port interactive playgrounds O-S: Observable, OnSubmit, Picker, Preference, ProgressView, ScrollView, Searchable, SecureField, Sheet, State + StatePlaygroundModel (SHOWCASE-09)
 - [ ] 19-11-PLAN.md — Wave 2: Port remaining interactive playgrounds: Animation, ScenePhase, Slider, SQL, Stepper, Storage, TabView, TextEditor, TextField, Timer, Toggle, Toolbar, Tracking, Transition, ViewThatFits (SHOWCASE-09)
 - [ ] 19-12-PLAN.md — Wave 3: Wire all 84 playgrounds in ShowcasePath navigation + integration test cleanup (SHOWCASE-10, SHOWCASE-11)
+- [ ] 19-13-PLAN.md — Wave 4: PFW skill validation — infrastructure + A-B playgrounds (19 files) (SHOWCASE-02, SHOWCASE-03, SHOWCASE-10)
+- [ ] 19-14-PLAN.md — Wave 4: PFW skill validation — C-I playgrounds (18 files) (SHOWCASE-04..SHOWCASE-08)
+- [ ] 19-15-PLAN.md — Wave 4: PFW skill validation — I-O playgrounds (18 files) (SHOWCASE-06, SHOWCASE-08, SHOWCASE-09)
+- [ ] 19-16-PLAN.md — Wave 4: PFW skill validation — O-S playgrounds (19 files) (SHOWCASE-06..SHOWCASE-09)
+- [ ] 19-17-PLAN.md — Wave 4: PFW skill validation — S-Z playgrounds (19 files) (SHOWCASE-05, SHOWCASE-07, SHOWCASE-09)
