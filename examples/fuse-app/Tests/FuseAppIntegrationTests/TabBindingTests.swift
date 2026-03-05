@@ -7,7 +7,8 @@ import Testing
 // MARK: - Tab Binding Tests
 
 /// These tests verify that the explicit Binding used in TestHarnessView correctly dispatches
-/// TCA actions and updates state. This validates tab switching across the test harness tabs.
+/// TCA actions and updates state. Minimal suite with only the Control tab remaining;
+/// Plan 03 will add the Showcase tab and expand these tests.
 @Suite(.serialized) @MainActor
 struct TabBindingTests {
 
@@ -17,8 +18,8 @@ struct TabBindingTests {
             get: { store.selectedTab },
             set: { store.send(.tabSelected($0)) }
         )
-        binding.wrappedValue = .peerSurvival
-        #expect(store.selectedTab == .peerSurvival)
+        binding.wrappedValue = .control
+        #expect(store.selectedTab == .control)
     }
 
     @Test func allTabsAccessibleViaExplicitBinding() async {
@@ -27,7 +28,7 @@ struct TabBindingTests {
             get: { store.selectedTab },
             set: { store.send(.tabSelected($0)) }
         )
-        let allTabs: [TestHarnessFeature.State.Tab] = [.forEachNamespace, .peerSurvival, .control]
+        let allTabs: [TestHarnessFeature.State.Tab] = [.control]
         for tab in allTabs {
             binding.wrappedValue = tab
             #expect(store.selectedTab == tab, "Expected selectedTab to be \(tab)")
@@ -36,7 +37,7 @@ struct TabBindingTests {
 
     @Test func allTabsAccessibleViaSend() async {
         let store = Store(initialState: TestHarnessFeature.State()) { TestHarnessFeature() }
-        let allTabs: [TestHarnessFeature.State.Tab] = [.forEachNamespace, .peerSurvival, .control]
+        let allTabs: [TestHarnessFeature.State.Tab] = [.control]
         for tab in allTabs {
             store.send(.tabSelected(tab))
             #expect(store.selectedTab == tab, "Expected selectedTab to be \(tab)")
@@ -44,7 +45,7 @@ struct TabBindingTests {
     }
 
     @Test func tabRawValueRoundTrips() async {
-        let allTabs: [TestHarnessFeature.State.Tab] = [.forEachNamespace, .peerSurvival, .control]
+        let allTabs: [TestHarnessFeature.State.Tab] = [.control]
         for tab in allTabs {
             let rawValue = tab.rawValue
             let restored = TestHarnessFeature.State.Tab(rawValue: rawValue)
@@ -52,9 +53,9 @@ struct TabBindingTests {
         }
     }
 
-    @Test func tabSelectionDefaultIsForEachNamespace() async {
+    @Test func tabSelectionDefaultIsControl() async {
         let store = Store(initialState: TestHarnessFeature.State()) { TestHarnessFeature() }
-        #expect(store.selectedTab == .forEachNamespace, "Default tab should be forEachNamespace")
+        #expect(store.selectedTab == .control, "Default tab should be control")
     }
 }
 #endif
