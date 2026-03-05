@@ -1,0 +1,39 @@
+// Licensed under the GNU General Public License v3.0 or later
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+import Foundation
+import SwiftUI
+
+struct LinkPlayground: View {
+    @Environment(\.openURL) var openURL
+    let destination = URL(string: "https://skip.dev")!
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                Link(destination: destination) {
+                    Text(".init(destination:label:)")
+                }
+                Link(".init(_:destination:)", destination: destination)
+                Link(destination: destination) {
+                    Image(systemName: "heart.fill")
+                }
+                .border(.blue)
+                Link(".buttonStyle(.bordered)", destination: destination)
+                    .buttonStyle(.bordered)
+                Link(".foregroundStyle(.red)", destination: destination)
+                    .foregroundStyle(.red)
+                Link(".tint(.red)", destination: destination)
+                    .tint(.red)
+                Link("Remapped URL", destination: destination)
+                    .environment(\.openURL, OpenURLAction { url in
+                        return .systemAction(URL(string: url.absoluteString + "/docs")!)
+                    })
+                Button("@Environment(\\.openURL)") {
+                    openURL(destination)
+                }
+            }
+            .padding()
+        }
+    }
+}
