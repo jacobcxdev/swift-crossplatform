@@ -7,8 +7,7 @@ import Testing
 // MARK: - Tab Binding Tests
 
 /// These tests verify that the explicit Binding used in TestHarnessView correctly dispatches
-/// TCA actions and updates state. Minimal suite with only the Control tab remaining;
-/// Plan 03 will add the Showcase tab and expand these tests.
+/// TCA actions and updates state. 2-tab structure: Showcase + Control.
 @Suite(.serialized) @MainActor
 struct TabBindingTests {
 
@@ -20,6 +19,8 @@ struct TabBindingTests {
         )
         binding.wrappedValue = .control
         #expect(store.selectedTab == .control)
+        binding.wrappedValue = .showcase
+        #expect(store.selectedTab == .showcase)
     }
 
     @Test func allTabsAccessibleViaExplicitBinding() async {
@@ -28,7 +29,7 @@ struct TabBindingTests {
             get: { store.selectedTab },
             set: { store.send(.tabSelected($0)) }
         )
-        let allTabs: [TestHarnessFeature.State.Tab] = [.control]
+        let allTabs: [TestHarnessFeature.State.Tab] = [.showcase, .control]
         for tab in allTabs {
             binding.wrappedValue = tab
             #expect(store.selectedTab == tab, "Expected selectedTab to be \(tab)")
@@ -37,7 +38,7 @@ struct TabBindingTests {
 
     @Test func allTabsAccessibleViaSend() async {
         let store = Store(initialState: TestHarnessFeature.State()) { TestHarnessFeature() }
-        let allTabs: [TestHarnessFeature.State.Tab] = [.control]
+        let allTabs: [TestHarnessFeature.State.Tab] = [.showcase, .control]
         for tab in allTabs {
             store.send(.tabSelected(tab))
             #expect(store.selectedTab == tab, "Expected selectedTab to be \(tab)")
@@ -45,7 +46,7 @@ struct TabBindingTests {
     }
 
     @Test func tabRawValueRoundTrips() async {
-        let allTabs: [TestHarnessFeature.State.Tab] = [.control]
+        let allTabs: [TestHarnessFeature.State.Tab] = [.showcase, .control]
         for tab in allTabs {
             let rawValue = tab.rawValue
             let restored = TestHarnessFeature.State.Tab(rawValue: rawValue)
@@ -53,9 +54,9 @@ struct TabBindingTests {
         }
     }
 
-    @Test func tabSelectionDefaultIsControl() async {
+    @Test func tabSelectionDefaultIsShowcase() async {
         let store = Store(initialState: TestHarnessFeature.State()) { TestHarnessFeature() }
-        #expect(store.selectedTab == .control, "Default tab should be control")
+        #expect(store.selectedTab == .showcase, "Default tab should be showcase")
     }
 }
 #endif

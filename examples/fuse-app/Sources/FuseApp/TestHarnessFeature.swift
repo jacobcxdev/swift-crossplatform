@@ -8,7 +8,8 @@ import SwiftUI
 struct TestHarnessFeature {
     @ObservableState
     struct State: Equatable {
-        var selectedTab: Tab = .control
+        var selectedTab: Tab = .showcase
+        var showcase = ShowcaseFeature.State()
         var pendingUICommand: UICommand? = nil
         var selectedScenarioIDs: Set<String> = []
         var runningScenarioID: String? = nil
@@ -29,10 +30,12 @@ struct TestHarnessFeature {
         }
 
         enum Tab: String, Equatable, CaseIterable {
+            case showcase
             case control
 
             var displayName: String {
                 switch self {
+                case .showcase: "Showcase"
                 case .control: "Control"
                 }
             }
@@ -42,6 +45,7 @@ struct TestHarnessFeature {
     @CasePathable
     enum Action {
         case tabSelected(State.Tab)
+        case showcase(ShowcaseFeature.Action)
         case resetAll
         case executeUICommand(UICommand)
         case uiCommandCompleted
@@ -63,10 +67,16 @@ struct TestHarnessFeature {
     }
 
     var body: some ReducerOf<Self> {
+        Scope(state: \.showcase, action: \.showcase) {
+            ShowcaseFeature()
+        }
+
         Reduce { state, action in
             switch action {
             case .tabSelected(let tab):
                 state.selectedTab = tab
+                return .none
+            case .showcase:
                 return .none
             case .scenarioToggled(let id):
                 if state.selectedScenarioIDs.contains(id) {
@@ -85,6 +95,7 @@ struct TestHarnessFeature {
                 }
                 return .none
             case .resetAll:
+                state.showcase = ShowcaseFeature.State()
                 state.pendingUICommand = nil
                 return .none
             case .executeUICommand(let cmd):
@@ -156,6 +167,10 @@ struct TestHarnessView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             TabView(selection: $store.selectedTab.sending(\.tabSelected)) {
+                ShowcaseView(store: store.scope(state: \.showcase, action: \.showcase))
+                    .tabItem { Label("Showcase", systemImage: "list.bullet.rectangle") }
+                    .tag(TestHarnessFeature.State.Tab.showcase)
+
                 NavigationStack {
                     ControlPanelView(store: store)
                 }

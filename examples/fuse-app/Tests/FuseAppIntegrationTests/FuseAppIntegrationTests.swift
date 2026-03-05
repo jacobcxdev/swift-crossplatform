@@ -13,20 +13,22 @@ struct TestHarnessFeatureTests {
         let store = TestStore(initialState: TestHarnessFeature.State()) {
             TestHarnessFeature()
         }
-        #expect(store.state.selectedTab == .control)
+        #expect(store.state.selectedTab == .showcase)
+        #expect(store.state.showcase == ShowcaseFeature.State())
         #expect(store.state.pendingUICommand == nil)
         #expect(store.state.isScenarioRunning == false)
         #expect(store.state.eventLog.isEmpty)
     }
 
-    @Test func resetAllClearsPendingCommand() async {
-        let store = TestStore(
-            initialState: TestHarnessFeature.State(pendingUICommand: .scrollToTop)
-        ) {
+    @Test func resetAllClearsPendingCommandAndShowcase() async {
+        var initialState = TestHarnessFeature.State(pendingUICommand: .scrollToTop)
+        initialState.showcase.searchText = "test"
+        let store = TestStore(initialState: initialState) {
             TestHarnessFeature()
         }
 
         await store.send(.resetAll) {
+            $0.showcase = ShowcaseFeature.State()
             $0.pendingUICommand = nil
         }
     }
