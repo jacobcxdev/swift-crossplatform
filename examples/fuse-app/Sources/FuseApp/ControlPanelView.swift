@@ -41,7 +41,7 @@ struct ControlPanelView: View {
                 }
             }
 
-            // Event Log (captures events from all tabs)
+            // Event Log (captures events from scenario execution)
             Section {
                 Button {
                     eventLogExpanded.toggle()
@@ -202,11 +202,7 @@ struct ControlPanelView: View {
 #Preview("Control Panel") {
     NavigationStack {
         ControlPanelView(
-            store: Store(
-                initialState: TestHarnessFeature.State(
-                    selectedTab: .control
-                )
-            ) {
+            store: Store(initialState: TestHarnessFeature.State()) {
                 TestHarnessFeature()
             }
         )
