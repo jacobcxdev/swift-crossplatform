@@ -8,10 +8,7 @@ import SwiftUI
 struct TestHarnessFeature {
     @ObservableState
     struct State: Equatable {
-        var selectedTab: Tab = .forEachNamespace
-        var forEachNamespace = ForEachNamespaceSetting.State()
-        var peerSurvival = PeerSurvivalSetting.State()
-        var engineTest = ScenarioEngineSetting.State()
+        var selectedTab: Tab = .control
         var pendingUICommand: UICommand? = nil
         var selectedScenarioIDs: Set<String> = []
         var runningScenarioID: String? = nil
@@ -32,13 +29,10 @@ struct TestHarnessFeature {
         }
 
         enum Tab: String, Equatable, CaseIterable {
-            case forEachNamespace, peerSurvival, engineTest, control
+            case control
 
             var displayName: String {
                 switch self {
-                case .forEachNamespace: "ForEach Namespace"
-                case .peerSurvival: "Peer Survival"
-                case .engineTest: "Engine Test"
                 case .control: "Control"
                 }
             }
@@ -48,9 +42,6 @@ struct TestHarnessFeature {
     @CasePathable
     enum Action {
         case tabSelected(State.Tab)
-        case forEachNamespace(ForEachNamespaceSetting.Action)
-        case peerSurvival(PeerSurvivalSetting.Action)
-        case engineTest(ScenarioEngineSetting.Action)
         case resetAll
         case executeUICommand(UICommand)
         case uiCommandCompleted
@@ -72,15 +63,6 @@ struct TestHarnessFeature {
     }
 
     var body: some ReducerOf<Self> {
-        Scope(state: \.forEachNamespace, action: \.forEachNamespace) {
-            ForEachNamespaceSetting()
-        }
-        Scope(state: \.peerSurvival, action: \.peerSurvival) {
-            PeerSurvivalSetting()
-        }
-        Scope(state: \.engineTest, action: \.engineTest) {
-            ScenarioEngineSetting()
-        }
         Reduce { state, action in
             switch action {
             case .tabSelected(let tab):
@@ -103,34 +85,16 @@ struct TestHarnessFeature {
                 }
                 return .none
             case .resetAll:
-                state.forEachNamespace = .init()
-                state.engineTest = .init()
                 state.pendingUICommand = nil
-                return .merge(
-                    .send(.forEachNamespace(.seedInitialCards)),
-                    .send(.peerSurvival(.reset))
-                )
+                return .none
             case .executeUICommand(let cmd):
                 state.pendingUICommand = cmd
-                // Forward to active tab's child via action
-                switch state.selectedTab {
-                case .forEachNamespace:
-                    return .send(.forEachNamespace(.executeUICommand(cmd)))
-                case .engineTest:
-                    return .send(.engineTest(.executeUICommand(cmd)))
-                case .peerSurvival:
-                    return .send(.peerSurvival(.executeUICommand(cmd)))
-                case .control:
-                    return .none
-                }
+                return .none
             case .uiCommandCompleted:
                 state.pendingUICommand = nil
                 return .none
             case .cancelUICommand:
                 state.pendingUICommand = nil
-                state.forEachNamespace.pendingUICommand = nil
-                state.engineTest.pendingUICommand = nil
-                state.peerSurvival.pendingUICommand = nil
                 return .none
             case .scenarioStarted(let id):
                 state.runningScenarioID = id
@@ -178,17 +142,6 @@ struct TestHarnessFeature {
             case .clearEventLog:
                 state.eventLog = []
                 return .none
-            case .forEachNamespace(.view(.uiCommandCompleted)):
-                state.pendingUICommand = nil
-                return .none
-            case .engineTest(.view(.uiCommandCompleted)):
-                state.pendingUICommand = nil
-                return .none
-            case .peerSurvival(.view(.uiCommandCompleted)):
-                state.pendingUICommand = nil
-                return .none
-            case .forEachNamespace, .peerSurvival, .engineTest:
-                return .none
             }
         }
     }
@@ -204,36 +157,11 @@ struct TestHarnessView: View {
         ZStack(alignment: .bottom) {
             TabView(selection: $store.selectedTab.sending(\.tabSelected)) {
                 NavigationStack {
-                    ForEachNamespaceSettingView(
-                        store: store.scope(state: \.forEachNamespace, action: \.forEachNamespace)
-                    )
-                }
-                .tabItem { Label("ForEach NS", systemImage: "list.bullet") }
-                .tag(TestHarnessFeature.State.Tab.forEachNamespace)
-
-                NavigationStack {
-                    PeerSurvivalSettingView(
-                        store: store.scope(state: \.peerSurvival, action: \.peerSurvival)
-                    )
-                }
-                .tabItem { Label("Peer", systemImage: "person.crop.square") }
-                .tag(TestHarnessFeature.State.Tab.peerSurvival)
-
-                NavigationStack {
-                    ScenarioEngineSettingView(
-                        store: store.scope(state: \.engineTest, action: \.engineTest)
-                    )
-                }
-                .tabItem { Label("Engine", systemImage: "wrench") }
-                .tag(TestHarnessFeature.State.Tab.engineTest)
-
-                NavigationStack {
                     ControlPanelView(store: store)
                 }
                 .tabItem { Label("Control", systemImage: "gearshape") }
                 .tag(TestHarnessFeature.State.Tab.control)
             }
-
 
             if store.isScenarioRunning {
                 let isPaused = store.executionMode == .paused

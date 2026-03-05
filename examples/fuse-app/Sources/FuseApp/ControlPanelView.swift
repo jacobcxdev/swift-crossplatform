@@ -204,8 +204,7 @@ struct ControlPanelView: View {
         ControlPanelView(
             store: Store(
                 initialState: TestHarnessFeature.State(
-                    selectedTab: .control,
-                    runningScenarioID: ScenarioRegistry.foreachNamespaceAddCard.id
+                    selectedTab: .control
                 )
             ) {
                 TestHarnessFeature()
