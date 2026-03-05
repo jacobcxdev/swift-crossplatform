@@ -60,7 +60,7 @@ struct TestHarnessFeature {
         case debugStep
         case debugStepOver
         case debugStop
-        case toggleBreakOnAllCheckpoints
+        case breakOnAllCheckpointsChanged(Bool)
         case scenarioStepIndexChanged(index: Int, total: Int)
         case eventLogAppend(EngineEvent)
         case clearEventLog
@@ -140,8 +140,8 @@ struct TestHarnessFeature {
                 state.currentStepIndex = 0
                 state.totalStepCount = 0
                 return .none
-            case .toggleBreakOnAllCheckpoints:
-                state.breakOnAllCheckpoints.toggle()
+            case .breakOnAllCheckpointsChanged(let value):
+                state.breakOnAllCheckpoints = value
                 return .none
             case .scenarioStepIndexChanged(let index, let total):
                 state.currentStepIndex = index

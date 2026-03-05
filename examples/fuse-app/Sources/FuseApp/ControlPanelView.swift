@@ -5,7 +5,7 @@ import SwiftUI
 // MARK: - ControlPanelView
 
 struct ControlPanelView: View {
-    let store: StoreOf<TestHarnessFeature>
+    @Bindable var store: StoreOf<TestHarnessFeature>
     @State var expandedTabs: Set<String> = []
     @State var eventLogExpanded: Bool = false
 
@@ -24,10 +24,7 @@ struct ControlPanelView: View {
                         .font(.caption).foregroundStyle(.green)
                 }
 
-                Toggle("Pause on all checkpoints", isOn: Binding(
-                    get: { store.breakOnAllCheckpoints },
-                    set: { _ in store.send(.toggleBreakOnAllCheckpoints) }
-                ))
+                Toggle("Pause on all checkpoints", isOn: $store.breakOnAllCheckpoints.sending(\.breakOnAllCheckpointsChanged))
                 .font(.subheadline)
             }
 
