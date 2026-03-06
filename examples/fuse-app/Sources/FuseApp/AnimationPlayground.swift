@@ -1,7 +1,4 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-// Ported from skipapp-showcase-fuse AnimationPlayground.swift (602 lines)
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct AnimationPlayground: View {
@@ -437,6 +434,10 @@ struct AnimationPlayground: View {
                     withAnimation(.easeInOut(duration: 1.5)) { isOn = !isOn }
                 }
                 .buttonStyle(.bordered)
+                NavigationLink("Push") {
+                    Text("Pushed")
+                }
+                .buttonStyle(.bordered)
 
                 Divider()
                     .padding(.vertical, 8)
@@ -471,6 +472,17 @@ struct AnimationPlayground: View {
                         .cornerRadius(10)
                 }
                 .padding(.bottom, 4)
+
+                // cannot use LazyVGrid in Scrollview, else
+                /*
+                let columns = [
+                    GridItem(.flexible(), spacing: 12),
+                    GridItem(.flexible(), spacing: 12),
+                    GridItem(.flexible(), spacing: 12)
+                ]
+
+                LazyVGrid(columns: columns, spacing: 12) {
+                */    
 
                 HStack(spacing: 12) {
                     animationCell(label: ".blur") {

@@ -1,4 +1,4 @@
-// Copyright 2023-2025 Skip
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct BackgroundPlayground: View {
@@ -176,3 +176,4 @@ struct BackgroundPlayground: View {
         }
     }
 }
+

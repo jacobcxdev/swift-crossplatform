@@ -1,4 +1,4 @@
-// Copyright 2023-2025 Skip
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct BlendModePlayground: View {
@@ -209,14 +209,14 @@ struct FlipsForRTLDemo: View {
                 VStack {
                     Text("Normal")
                         .font(.caption)
-                    Text("\u{2192}")
+                    Text("→")
                         .font(.system(size: 48))
                 }
 
                 VStack {
                     Text("Flips for RTL")
                         .font(.caption)
-                    Text("\u{2192}")
+                    Text("→")
                         .font(.system(size: 48))
                         .flipsForRightToLeftLayoutDirection(true)
                 }

@@ -1,4 +1,4 @@
-// Copyright 2023-2025 Skip
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct ColorEffectsPlayground: View {
@@ -16,7 +16,7 @@ struct ColorEffectsPlayground: View {
                     VStack(spacing: 8) {
                         Text("Original (no effects)")
                             .font(.headline)
-                        sampleContent
+                        sampleImage
                     }
                 }
 
@@ -30,7 +30,7 @@ struct ColorEffectsPlayground: View {
                                 .font(.headline)
                             Spacer()
                         }
-                        sampleContent
+                        sampleImage
                             .brightness(brightnessValue)
                         Slider(value: $brightnessValue, in: -1.0...1.0)
                         Text("Range: -1.0 (black) to 1.0 (white)")
@@ -49,7 +49,7 @@ struct ColorEffectsPlayground: View {
                                 .font(.headline)
                             Spacer()
                         }
-                        sampleContent
+                        sampleImage
                             .contrast(contrastValue)
                         Slider(value: $contrastValue, in: 0.0...2.0)
                         Text("Range: 0.0 (gray) to 2.0 (high contrast)")
@@ -68,7 +68,7 @@ struct ColorEffectsPlayground: View {
                                 .font(.headline)
                             Spacer()
                         }
-                        sampleContent
+                        sampleImage
                             .saturation(saturationValue)
                         Slider(value: $saturationValue, in: 0.0...3.0)
                         Text("Range: 0.0 (grayscale) to 3.0 (oversaturated)")
@@ -83,11 +83,11 @@ struct ColorEffectsPlayground: View {
                 Section {
                     VStack(spacing: 8) {
                         HStack {
-                            Text("hueRotation(\(Int(hueRotationValue))\u{00B0})")
+                            Text("hueRotation(\(Int(hueRotationValue))°)")
                                 .font(.headline)
                             Spacer()
                         }
-                        sampleContent
+                        sampleImage
                             .hueRotation(.degrees(hueRotationValue))
                         Slider(value: $hueRotationValue, in: 0...360)
                         Text("Rotates all colors around the color wheel")
@@ -109,10 +109,10 @@ struct ColorEffectsPlayground: View {
                                 .labelsHidden()
                         }
                         if showColorInvert {
-                            sampleContent
+                            sampleImage
                                 .colorInvert()
                         } else {
-                            sampleContent
+                            sampleImage
                         }
                         Text("Inverts all colors (like a photo negative)")
                             .font(.caption)
@@ -132,19 +132,19 @@ struct ColorEffectsPlayground: View {
                         }
                         HStack(spacing: 12) {
                             VStack {
-                                sampleContent
+                                sampleImage
                                     .colorMultiply(.red)
                                 Text(".red")
                                     .font(.caption)
                             }
                             VStack {
-                                sampleContent
+                                sampleImage
                                     .colorMultiply(.green)
                                 Text(".green")
                                     .font(.caption)
                             }
                             VStack {
-                                sampleContent
+                                sampleImage
                                     .colorMultiply(.blue)
                                 Text(".blue")
                                     .font(.caption)
@@ -166,7 +166,7 @@ struct ColorEffectsPlayground: View {
                                 .font(.headline)
                             Spacer()
                         }
-                        sampleContent
+                        sampleImage
                             .saturation(0.5)
                             .brightness(0.1)
                             .contrast(1.2)
@@ -226,26 +226,11 @@ struct ColorEffectsPlayground: View {
         }
     }
 
-    /// A colorful sample view used in place of the upstream Cat image.
-    /// Uses a gradient with overlaid shapes to provide rich color content
-    /// for demonstrating color effects.
-    private var sampleContent: some View {
-        ZStack {
-            LinearGradient(
-                colors: [.red, .orange, .yellow, .green, .blue, .purple],
-                startPoint: .leading,
-                endPoint: .trailing
-            )
-            HStack {
-                Image(systemName: "sun.max.fill")
-                    .font(.title)
-                    .foregroundStyle(.white)
-                Image(systemName: "moon.fill")
-                    .font(.title)
-                    .foregroundStyle(.white)
-            }
-        }
-        .frame(height: 120)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+    private var sampleImage: some View {
+        Image("Cat", bundle: .module, label: Text("Cat image"))
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .frame(height: 120)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }

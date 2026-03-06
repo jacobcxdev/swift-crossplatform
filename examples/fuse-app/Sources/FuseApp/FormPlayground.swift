@@ -1,6 +1,4 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct FormPlayground: View {
@@ -11,11 +9,7 @@ struct FormPlayground: View {
     let pickerValues = ["One", "Two", "Three"]
     @State var expanded = false
     @State var disabledExpanded = false
-    @State var nestedModel = DisclosureGroupPlaygroundModel(
-        title: "Multi-Level",
-        items: ["AAAA", "BBBB", "CCCC"],
-        nested: [DisclosureGroupPlaygroundModel(title: "Nested", items: ["1111", "2222", "3333"])]
-    )
+    @State var nestedModel = DisclosureGroupPlaygroundModel(title: "Multi-Level", items: ["AAAA", "BBBB", "CCCC"], nested: [DisclosureGroupPlaygroundModel(title: "Nested", items: ["1111", "2222", "3333"])])
     var redaction: RedactionReasons = []
 
     var body: some View {
@@ -32,17 +26,17 @@ struct FormPlayground: View {
             NavigationLink(value: "Test") {
                 Label("Label in NavigationLink", systemImage: "star.fill")
             }
-            Button("Button .automatic", action: {})
-            Button("Button .bordered", action: {})
+            Button("Button .automatic", action: { logger.info("Tap") })
+            Button("Button .bordered", action: { logger.info("Tap") })
                 .buttonStyle(.bordered)
-            Button(action: {}) {
+            Button(action: { logger.info("Tap") }) {
                 HStack {
                     Text("Complex content button")
                     Spacer()
-                    Button("Inner button", action: {})
+                    Button("Inner button", action: { logger.info("Tap inner") })
                 }
             }
-            FormPlaygroundButtonRow()
+            ButtonRow()
             DatePicker("DatePicker", selection: $dateValue)
             DatePicker("DatePicker .disabled", selection: $dateValue)
                 .disabled(true)
@@ -127,10 +121,12 @@ struct FormPlayground: View {
             Text(value)
         }
     }
-}
 
-struct FormPlaygroundButtonRow: View {
-    var body: some View {
-        Button("Button in custom view") {}
+    struct ButtonRow: View {
+        var body: some View {
+            Button("Button in custom view") {
+                logger.info("Tap")
+            }
+        }
     }
 }

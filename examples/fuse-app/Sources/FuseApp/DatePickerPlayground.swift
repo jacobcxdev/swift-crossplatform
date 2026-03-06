@@ -1,18 +1,18 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import Foundation
 import SwiftUI
 
 struct DatePickerPlayground: View {
     @State var selectedDate = Date.now
 
+    // Date range: next 30 days from now
     var dateRange: ClosedRange<Date> {
         let now = Date.now
         let thirtyDaysLater = Calendar.current.date(byAdding: .day, value: 30, to: now)!
         return now...thirtyDaysLater
     }
 
+    // Date range: past week
     var pastWeekRange: ClosedRange<Date> {
         let now = Date.now
         let oneWeekAgo = Calendar.current.date(byAdding: .day, value: -7, to: now)!
@@ -34,6 +34,7 @@ struct DatePickerPlayground: View {
 
                 Divider()
 
+                // Date range examples
                 Text("Date Range Examples").font(.headline)
 
                 DatePicker("Next 30 days", selection: $selectedDate, in: dateRange)

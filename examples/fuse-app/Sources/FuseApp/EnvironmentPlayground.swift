@@ -1,23 +1,5 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
-
-// MARK: - Environment key
-// TapCountObservable is defined in StatePlaygroundModel.swift
-
-struct EnvironmentPlaygroundCustomKey: EnvironmentKey {
-    static let defaultValue = "default"
-}
-
-extension EnvironmentValues {
-    var environmentPlaygroundCustomKey: String {
-        get { self[EnvironmentPlaygroundCustomKey.self] }
-        set { self[EnvironmentPlaygroundCustomKey.self] = newValue }
-    }
-}
-
-// MARK: - Playground
 
 struct EnvironmentPlayground: View {
     @State var tapCountObservable = TapCountObservable()
@@ -34,10 +16,22 @@ struct EnvironmentPlayground: View {
                     .environment(\.environmentPlaygroundCustomKey, "Custom!")
             }
         }
+        .onChange(of: tapCountObservable.tapCount) {
+            logger.log("onChange(of: tapCountObservable.tapCount): \($0)")
+        }
     }
 }
 
-// MARK: - Helper views
+struct EnvironmentPlaygroundCustomKey: EnvironmentKey {
+    static let defaultValue = "default"
+}
+
+extension EnvironmentValues {
+    var environmentPlaygroundCustomKey: String {
+        get { self[EnvironmentPlaygroundCustomKey.self] }
+        set { self[EnvironmentPlaygroundCustomKey.self] = newValue }
+    }
+}
 
 struct EnvironmentPlaygroundEnvironmentObjectView: View {
     @Environment(TapCountObservable.self) var tapCountObservable
@@ -48,21 +42,11 @@ struct EnvironmentPlaygroundEnvironmentObjectView: View {
             tapCountObservable.tapCount += 1
         }
         @Bindable var tco = tapCountObservable
-        EnvironmentPlaygroundBindingView(tapCount: $tco.tapCount)
+        StatePlaygroundBindingView(tapCount: $tco.tapCount)
     }
 }
 
-/// Binding view for environment playground tap count demonstration.
-struct EnvironmentPlaygroundBindingView: View {
-    @Binding var tapCount: Int
-    var body: some View {
-        Button("Binding") {
-            tapCount += 1
-        }
-    }
-}
-
-struct EnvironmentPlaygroundCustomKeyView: View {
+struct EnvironmentPlaygroundCustomKeyView : View {
     let label: String
     @Environment(\.environmentPlaygroundCustomKey) var customKeyValue
 

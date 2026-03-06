@@ -1,4 +1,4 @@
-// Copyright 2023-2025 Skip
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct GradientPlayground: View {
@@ -13,7 +13,7 @@ struct GradientPlayground: View {
                         .frame(width: 100, height: 100)
                 }
                 HStack {
-                    Text("EllipticalGradient")
+                    Text("EllipitcalGradient")
                     Spacer()
                     EllipticalGradient(colors: [.red, .blue], center: UnitPoint(x: 0.5, y: 0.5), startRadiusFraction: 0.25)
                         .frame(width: 50, height: 100)
@@ -35,3 +35,4 @@ struct GradientPlayground: View {
         }
     }
 }
+

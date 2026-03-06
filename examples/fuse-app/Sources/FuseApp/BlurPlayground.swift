@@ -1,4 +1,4 @@
-// Copyright 2023-2025 Skip
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct BlurPlayground: View {
@@ -90,7 +90,9 @@ struct BlurPlayground: View {
                 HStack {
                     Text("Button")
                     Spacer()
-                    Button("Tap") { }
+                    Button("Tap") {
+                        logger.log("Tap")
+                    }
                     .buttonStyle(.bordered)
                     .blur(radius: 4)
                     .border(.blue)

@@ -1,17 +1,34 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct ComposePlayground: View {
     var body: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "apple.terminal")
-                .font(.largeTitle)
-            Text("Not Yet Ported")
-                .font(.title2)
-            Text("This playground requires platform-specific APIs.")
-                .foregroundStyle(.secondary)
+        Group {
+            #if os(Android)
+            ComposeView {
+                MessageComposer(message: Text("Welcome"), textColor: .red)
+            }
+            .border(.blue)
+            #else
+            Text("This view only renders on Android")
+            #endif
+        }
+        .padding()
+    }
+}
+
+#if SKIP
+
+struct MessageComposer : ContentComposer {
+    let message: Text
+    let textColor: Color
+
+    @Composable override func Compose(context: ComposeContext) {
+        androidx.compose.foundation.layout.Column(modifier: context.modifier) {
+            androidx.compose.material3.Text(message.localizedTextString(), color: textColor.asComposeColor())
+            androidx.compose.material3.Text("This content is rendered with Compose code using ComposeView")
         }
     }
 }
+
+#endif

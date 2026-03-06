@@ -1,11 +1,12 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import Foundation
 import SwiftUI
 
 private let systemNameSample = "heart.fill"
 private let remoteImageResourceURL: URL? = URL(string: "https://picsum.photos/id/237/200/300")
+// iOS: file://…/Application/…/Showcase.app/skipapp-showcase_Showcase.bundle/skip-logo.png
+// Android: jar:file:/data/app/…/base.apk!/showcase/module/Resources/skip-logo.png
+private let localImageResourceURL: URL? = Bundle.module.url(forResource: "skip-logo", withExtension: "png")
 
 struct ImagePlayground: View {
     var redaction: RedactionReasons = []
@@ -13,6 +14,103 @@ struct ImagePlayground: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
+                NavigationLink("Pager") {
+                    ImagePlaygroundPagerView()
+                }
+                NavigationLink("Complex Layout (Landscape)") {
+                    ImagePlaygroundComplexLayoutView(imageName: "Cat")
+                }
+                NavigationLink("Complex Layout (Portrait)") {
+                    ImagePlaygroundComplexLayoutView(imageName: "CatPortrait")
+                }
+
+                Text("Asset JPEG Image").font(.title).bold()
+                HStack {
+                    Spacer()
+                    Image("Cat", bundle: .module, label: Text("Cat JPEG image"))
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .border(.yellow, width: 5.0)
+                        .clipShape(RoundedRectangle(cornerSize: CGSize(width: 15, height: 15)))
+                    Spacer()
+                }
+
+                Text("Asset SVG Image").font(.title).bold()
+                HStack {
+                    Spacer()
+                    Image("Butterfly", bundle: .module, label: Text("Butterfly SVG image"))
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .foregroundStyle(.red)
+                    Spacer()
+                }
+
+                Text("Bundled Image").font(.title).bold()
+                HStack {
+                    Spacer()
+                    AsyncImage(url: localImageResourceURL)
+                        .border(.blue)
+                    Spacer()
+                }
+
+                Text("PDF Image").font(.title).bold()
+                HStack {
+                    Spacer()
+                    Image("skiplogo", bundle: .module, label: Text("skiplogo PDF image"))
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                    Spacer()
+                }
+
+                #if os(macOS)
+                #else
+                Text("Image from Data").font(.title).bold()
+                HStack {
+                    Spacer()
+                    Image(uiImage: UIImage(data: try! Data(contentsOf: localImageResourceURL!))!)
+                        .border(.blue)
+                    Spacer()
+                }
+                #endif
+
+                Text("Symbol Image Weights").font(.title).bold()
+                HStack {
+                    // This symbol was downloaded from the Google Material Icons catalog and imported into the Module.xcassets: https://fonts.google.com/icons?selected=Material+Symbols+Outlined:passkey:FILL@0;wght@400;GRAD@0;opsz@24&icon.query=passkey&icon.size=24&icon.color=%235f6368&icon.platform=ios
+                    Image("passkey_passkey_symbol", bundle: .module)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .foregroundStyle(.red)
+                        .fontWeight(.ultraLight)
+                        .frame(width: 80.0, height: 80.0)
+                    Image("passkey_passkey_symbol", bundle: .module)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .foregroundStyle(.green)
+                        .frame(width: 80.0, height: 80.0)
+                    Image("passkey_passkey_symbol", bundle: .module, label: Text("Passkey"))
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .foregroundStyle(.blue)
+                        .fontWeight(.black)
+                        .frame(width: 80.0, height: 80.0)
+                }
+
+                Text("Symbol Image Sizes").font(.title).bold()
+                HStack {
+                    Image("textformat.size.smaller", bundle: .module)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 80.0, height: 80.0)
+                    Image("textformat.size", bundle: .module)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 80.0, height: 80.0)
+                    Image("textformat.size.larger", bundle: .module)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 80.0, height: 80.0)
+                }
+
                 Text("systemName").font(.title).bold()
                 HStack {
                     Text(".frame(100, 100)")
@@ -255,5 +353,35 @@ struct PagingModifier: ViewModifier {
         #else
         content
         #endif
+    }
+}
+
+struct ImagePlaygroundComplexLayoutView: View {
+    let imageName: String
+
+    var body: some View {
+        GeometryReader { geometry in
+            ScrollView {
+                VStack {
+                    VStack {
+                        Text("Header")
+                        Spacer()
+                        Image(imageName, bundle: .module)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: .infinity)
+                            .border(Color.pink)
+                        Spacer()
+                        Text("Body")
+                        Spacer()
+                        Text("Footer")
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    .background(Color.cyan)
+                }
+                .frame(minHeight: geometry.size.height, alignment: .topLeading)
+            }
+        }
     }
 }

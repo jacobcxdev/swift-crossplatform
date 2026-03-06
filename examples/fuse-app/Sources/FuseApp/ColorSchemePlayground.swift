@@ -1,6 +1,4 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct ColorSchemePlayground: View {
@@ -41,8 +39,6 @@ struct ColorSchemePlayground: View {
     }
 }
 
-// MARK: - Supporting Views
-
 struct ColorSchemeSheetView: View {
     @Environment(\.dismiss) var dismiss
     @State var preferredColorScheme = ""
@@ -70,7 +66,7 @@ struct ColorSchemeSheetView: View {
     }
 }
 
-func namedColorScheme(for string: String) -> ColorScheme? {
+private func namedColorScheme(for string: String) -> ColorScheme? {
     switch string {
     case "light":
         return .light

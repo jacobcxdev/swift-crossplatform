@@ -1,15 +1,9 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct DisclosureGroupPlayground: View {
     @State var expanded = false
-    @State var nestedModel = DisclosureGroupPlaygroundModel(
-        title: "Multi-Level",
-        items: ["AAAA", "BBBB", "CCCC"],
-        nested: [DisclosureGroupPlaygroundModel(title: "Nested", items: ["1111", "2222", "3333"])]
-    )
+    @State var nestedModel = DisclosureGroupPlaygroundModel(title: "Multi-Level", items: ["AAAA", "BBBB", "CCCC"], nested: [DisclosureGroupPlaygroundModel(title: "Nested", items: ["1111", "2222", "3333"])])
 
     var body: some View {
         ScrollView {

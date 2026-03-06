@@ -1,6 +1,4 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct GridPlayground: View {
@@ -68,8 +66,6 @@ struct GridPlayground: View {
         }
     }
 }
-
-// MARK: - LazyVGrid Views
 
 struct LazyVGridAdaptiveView: View {
     let count: Int
@@ -161,19 +157,6 @@ struct LazyVGridRefreshableView: View {
     }
 }
 
-struct LazyVGridPaddingView: View {
-    var body: some View {
-        ScrollView {
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))]) {
-                VGridCellsView(start: 0, count: 100, color: .yellow)
-            }
-            .padding(32)
-        }
-    }
-}
-
-// MARK: - LazyHGrid Views
-
 struct LazyHGridAdaptiveView: View {
     let count: Int
 
@@ -252,7 +235,16 @@ struct LazyHGridSectionedView: View {
     }
 }
 
-// MARK: - Grid Cell Views
+struct LazyVGridPaddingView: View {
+    var body: some View {
+        ScrollView {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))]) {
+                VGridCellsView(start: 0, count: 100, color: .yellow)
+            }
+            .padding(32)
+        }
+    }
+}
 
 struct VGridCellsView: View {
     let start: Int

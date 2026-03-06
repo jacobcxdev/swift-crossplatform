@@ -1,6 +1,4 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import Foundation
 import SwiftUI
 
@@ -17,6 +15,7 @@ struct AlertPlayground: View {
     @State var secureFieldIsPresented = false
     @State var textFieldText = ""
     @State var secureFieldText = ""
+//    @State var errorIsPresented = false
     @State var dataIsPresented = false
 
     var body: some View {
@@ -45,6 +44,17 @@ struct AlertPlayground: View {
                 secureFieldIsPresented = true
             }
             Divider()
+//                Text("Present with error")
+//                Button("Error: \(String(describing: error))") {
+//                    error = AlertPlaygroundError.testError
+//                }
+//                Button("Nil error") {
+//                    error = nil
+//                }
+//                Button("Present") {
+//                    errorIsPresented = true
+//                }
+//            Divider()
             Text("Present with data")
             Button("Data: \(String(describing: data))") {
                 if data == nil {
@@ -116,6 +126,14 @@ struct AlertPlayground: View {
                 data = nil
             }
         }
+        //        .alert(isPresented: $errorIsPresented, error: error) {
+        //            Button("Error: \(String(describing: error))") {
+        //                value = "\(String(describing: error))"
+        //            }
+        //            Button("Nil Error", role: .destructive) {
+        //                error = nil
+        //            }
+        //        }
     }
 }
 
@@ -123,7 +141,7 @@ enum AlertPlaygroundError: LocalizedError {
     case testError
 }
 
-struct AlertCancelButton: View {
+struct AlertCancelButton : View {
     @Binding var value: String
 
     var body: some View {
@@ -133,7 +151,7 @@ struct AlertCancelButton: View {
     }
 }
 
-struct AlertDestructiveButton: View {
+struct AlertDestructiveButton : View {
     @Binding var value: String
 
     var body: some View {
