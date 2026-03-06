@@ -172,6 +172,7 @@ Note: Phases 12 and 13 could partially overlap once Phase 11 test infra is worki
 | 16. TCA API Parity Completion | 2/2 | Complete   | 2019-02-24 |
 | 17. Test Evidence & Infrastructure Hardening | 0/0 | Planned | - |
 | 18. Complete View Identity Layer | 1/1 | Complete    | 2019-02-28 |
+| 19. Reimplement skipapp-showcase-fuse showcases | 20/20 | Complete | 2026-03-06 |
 
 ### Phase 8: PFW Skill Alignment
 
@@ -422,23 +423,26 @@ Plans:
   4. 2-tab structure (Showcase + Control) replaces 4-tab test harness
   5. ScenarioEngine infrastructure retained for on-demand scenario creation
   6. All tests pass on iOS after restructuring
-**Plans:** 18/20 plans executed
+**Plans:** 20/20 plans complete
 
 Plans:
-- [ ] 19-01-PLAN.md — Wave 1: Delete Phase 18.1 files (ForEachNamespaceSetting, PeerSurvivalSetting, IdentityComponents, ScenarioEngineSetting) and associated tests (SHOWCASE-01)
-- [ ] 19-02-PLAN.md — Wave 1: Create PlaygroundType enum (84 cases) + ShowcaseFeature reducer + ShowcasePath navigation skeleton (SHOWCASE-02)
-- [ ] 19-03-PLAN.md — Wave 2: Restructure TestHarnessFeature to 2 tabs (Showcase + Control), compose ShowcaseFeature (SHOWCASE-03)
-- [ ] 19-04-PLAN.md — Wave 2: Port PlatformHelper + 10 platform stub playgrounds (SHOWCASE-04, SHOWCASE-05)
-- [ ] 19-05-PLAN.md — Wave 2: Port visual playgrounds A-G: Background, BlendMode, Blur, Border, Color, ColorEffects, Divider, Frame, Gradient, Graphics (SHOWCASE-06)
-- [ ] 19-06-PLAN.md — Wave 2: Port visual playgrounds I-S: Icon, Image, Label, LineSpacing, Link, Mask, OffsetPosition, Overlay, Redacted, SafeArea (SHOWCASE-06)
-- [ ] 19-07-PLAN.md — Wave 2: Port visual playgrounds S-Z: Shadow, Shape, Spacer, Stack, Symbol, Text, Transform, ZIndex, MinimumScaleFactor, ColorScheme (SHOWCASE-07)
-- [ ] 19-08-PLAN.md — Wave 2: Port interactive playgrounds A-F: Accessibility, Alert, Button, ConfirmationDialog, DatePicker, DisclosureGroup, Environment, FocusState, Form (SHOWCASE-08)
-- [ ] 19-09-PLAN.md — Wave 2: Port interactive playgrounds G-N: Gesture, GeometryReader, Grid, Keyboard, List, Localization, Menu, Modifier, NavigationStack, Notification (SHOWCASE-08)
-- [ ] 19-10-PLAN.md — Wave 2: Port interactive playgrounds O-S: Observable, OnSubmit, Picker, Preference, ProgressView, ScrollView, Searchable, SecureField, Sheet, State + StatePlaygroundModel (SHOWCASE-09)
-- [ ] 19-11-PLAN.md — Wave 2: Port remaining interactive playgrounds: Animation, ScenePhase, Slider, SQL, Stepper, Storage, TabView, TextEditor, TextField, Timer, Toggle, Toolbar, Tracking, Transition, ViewThatFits (SHOWCASE-09)
-- [ ] 19-12-PLAN.md — Wave 3: Wire all 84 playgrounds in ShowcasePath navigation + integration test cleanup (SHOWCASE-10, SHOWCASE-11)
-- [ ] 19-13-PLAN.md — Wave 4: PFW skill validation — infrastructure + A-B playgrounds (19 files) (SHOWCASE-02, SHOWCASE-03, SHOWCASE-10)
-- [ ] 19-14-PLAN.md — Wave 4: PFW skill validation — C-I playgrounds (18 files) (SHOWCASE-04..SHOWCASE-08)
-- [ ] 19-15-PLAN.md — Wave 4: PFW skill validation — I-O playgrounds (18 files) (SHOWCASE-06, SHOWCASE-08, SHOWCASE-09)
-- [ ] 19-16-PLAN.md — Wave 4: PFW skill validation — O-S playgrounds (19 files) (SHOWCASE-06..SHOWCASE-09)
-- [ ] 19-17-PLAN.md — Wave 4: PFW skill validation — S-Z playgrounds (19 files) (SHOWCASE-05, SHOWCASE-07, SHOWCASE-09)
+- [x] 19-01-PLAN.md — Wave 1: Delete Phase 18.1 files (ForEachNamespaceSetting, PeerSurvivalSetting, IdentityComponents, ScenarioEngineSetting) and associated tests (SHOWCASE-01) ✓
+- [x] 19-02-PLAN.md — Wave 1: Create PlaygroundType enum (84 cases) + ShowcaseFeature reducer + ShowcasePath navigation skeleton (SHOWCASE-02) ✓
+- [x] 19-03-PLAN.md — Wave 2: Restructure TestHarnessFeature to 2 tabs (Showcase + Control), compose ShowcaseFeature (SHOWCASE-03) ✓
+- [x] 19-04-PLAN.md — Wave 2: Port PlatformHelper + 10 platform stub playgrounds (SHOWCASE-04, SHOWCASE-05) ✓
+- [x] 19-05-PLAN.md — Wave 2: Port visual playgrounds A-G: Background, BlendMode, Blur, Border, Color, ColorEffects, Divider, Frame, Gradient, Graphics (SHOWCASE-06) ✓
+- [x] 19-06-PLAN.md — Wave 2: Port visual playgrounds I-S: Icon, Image, Label, LineSpacing, Link, Mask, OffsetPosition, Overlay, Redacted, SafeArea (SHOWCASE-06) ✓
+- [x] 19-07-PLAN.md — Wave 2: Port visual playgrounds S-Z: Shadow, Shape, Spacer, Stack, Symbol, Text, Transform, ZIndex, MinimumScaleFactor, ColorScheme (SHOWCASE-07) ✓
+- [x] 19-08-PLAN.md — Wave 2: Port interactive playgrounds A-F: Accessibility, Alert, Button, ConfirmationDialog, DatePicker, DisclosureGroup, Environment, FocusState, Form (SHOWCASE-08) ✓
+- [x] 19-09-PLAN.md — Wave 2: Port interactive playgrounds G-N: Gesture, GeometryReader, Grid, Keyboard, List, Localization, Menu, Modifier, NavigationStack, Notification (SHOWCASE-08) ✓
+- [x] 19-10-PLAN.md — Wave 2: Port interactive playgrounds O-S: Observable, OnSubmit, Picker, Preference, ProgressView, ScrollView, Searchable, SecureField, Sheet, State + StatePlaygroundModel (SHOWCASE-09) ✓
+- [x] 19-11-PLAN.md — Wave 2: Port remaining interactive playgrounds: Animation, ScenePhase, Slider, SQL, Stepper, Storage, TabView, TextEditor, TextField, Timer, Toggle, Toolbar, Tracking, Transition, ViewThatFits (SHOWCASE-09) ✓
+- [x] 19-12-PLAN.md — Wave 3: Wire all 84 playgrounds in ShowcasePath navigation + integration test cleanup (SHOWCASE-10, SHOWCASE-11) ✓
+- [x] 19-13-PLAN.md — Wave 4: PFW skill validation — infrastructure + A-B playgrounds (19 files) (SHOWCASE-02, SHOWCASE-03, SHOWCASE-10) ✓
+- [x] 19-14-PLAN.md — Wave 4: PFW skill validation — C-I playgrounds (18 files) (SHOWCASE-04..SHOWCASE-08) ✓
+- [x] 19-15-PLAN.md — Wave 4: PFW skill validation — I-O playgrounds (18 files) (SHOWCASE-06, SHOWCASE-08, SHOWCASE-09) ✓
+- [x] 19-16-PLAN.md — Wave 4: PFW skill validation — O-S playgrounds (19 files) (SHOWCASE-06..SHOWCASE-09) ✓
+- [x] 19-17-PLAN.md — Wave 4: PFW skill validation — S-Z playgrounds (19 files) (SHOWCASE-05, SHOWCASE-07, SHOWCASE-09) ✓
+- [x] 19-18-PLAN.md — Wave 5: Upstream-faithful restoration — A-I playgrounds (29 files) + DocumentPickerPlayground canImport guard (SHOWCASE-06..SHOWCASE-08) ✓ 2026-03-06
+- [x] 19-19-PLAN.md — Wave 5: Upstream-faithful restoration — K-S playgrounds (29 files) including full Keychain/Lottie/Map/Notification/Pasteboard restoration (SHOWCASE-06..SHOWCASE-09) ✓ 2026-03-06
+- [x] 19-20-PLAN.md — Wave 5: Upstream-faithful restoration — S-Z playgrounds (28 files) + canImport guards + comprehensive validation report (SHOWCASE-05, SHOWCASE-07, SHOWCASE-09) ✓ 2026-03-06
