@@ -1,6 +1,4 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct PreferencePlayground: View {
@@ -41,7 +39,7 @@ struct PreferencePlaygroundCustomKeyDisplayView: View {
     }
 }
 
-struct PreferencePlaygroundCustomKeyIncrementView: View {
+struct PreferencePlaygroundCustomKeyIncrementView : View {
     @State var count = 0
 
     var body: some View {

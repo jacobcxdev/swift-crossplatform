@@ -1,6 +1,4 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct PickerPlayground: View {
@@ -165,7 +163,7 @@ struct PickerPlayground: View {
 
 #if SKIP
 
-struct NoIconModifier: ContentModifier {
+struct NoIconModifier : ContentModifier {
     func modify(view: any View) -> any View {
         view.material3SegmentedButton {
             $0.copy(icon: {})

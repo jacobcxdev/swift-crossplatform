@@ -1,6 +1,4 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 enum SafeAreaPlaygroundType: String, CaseIterable {
@@ -66,21 +64,19 @@ struct SafeAreaPlayground: View {
         }
         #if os(macOS)
         .sheet(isPresented: $isSheetPresented) {
-            safeAreaPlaygroundContent(for: playgroundType)
+            playground(for: playgroundType)
         }
         #else
         .sheet(isPresented: $isSheetPresented) {
-            safeAreaPlaygroundContent(for: playgroundType)
+            playground(for: playgroundType)
         }
         .fullScreenCover(isPresented: $isCoverPresented) {
-            safeAreaPlaygroundContent(for: playgroundType)
+            playground(for: playgroundType)
         }
         #endif
     }
 
-    @ViewBuilder private func safeAreaPlaygroundContent(
-        for playgroundType: SafeAreaPlaygroundType
-    ) -> some View {
+    @ViewBuilder private func playground(for playgroundType: SafeAreaPlaygroundType) -> some View {
         switch playgroundType {
         case .fullscreenContent:
             SafeAreaFullscreenContent()
@@ -102,8 +98,6 @@ struct SafeAreaPlayground: View {
     }
 }
 
-// MARK: - Sub-views
-
 struct SafeAreaBackgroundView: View {
     @Environment(\.dismiss) var dismiss
 
@@ -122,7 +116,7 @@ struct SafeAreaFullscreenContent: View {
     var body: some View {
         ZStack {
             Color.yellow
-            Button("Dismiss") {
+            Button("Dimiss") {
                 dismiss()
             }
         }
@@ -138,7 +132,7 @@ struct SafeAreaFullscreenBackground: View {
         ZStack {
             Color.yellow
                 .ignoresSafeArea()
-            Button("Dismiss") {
+            Button("Dimiss") {
                 dismiss()
             }
         }
@@ -155,7 +149,7 @@ struct SafeAreaPlainList: View {
                 Text("Row: \(index)")
             }
             .listStyle(.plain)
-            .navigationTitle("Plain list")
+            .navigationTitle(SafeAreaPlaygroundType.plainList.title)
             .toolbar {
                 Button("Dismiss") {
                     dismiss()
@@ -187,7 +181,7 @@ struct SafeAreaList: View {
             List(0..<40) { index in
                 Text("Row: \(index)")
             }
-            .navigationTitle("List")
+            .navigationTitle(SafeAreaPlaygroundType.list.title)
             .toolbar {
                 Button("Dismiss") {
                     dismiss()
@@ -207,7 +201,7 @@ struct SafeAreaBottomBar: View {
             List(0..<40) { index in
                 Text("Row: \(index)")
             }
-            .navigationTitle("Bottom toolbar")
+            .navigationTitle(SafeAreaPlaygroundType.bottomBar.title)
             .toolbar {
                 ToolbarItem(placement: .bottomBar) {
                     Button("Dismiss") {

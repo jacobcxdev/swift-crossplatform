@@ -1,14 +1,12 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 import Foundation
 
 struct LocalizationPlayground: View {
     @Environment(\.locale) var currentLocale
 
-    /// The list of available localizations in the main bundle.
-    static let bundleLocalizations: [Locale] = Bundle.main.localizations.map({ Locale(identifier: $0) })
+    /// The list of available localizations in the current bundle
+    static let bundleLocalizations: [Locale] = Bundle.module.localizations.map({ Locale(identifier: $0) })
 
     var body: some View {
         List(Self.bundleLocalizations.sorted(by: { $0.identifier < $1.identifier }), id: \.self) { type in
@@ -37,8 +35,12 @@ struct LocalizationPreview: View {
         VStack {
             Text("Welcome")
                 .font(.largeTitle)
+            Text(LocalizedStringResource("Welcome"))
+                .font(.title)
             Text("Welcome \(skipper)")
                 .font(.largeTitle)
+            Text(LocalizedStringResource("Welcome \(skipper)"))
+                .font(.title)
 
             Divider()
 
@@ -70,7 +72,7 @@ struct LocalizationPreview: View {
 }
 
 extension Locale {
-    /// The title of the language as the current locale language's name for the locale followed by the language name in the language itself.
+    /// The title of the language as the current locale language's name for the locale followed by the language name in the language itself. E.g., `French: français`
     var localizedNavigationTitle: String {
         (Locale.current.localizedString(forIdentifier: identifier) ?? "") + ": " + (localizedString(forIdentifier: identifier) ?? "")
     }

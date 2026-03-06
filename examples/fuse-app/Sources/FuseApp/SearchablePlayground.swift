@@ -1,6 +1,4 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 enum SearchablePlaygroundType: String, CaseIterable {
@@ -42,30 +40,31 @@ struct SearchablePlayground: View {
                     isPresentingWithoutNavStack = true
                 }
             } else {
-                NavigationLink(type.title) {
-                    switch type {
-                    case .list:
-                        ListSearchablePlayground()
-                            .navigationTitle(type.title)
-                    case .plainList:
-                        PlainListSearchablePlayground()
-                            .navigationTitle(type.title)
-                    case .grid:
-                        GridSearchablePlayground()
-                            .navigationTitle(type.title)
-                    case .lazyStack:
-                        LazyVStackSearchablePlayground()
-                            .navigationTitle(type.title)
-                    case .submit:
-                        SubmitSearchablePlayground()
-                            .navigationTitle(type.title)
-                    case .isSearching:
-                        IsSearchingSearchablePlayground()
-                            .navigationTitle(type.title)
-                    case .withoutNavStack:
-                        EmptyView()
-                    }
-                }
+                NavigationLink(type.title, value: type)
+            }
+        }
+        .navigationDestination(for: SearchablePlaygroundType.self) {
+            switch $0 {
+            case .list:
+                ListSearchablePlayground()
+                    .navigationTitle($0.title)
+            case .plainList:
+                PlainListSearchablePlayground()
+                    .navigationTitle($0.title)
+            case .grid:
+                GridSearchablePlayground()
+                    .navigationTitle($0.title)
+            case .lazyStack:
+                LazyVStackSearchablePlayground()
+                    .navigationTitle($0.title)
+            case .submit:
+                SubmitSearchablePlayground()
+                    .navigationTitle($0.title)
+            case .isSearching:
+                IsSearchingSearchablePlayground()
+                    .navigationTitle($0.title)
+            case .withoutNavStack:
+                EmptyView()
             }
         }
         #if os(macOS)
@@ -93,7 +92,7 @@ struct ListSearchablePlayground: View {
     }
 
     func matchingAnimals() -> [String] {
-        return searchableAnimals().filter {
+        return animals().filter {
             $0.lowercased().starts(with: searchText.lowercased().trimmingCharacters(in: .whitespacesAndNewlines))
         }
     }
@@ -113,7 +112,7 @@ struct PlainListSearchablePlayground: View {
     }
 
     func matchingAnimals() -> [String] {
-        return searchableAnimals().filter {
+        return animals().filter {
             $0.lowercased().starts(with: searchText.lowercased().trimmingCharacters(in: .whitespacesAndNewlines))
         }
     }
@@ -154,7 +153,7 @@ struct LazyVStackSearchablePlayground: View {
     }
 
     func matchingAnimals() -> [String] {
-        return searchableAnimals().filter {
+        return animals().filter {
             $0.lowercased().starts(with: searchText.lowercased().trimmingCharacters(in: .whitespacesAndNewlines))
         }
     }
@@ -162,7 +161,7 @@ struct LazyVStackSearchablePlayground: View {
 
 struct SubmitSearchablePlayground: View {
     @State var searchText = ""
-    @State var matchingAnimals = searchableAnimals()
+    @State var matchingAnimals = animals()
 
     var body: some View {
         List {
@@ -172,7 +171,7 @@ struct SubmitSearchablePlayground: View {
         }
         .searchable(text: $searchText)
         .onSubmit(of: .search) {
-            matchingAnimals = searchableAnimals().filter {
+            matchingAnimals = animals().filter {
                 $0.lowercased().starts(with: searchText.lowercased().trimmingCharacters(in: .whitespacesAndNewlines))
             }
         }
@@ -218,39 +217,60 @@ struct WithoutNavStackSearchablePlayground: View {
     }
 
     func matchingAnimals() -> [String] {
-        return searchableAnimals().filter {
+        return animals().filter {
             $0.lowercased().starts(with: searchText.lowercased().trimmingCharacters(in: .whitespacesAndNewlines))
         }
     }
 }
 
-/// Animal names used by searchable playground demos.
-func searchableAnimals() -> [String] {
+func animals() -> [String] {
     return [
-        "Alligator", "Ant",
-        "Bat", "Bear",
-        "Cat", "Cheetah",
-        "Dog", "Dolphin",
-        "Eagle", "Elephant",
-        "Flamingo", "Fox",
-        "Goat", "Gorilla",
-        "Hippo", "Horse",
-        "Ibis", "Insect",
-        "Jackrabbit", "Jellyfish",
-        "Kangaroo", "Kingfisher",
-        "Lampfish", "Llama",
-        "Manitee", "Monkey",
-        "Narwhal", "Nightingale",
-        "Octopus", "Ocelot",
-        "Penguin", "Pufferfish",
-        "Quahog", "Quail",
-        "Rat", "Rhinocerous",
-        "Snake", "Squirrel",
-        "Tarantula", "Turtle",
+        "Alligator",
+        "Ant",
+        "Bat",
+        "Bear",
+        "Cat",
+        "Cheetah",
+        "Dog",
+        "Dolphin",
+        "Eagle",
+        "Elephant",
+        "Flamingo",
+        "Fox",
+        "Goat",
+        "Gorilla",
+        "Hippo",
+        "Horse",
+        "Ibis",
+        "Insect",
+        "Jackrabbit",
+        "Jellyfish",
+        "Kangaroo",
+        "Kingfisher",
+        "Lampfish",
+        "Llama",
+        "Manitee",
+        "Monkey",
+        "Narwhal",
+        "Nightingale",
+        "Octopus",
+        "Ocelot",
+        "Penguin",
+        "Pufferfish",
+        "Quahog",
+        "Quail",
+        "Rat",
+        "Rhinocerous",
+        "Snake",
+        "Squirrel",
+        "Tarantula",
+        "Turtle",
         "Unicorn",
-        "Vole", "Vulture",
-        "Walrus", "Whale",
+        "Vole",
+        "Vulture",
+        "Walrus",
+        "Whale",
         "Yak",
-        "Zebra",
+        "Zebra"
     ]
 }

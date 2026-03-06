@@ -1,16 +1,18 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
-import Observation
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct ObservablePlayground: View {
     var body: some View {
-        ObservablesOuterView()
-            .environment(PlaygroundEnvironmentObject(text: "initialEnvironment"))
+        if #available(iOS 17.0, macOS 14.0, *) {
+            ObservablesOuterView()
+                .environment(PlaygroundEnvironmentObject(text: "initialEnvironment"))
+        } else {
+            Text("iOS 17 / macOS 14 required for Observation framework")
+        }
     }
 }
 
+@available(iOS 17.0, macOS 14.0, *)
 @Observable class PlaygroundEnvironmentObject {
     var text: String
     init(text: String) {
@@ -18,6 +20,7 @@ struct ObservablePlayground: View {
     }
 }
 
+@available(iOS 17.0, macOS 14.0, *)
 @Observable class PlaygroundObservable {
     var text = ""
     init(text: String) {
@@ -25,6 +28,7 @@ struct ObservablePlayground: View {
     }
 }
 
+@available(iOS 17.0, macOS 14.0, *)
 struct ObservablesOuterView: View {
     @State var stateObject = PlaygroundObservable(text: "initialState")
     @Environment(PlaygroundEnvironmentObject.self) var environmentObject
@@ -40,6 +44,7 @@ struct ObservablesOuterView: View {
     }
 }
 
+@available(iOS 17.0, macOS 14.0, *)
 struct ObservablesObservableView: View {
     let observable: PlaygroundObservable
     @Environment(PlaygroundEnvironmentObject.self) var environmentObject

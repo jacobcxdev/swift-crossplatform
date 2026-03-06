@@ -1,6 +1,4 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct OffsetPositionPlayground: View {
@@ -104,6 +102,11 @@ struct OffsetPositionPlayground: View {
                     }
                     .frame(width: 100, height: 100)
                     .border(.primary)
+                }
+                NavigationLink("Push Text.position(100, 100)") {
+                    Text("Over here!")
+                        .background(.yellow)
+                        .position(x: 100, y: 100)
                 }
             }
             .padding()

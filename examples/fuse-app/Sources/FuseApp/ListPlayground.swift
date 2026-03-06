@@ -1,9 +1,5 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
-
-// MARK: - ListPlaygroundType
 
 enum ListPlaygroundType: String, CaseIterable {
     case fixedContent
@@ -72,8 +68,6 @@ enum ListPlaygroundType: String, CaseIterable {
         }
     }
 }
-
-// MARK: - ListPlayground
 
 struct ListPlayground: View {
     @State var editActionsModel = ObservableEditActionsListPlayground.Model()
@@ -151,8 +145,6 @@ struct ListPlayground: View {
     }
 }
 
-// MARK: - Fixed Content
-
 struct FixedContentListPlayground: View {
     var body: some View {
         List {
@@ -168,8 +160,6 @@ struct FixedContentListPlayground: View {
     }
 }
 
-// MARK: - Indexed Content
-
 struct IndexedContentListPlayground: View {
     var body: some View {
         List(100..<200) {
@@ -177,8 +167,6 @@ struct IndexedContentListPlayground: View {
         }
     }
 }
-
-// MARK: - Collection Content
 
 struct CollectionContentListPlayground: View {
     struct ListItem {
@@ -201,11 +189,9 @@ struct CollectionContentListPlayground: View {
     }
 }
 
-// MARK: - ForEach Content
-
 struct ForEachContentListPlayground: View {
     struct ListItem {
-        let id: UUID
+        let id: UUID // Test ID serialization
         let i: Int
         let s: String
     }
@@ -243,8 +229,6 @@ struct ForEachContentListPlayground: View {
         }
     }
 }
-
-// MARK: - Sectioned
 
 struct SectionedListPlayground: View {
     var body: some View {
@@ -291,8 +275,6 @@ struct SectionedListSectionContent: View {
     }
 }
 
-// MARK: - Empty
-
 struct EmptyListPlayground: View {
     var body: some View {
         List {
@@ -320,8 +302,6 @@ struct EmptyItemsListPlayground: View {
         }
     }
 }
-
-// MARK: - Plain Style
 
 struct PlainStyleListPlayground: View {
     var body: some View {
@@ -371,8 +351,6 @@ struct PlainStyleEmptyListPlayground: View {
     }
 }
 
-// MARK: - Refreshable
-
 struct RefreshableListPlayground: View {
     @Observable
     class Model {
@@ -398,8 +376,6 @@ struct RefreshableListPlayground: View {
         }
     }
 }
-
-// MARK: - Hidden Background
 
 struct HiddenBackgroundListPlayground: View {
     var body: some View {
@@ -455,8 +431,6 @@ struct HiddenBackgroundPlainStyleListPlayground: View {
         }
     }
 }
-
-// MARK: - Edit Actions
 
 struct EditActionsListPlayground: View {
     struct ListItem {
@@ -525,8 +499,6 @@ struct ObservableEditActionsListPlayground: View {
         .listStyle(.plain)
     }
 }
-
-// MARK: - Sectioned Edit Actions
 
 struct SectionedEditActionsListPlayground: View {
     @State var items0 = {
@@ -617,8 +589,6 @@ struct PlainStyleSectionedEditActionsListPlayground: View {
     }
 }
 
-// MARK: - OnMove / OnDelete
-
 struct OnMoveDeleteListPlayground: View {
     @State var items0 = {
         var items: [Int] = []
@@ -702,8 +672,6 @@ struct OnMoveDeleteListPlayground: View {
     }
 }
 
-// MARK: - Positioned
-
 struct PositionedListPlayground: View {
     var body: some View {
         VStack {
@@ -733,8 +701,6 @@ struct PositionedListPlayground: View {
         }
     }
 }
-
-// MARK: - Badges
 
 struct BadgeListPlayground: View {
     var body: some View {

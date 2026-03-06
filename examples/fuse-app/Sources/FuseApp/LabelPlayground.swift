@@ -1,9 +1,12 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct LabelPlayground: View {
+    #if os(macOS)
+    let placement: ToolbarItemPlacement = .automatic
+    #else
+    let placement: ToolbarItemPlacement = .topBarLeading
+    #endif
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
@@ -39,6 +42,15 @@ struct LabelPlayground: View {
                 }
             }
             .padding()
+            .toolbar {
+                ToolbarItemGroup(placement: placement) {
+                    Label("Icon Only", systemImage: "heart.fill")
+                    Label("+ Title", systemImage: "star.fill")
+                        .labelStyle(.titleAndIcon)
+                    Label("Title Only", systemImage: "star.fill")
+                        .labelStyle(.titleOnly)
+                }
+            }
         }
     }
 }

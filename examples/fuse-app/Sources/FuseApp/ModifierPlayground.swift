@@ -1,7 +1,9 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
+//#if SKIP
+//import androidx.compose.foundation.background
+//import androidx.compose.foundation.layout.fillMaxWidth
+//#endif
 
 struct ModifierPlayground: View {
     var body: some View {
@@ -26,7 +28,7 @@ struct ModifierPlayground: View {
 }
 
 extension View {
-    func dismissable() -> some View {
+    public func dismissable() -> some View {
         modifier(DismissModifier())
     }
 }
@@ -59,4 +61,5 @@ struct BackgroundModifier : ContentModifier {
         }
     }
 }
+
 #endif

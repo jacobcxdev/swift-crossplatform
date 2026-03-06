@@ -1,6 +1,4 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct MaskPlayground: View {
@@ -10,7 +8,7 @@ struct MaskPlayground: View {
                 HStack {
                     Text("Circle mask")
                     Spacer()
-                    Image(systemName: "photo.artframe")
+                    Image("Cat", bundle: .module, label: Text("Cat JPEG image"))
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 150, height: 150)
@@ -21,7 +19,7 @@ struct MaskPlayground: View {
                 HStack {
                     Text("RoundedRect mask")
                     Spacer()
-                    Image(systemName: "photo.artframe")
+                    Image("Cat", bundle: .module, label: Text("Cat JPEG image"))
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 150, height: 150)
@@ -30,7 +28,9 @@ struct MaskPlayground: View {
                 HStack {
                     Text("Gradient mask")
                     Spacer()
-                    Color.blue
+                    Image("Cat", bundle: .module, label: Text("Cat JPEG image"))
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
                         .frame(width: 150, height: 150)
                         .mask {
                             LinearGradient(
@@ -69,7 +69,9 @@ struct MaskPlayground: View {
                 HStack {
                     Text("VStack mask")
                     Spacer()
-                    Color.orange
+                    Image("Cat", bundle: .module, label: Text("Cat JPEG image"))
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
                         .frame(width: 150, height: 150)
                         .mask {
                             VStack(spacing: 8) {

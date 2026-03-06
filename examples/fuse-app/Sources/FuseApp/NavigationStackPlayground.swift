@@ -1,9 +1,5 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
-
-// MARK: - NavigationStackPlayground
 
 struct NavigationStackPlayground: View {
     @Environment(\.dismiss) var dismiss
@@ -60,17 +56,6 @@ struct NavigationStackPlayground: View {
     }
 }
 
-// MARK: - PathElement
-
-struct PathElement: RawRepresentable, Hashable, CustomStringConvertible {
-    let rawValue: Int
-    var description: String {
-        return rawValue.description
-    }
-}
-
-// MARK: - Path Binding Sheet
-
 struct PathBindingSheetContentView: View {
     @Environment(\.dismiss) var dismiss
     @State var path: [PathElement] = []
@@ -102,8 +87,6 @@ struct PathBindingSheetContentView: View {
         }
     }
 }
-
-// MARK: - NavigationPath Binding Sheet
 
 struct NavigationPathBindingSheetContentView: View {
     @Environment(\.dismiss) var dismiss
@@ -150,7 +133,12 @@ struct NavigationPathBindingSheetContentView: View {
     }
 }
 
-// MARK: - PathElementView
+struct PathElement: RawRepresentable, Hashable, CustomStringConvertible {
+    let rawValue: Int
+    var description: String {
+        return rawValue.description
+    }
+}
 
 struct PathElementView: View {
     @Environment(\.dismiss) var dismiss
@@ -199,8 +187,6 @@ struct PathElementView: View {
     }
 }
 
-// MARK: - NavigationPathElementView
-
 struct NavigationPathElementView: View {
     @Environment(\.dismiss) var dismiss
     let element: PathElement
@@ -240,8 +226,6 @@ struct NavigationPathElementView: View {
         .navigationTitle(element.description)
     }
 }
-
-// MARK: - ItemDestinationView
 
 struct ItemDestinationView: View {
     @Environment(\.dismiss) var dismiss
