@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Completed 19-15-PLAN.md
-last_updated: "2026-03-05T07:00:57.649Z"
-last_activity: 2026-03-05 -- Plan 19-17 validate S-Z playgrounds (Stack through ZIndex)
+stopped_at: Completed 19-18-PLAN.md
+last_updated: "2026-03-06T02:58:10.500Z"
+last_activity: 2026-03-06 -- Plan 19-18 upstream-faithful validation batch A-I (29 playgrounds)
 progress:
   total_phases: 21
-  completed_phases: 17
-  total_plans: 87
-  completed_plans: 82
-  percent: 95
+  completed_phases: 16
+  total_plans: 90
+  completed_plans: 83
+  percent: 92
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 19 (Reimplement skipapp-showcase-fuse showcases in fuse-app with TCA and SkipUI API validation)
-Plan: 17 of 17 in current phase -- 19-17 complete (validate S-Z playgrounds Stack through ZIndex)
-Status: Phase 19 complete. All 19 S-Z playgrounds validated against PFW skills with zero violations. Combined with plans 19-13 through 19-16: all 92 fuse-app Source files validated.
-Last activity: 2026-03-05 -- Plan 19-17 validate S-Z playgrounds (Stack through ZIndex)
+Plan: 18 of 20 in current phase -- 19-18 complete (upstream-faithful validation batch A-I)
+Status: Plan 19-18 complete. 29 A-I playground files restored to upstream-faithful content (minus PlaygroundSourceLink toolbar). DocumentPickerPlayground gated with canImport(SkipKit).
+Last activity: 2026-03-06 -- Plan 19-18 upstream-faithful validation batch A-I (29 playgrounds)
 
-Progress: [█████████░] 95%
+Progress: [█████████░] 92%
 
 
 ## Performance Metrics
@@ -118,6 +118,7 @@ Progress: [█████████░] 95%
 | Phase 19 P14 | 2min | 2 tasks | 0 files |
 | Phase 19 P13 | 2min | 2 tasks | 2 files |
 | Phase 19 P17 | 3min | 2 tasks | 0 files |
+| Phase 19 P18 | 6min | 2 tasks | 29 files |
 
 ## Accumulated Context
 
@@ -279,6 +280,7 @@ Recent decisions affecting current work:
 - [Phase 19]: Renamed toggleBreakOnAllCheckpoints to breakOnAllCheckpointsChanged(Bool) for .sending() binding derivation per pfw-modern-swiftui
 - [Phase 19]: All 18 I-O playgrounds (Image through OffsetPosition) upstream-faithful with zero PFW violations -- NavigationStackPlayground, ObservablePlayground, ListPlayground fully conform to pfw-swift-navigation/pfw-observable-models
 - [Phase 19]: All 19 S-Z playgrounds (Stack through ZIndex) upstream-faithful with zero PFW violations -- StatePlayground (pfw-observable-models), StoragePlayground (pfw-sharing), TabViewPlayground (selection binding), binding-heavy views all correct
+- [Phase 19]: DocumentPickerPlayground gated with #if canImport(SkipKit) -- SkipKit not in fuse-app dependencies
 
 ### Pending Todos
 
@@ -316,8 +318,8 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-05T06:52:52.129Z
-Stopped at: Completed 19-15-PLAN.md
+Last session: 2026-03-06T02:58:10.496Z
+Stopped at: Completed 19-18-PLAN.md
 Resume file: None
 
 ### Phase 19 Plan Verification — Deferred Findings
