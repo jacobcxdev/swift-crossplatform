@@ -1,15 +1,16 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-// Ported from skipapp-showcase-fuse StoragePlayground.swift
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct StoragePlayground: View {
     @AppStorage("boolAppStorage") var boolAppStorage = false
     @AppStorage("doubleAppStorage") var doubleAppStorage = 5.0
-    @AppStorage("enumAppStorage") var enumAppStorage = StoragePlaygroundEnum.first
+    @AppStorage("enumAppStorage") var enumAppStorage = E.first
 
     let doubleAppStorageValues = [1.0, 5.0, 10.0, 20.0, 25.0]
+
+    enum E: Int {
+        case first, second, third
+    }
 
     var body: some View {
         VStack(spacing: 16) {
@@ -26,22 +27,19 @@ struct StoragePlayground: View {
                 Text("Enum AppStorage")
                 Spacer()
                 Picker("Enum AppStorage", selection: $enumAppStorage) {
-                    Text("First").tag(StoragePlaygroundEnum.first)
-                    Text("Second").tag(StoragePlaygroundEnum.second)
-                    Text("Third").tag(StoragePlaygroundEnum.third)
+                    Text("First").tag(E.first)
+                    Text("Second").tag(E.second)
+                    Text("Third").tag(E.third)
                 }
             }
             Toggle("Bool AppStorage", isOn: $boolAppStorage)
             NavigationLink("Push binding") {
                 StoragePlaygroundBindingView(binding: $boolAppStorage)
             }
+            NavigationLink("Push another", value: PlaygroundType.storage)
         }
         .padding()
     }
-}
-
-enum StoragePlaygroundEnum: Int {
-    case first, second, third
 }
 
 struct StoragePlaygroundBindingView: View {

@@ -142,7 +142,7 @@ struct SafeAreaFullscreenBackground: View {
 
 struct SafeAreaPlainList: View {
     @Environment(\.dismiss) var dismiss
-
+    
     var body: some View {
         NavigationStack {
             List(0..<40) { index in

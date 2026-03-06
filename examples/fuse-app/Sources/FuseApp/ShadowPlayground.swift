@@ -1,6 +1,4 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct ShadowPlayground: View {
@@ -102,7 +100,7 @@ struct ShadowPlayground: View {
                     Text("Button")
                     Spacer()
                     Button("Tap") {
-                        // Shadow demo tap
+                        logger.log("Tap")
                     }
                     .buttonStyle(.bordered)
                     .shadow(color: .black, radius: 4)

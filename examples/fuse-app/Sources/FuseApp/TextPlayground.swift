@@ -1,6 +1,4 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct TextPlayground: View {
@@ -26,7 +24,7 @@ struct TextPlayground: View {
                 Divider()
 
                 Text("Custom Font")
-                    .font(Font.custom("Protest Guerrilla", size: 30.0))
+                    .font(Font.custom("Protest Guerrilla", size: 30.0)) // protest_guerrilla.ttf
 
                 Divider()
 
@@ -66,6 +64,13 @@ struct TextPlayground: View {
 
                 Divider()
 
+                // TODO: AttributedString
+//                Text(try! AttributedString(markdown: "Attributed *Italic text* with \("substitution1") and \("substitution2")"))
+//                Text(try! AttributedString(markdown: "Attributed **Bold text** with .italic()"))
+//                    .italic()
+
+                Divider()
+
                 Text("Wrap: This is some long text that should wrap when it exceeds the width of its frame")
                     .frame(width: 200)
                     .border(Color.blue)
@@ -77,6 +82,17 @@ struct TextPlayground: View {
                     .lineLimit(1)
                     .frame(width: 200)
                     .border(Color.blue)
+                // TODO: once we have skip-fuse-ui parity for of https://github.com/skiptools/skip-ui/pull/288
+//                Text(".truncationMode(.middle): This is some long text that should middle truncate when it exceeds the width of its frame")
+//                    .truncationMode(.middle)
+//                    .lineLimit(1)
+//                    .frame(width: 200)
+//                    .border(Color.blue)
+//                Text(".truncationMode(.tail): This is some long text when it exceeds the width of its frame will head truncate")
+//                    .truncationMode(.head)
+//                    .lineLimit(1)
+//                    .frame(width: 200)
+//                    .border(Color.blue)
 
                 Divider()
 
@@ -119,3 +135,5 @@ struct TextPlayground: View {
         .redacted(reason: redaction)
     }
 }
+
+

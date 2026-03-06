@@ -1,6 +1,4 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct TransformPlayground: View {
@@ -75,7 +73,7 @@ struct TransformPlayground: View {
             Spacer()
 
             controlsSection {
-                sliderRow(label: "Angle", value: $rotationAngle, range: -180...180, format: "%.0f\u{00B0}")
+                sliderRow(label: "Angle", value: $rotationAngle, range: -180...180, format: "%.0f°")
             }
         }
     }
@@ -120,7 +118,7 @@ struct TransformPlayground: View {
             Spacer()
 
             controlsSection {
-                sliderRow(label: "Angle", value: $rotationAngle, range: -180...180, format: "%.0f\u{00B0}")
+                sliderRow(label: "Angle", value: $rotationAngle, range: -180...180, format: "%.0f°")
                 sliderRow(label: "Scale", value: $scale, range: 0.25...2.0, format: "%.2fx")
             }
         }

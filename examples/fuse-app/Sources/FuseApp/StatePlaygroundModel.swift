@@ -1,6 +1,4 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import Observation
 import SkipFuse
 
@@ -11,7 +9,7 @@ class TapCountObservable {
     var tapCount = 0
 }
 
-struct TapCountStruct: Identifiable {
+struct TapCountStruct : Identifiable {
     var id = 0
     var tapCount = 0
 }

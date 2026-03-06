@@ -1,32 +1,54 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-// Ported from skipapp-showcase-fuse TabViewPlayground.swift
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct TabViewPlayground: View {
     @State var selectedTab = "Home"
 
     var body: some View {
-        #if os(macOS)
-        tabViewLegacy
-        #else
         if #available(iOS 18.4, *) {
-            tabViewModern
-        } else {
-            tabViewLegacy
-        }
-        #endif
-    }
-
-    #if !os(macOS)
-    @available(iOS 18.4, *)
-    var tabViewModern: some View {
-        TabView(selection: $selectedTab) {
-            Tab("Home", systemImage: "house.fill", value: "Home") {
-                TabPlaygroundContentView(label: "Home", selectedTab: $selectedTab)
+            TabView(selection: $selectedTab) {
+                Tab("Home", systemImage: "house.fill", value: "Home") {
+                    TabPlaygroundContentView(label: "Home", selectedTab: $selectedTab)
+                }
+                Tab("Favorites", systemImage: "heart.fill", value: "Favorites") {
+                    TabView {
+                        TabPlaygroundContentView(label: "Favorites (page 1)", selectedTab: $selectedTab)
+                            .padding(32)
+                            .background {
+                                Capsule()
+                                    .fill(Color.pink.opacity(0.1))
+                            }
+                        Text("More (page 2)")
+                    }
+                    #if !os(macOS) || os(Android)
+                    .tabViewStyle(.page)
+                    #endif
+                }
+                #if !os(macOS) || os(Android)
+                Tab("Paging", systemImage: "arrow.forward.square", value: "Paging") {
+                    TabPageViewContentView()
+                }
+                #endif
+                TabSection {
+                    Tab(value: "Search", role: .search) {
+                        Text("Search Tab")
+                    }
+                    Tab("Hidden", systemImage: "plus", value: "Hidden") {
+                        Text("Hidden Tab")
+                    }
+                    .hidden(true)
+                    Tab("Disabled", systemImage: "xmark", value: "Disabled") {
+                        Text("Disabled Tab")
+                    }
+                    .disabled(true)
+                }
             }
-            Tab("Favorites", systemImage: "heart.fill", value: "Favorites") {
+            .tint(.red)
+        } else {
+            TabView(selection: $selectedTab) {
+                TabPlaygroundContentView(label: "Home", selectedTab: $selectedTab)
+                    .tabItem { Label("Home", systemImage: "house.fill") }
+                    .tag("Home")
                 TabView {
                     TabPlaygroundContentView(label: "Favorites (page 1)", selectedTab: $selectedTab)
                         .padding(32)
@@ -36,55 +58,19 @@ struct TabViewPlayground: View {
                         }
                     Text("More (page 2)")
                 }
+                #if !os(macOS) || os(Android)
                 .tabViewStyle(.page)
-            }
-            Tab("Paging", systemImage: "arrow.forward.square", value: "Paging") {
+                #endif
+                .tabItem { Label("Favorites", systemImage: "heart.fill") }
+                .tag("Favorites")
+                #if !os(macOS) || os(Android)
                 TabPageViewContentView()
+                    .tabItem { Label("Paging", systemImage: "arrow.forward.square") }
+                    .tag("Paging")
+                #endif
             }
-            TabSection {
-                Tab(value: "Search", role: .search) {
-                    Text("Search Tab")
-                }
-                Tab("Hidden", systemImage: "plus", value: "Hidden") {
-                    Text("Hidden Tab")
-                }
-                .hidden(true)
-                Tab("Disabled", systemImage: "xmark", value: "Disabled") {
-                    Text("Disabled Tab")
-                }
-                .disabled(true)
-            }
+            .tint(.red)
         }
-        .tint(.red)
-    }
-    #endif
-
-    var tabViewLegacy: some View {
-        TabView(selection: $selectedTab) {
-            TabPlaygroundContentView(label: "Home", selectedTab: $selectedTab)
-                .tabItem { Label("Home", systemImage: "house.fill") }
-                .tag("Home")
-            TabView {
-                TabPlaygroundContentView(label: "Favorites (page 1)", selectedTab: $selectedTab)
-                    .padding(32)
-                    .background {
-                        Capsule()
-                            .fill(Color.pink.opacity(0.1))
-                    }
-                Text("More (page 2)")
-            }
-            #if !os(macOS) || os(Android)
-            .tabViewStyle(.page)
-            #endif
-            .tabItem { Label("Favorites", systemImage: "heart.fill") }
-            .tag("Favorites")
-            #if !os(macOS) || os(Android)
-            TabPageViewContentView()
-                .tabItem { Label("Paging", systemImage: "arrow.forward.square") }
-                .tag("Paging")
-            #endif
-        }
-        .tint(.red)
     }
 }
 

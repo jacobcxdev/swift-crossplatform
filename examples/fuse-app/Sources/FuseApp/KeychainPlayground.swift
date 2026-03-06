@@ -1,8 +1,11 @@
 // Copyright 2023–2025 Skip
 import SwiftUI
+#if canImport(SkipKeychain)
 import SkipKeychain
+#endif
 
 struct KeychainPlayground: View {
+#if canImport(SkipKeychain)
     @State var allKeys: [String] = []
 
     var body: some View {
@@ -40,8 +43,23 @@ struct KeychainPlayground: View {
     func loadKeys() {
         allKeys = ((try? Keychain.shared.keys()) ?? []).sorted()
     }
+#else
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "key")
+                .font(.largeTitle)
+            Text("Requires SkipKeychain")
+                .font(.title2)
+            Text("Add skip-keychain dependency to enable keychain operations.")
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .padding()
+    }
+#endif
 }
 
+#if canImport(SkipKeychain)
 struct KeychainValueEditor: View {
     @State var key: String
     let isNewKey: Bool
@@ -92,3 +110,4 @@ struct KeychainValueEditor: View {
         }
     }
 }
+#endif

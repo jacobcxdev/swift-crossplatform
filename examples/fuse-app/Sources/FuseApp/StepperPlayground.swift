@@ -1,7 +1,4 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-// Ported from skipapp-showcase-fuse StepperPlayground.swift
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct StepperPlayground: View {

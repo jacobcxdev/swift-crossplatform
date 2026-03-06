@@ -1,6 +1,4 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct ShapePlayground: View {
@@ -510,8 +508,6 @@ struct ShapePlayground: View {
     }
 }
 
-// MARK: - Custom Shapes
-
 struct CustomShape: Shape {
     let arcSize = 20.0
 
@@ -526,14 +522,14 @@ struct CustomShape: Shape {
     }
 }
 
-private func customPath(in size: CGSize, transform: CGAffineTransform) -> Path {
+func customPath(in size: CGSize, transform: CGAffineTransform) -> Path {
     var path = Path()
     let rect = CGRect(origin: .zero, size: size).insetBy(dx: 20, dy: 0)
     path.addRect(rect, transform: transform)
     return path
 }
 
-private func customInsetPath() -> Path {
+func customInsetPath() -> Path {
     Path { p in
         p.move(to: CGPoint(x: 100, y: 50))
         p.addLine(to: CGPoint(x: 150, y: 150))
@@ -542,7 +538,7 @@ private func customInsetPath() -> Path {
     }
 }
 
-private func customCompoundShapePath() -> Path {
+func customCompoundShapePath() -> Path {
     Path { p in
         p.addEllipse(in: CGRect(x: 10, y: 85, width: 30, height: 30))
         p.addEllipse(in: CGRect(x: 85, y: 10, width: 30, height: 30))

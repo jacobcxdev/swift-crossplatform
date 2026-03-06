@@ -1,17 +1,50 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct ShareLinkPlayground: View {
     var body: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "square.and.arrow.up")
-                .font(.largeTitle)
-            Text("Not Yet Ported")
-                .font(.title2)
-            Text("This playground requires platform-specific APIs.")
-                .foregroundStyle(.secondary)
+        ScrollView {
+            VStack(spacing: 16) {
+                HStack {
+                    Text("Default")
+                    Spacer()
+                    ShareLink(item: "My text")
+                }
+                HStack {
+                    Text("Default URL")
+                    Spacer()
+                    ShareLink(item: URL(string: "https://skip.dev")!)
+                }
+                HStack {
+                    Text("Subject & Message")
+                    Spacer()
+                    ShareLink(item: "My text", subject: Text("My subject"), message: Text("My message"))
+                }
+                HStack {
+                    Text("Subject & Message URL")
+                    Spacer()
+                    ShareLink(item: URL(string: "https://skip.dev")!, subject: Text("My subject"), message: Text("My message"))
+                }
+                HStack {
+                    Text("Title")
+                    Spacer()
+                    ShareLink("Title", item: "My text")
+                }
+                HStack {
+                    Text(".buttonStyle(.bordered)")
+                    Spacer()
+                    ShareLink("Title", item: "My text")
+                        .buttonStyle(.bordered)
+                }
+                HStack {
+                    Text("Label")
+                    Spacer()
+                    ShareLink(item: "My text") {
+                        Label("Title", systemImage: "heart.fill")
+                    }
+                }
+            }
+            .padding()
         }
     }
 }

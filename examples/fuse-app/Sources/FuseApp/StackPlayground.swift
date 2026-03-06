@@ -1,6 +1,4 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct StackPlayground: View {
@@ -151,7 +149,7 @@ struct StackPlayground: View {
                 ScrollView(.horizontal) {
                     LazyHStack(spacing: 20) {
                         Section {
-                            ForEach(0..<20, id: \.self) { i in
+                            ForEach(0..<20) { i in
                                 ZStack {
                                     Color.yellow
                                     Text(String(describing: i))
@@ -171,7 +169,7 @@ struct StackPlayground: View {
                 Text("LazyHStack fills height").bold()
                 ScrollView(.horizontal) {
                     LazyHStack {
-                        ForEach(0..<20, id: \.self) { i in
+                        ForEach(0..<20) { i in
                             ZStack {
                                 Color.yellow
                                 Text(String(describing: i))
@@ -227,13 +225,12 @@ struct StackPlayground: View {
     }
 }
 
-// MARK: - Supporting Views
-
 struct LazyVStackScrollView: View {
     let count: Int
 
     var body: some View {
         ScrollView {
+            // Test that we can nest the LazyVStack in a custom view within the parent ScrollView
             LazyVStackView(count: count)
                 .border(.blue, width: 5)
         }
@@ -259,32 +256,32 @@ struct LazyVStackView: View {
 struct ScrollViewStacksView: View {
     var body: some View {
         ScrollView(.vertical) {
-            ScrollView(.horizontal) {
-                HStack(alignment: .top, spacing: 8.0) {
-                    VStack {
-                        VStack {
-                            Text("Test 1")
+          ScrollView(.horizontal) {
+            HStack(alignment: .top, spacing: 8.0) {
+              VStack {
+                VStack {
+                  Text("Test 1")
 
-                            Spacer()
+                  Spacer()
 
-                            Text("Test 2")
-                        }
-                        .border(.blue)
-                    }
-                    .frame(width: 150.0)
-                    .border(.red)
-
-                    VStack {
-                        VStack {
-                            Text("Test A\nTest B\nTest C\nTest D\nTest E")
-                        }
-                        .border(.blue)
-                    }
-                    .frame(width: 150.0)
-                    .border(.red)
+                  Text("Test 2")
                 }
+                .border(.blue)
+              }
+              .frame(width: 150.0)
+              .border(.red)
+
+              VStack {
+                VStack {
+                  Text("Test A\nTest B\nTest C\nTest D\nTest E")
+                }
+                .border(.blue)
+              }
+              .frame(width: 150.0)
+              .border(.red)
             }
-            .border(.black)
+          }
+          .border(.black)
         }
     }
 }

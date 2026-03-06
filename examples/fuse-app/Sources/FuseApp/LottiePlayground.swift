@@ -1,10 +1,13 @@
 // Copyright 2023–2025 Skip
 import Foundation
 import SwiftUI
+#if canImport(SkipMotion)
 import SkipMotion
+#endif
 
 /// This component uses the `SkipMotion` module from https://source.skip.tools/skip-motion
 struct LottiePlayground: View {
+#if canImport(SkipMotion)
     @State internal var refreshID = UUID()
 
     var body: some View {
@@ -64,8 +67,23 @@ struct LottiePlayground: View {
             }
         }
     }
+#else
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "play.rectangle")
+                .font(.largeTitle)
+            Text("Requires SkipMotion")
+                .font(.title2)
+            Text("Add skip-motion dependency to enable Lottie animations.")
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .padding()
+    }
+#endif
 }
 
+#if canImport(SkipMotion)
 // MARK: - Section Components
 
 internal struct PlaybackSection: View {
@@ -457,3 +475,4 @@ internal let allAnimations: [LottieContainer] = (1...22).map { i in
 internal func randomAnimation() -> LottieContainer {
     allAnimations.randomElement()!
 }
+#endif

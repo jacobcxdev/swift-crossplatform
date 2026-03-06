@@ -1,10 +1,5 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-// Ported from skipapp-showcase-fuse ToolbarPlayground.swift (701 lines)
-
+// Copyright 2023–2025 Skip
 import SwiftUI
-
-// MARK: - ToolbarPlaygroundType
 
 enum ToolbarPlaygroundType: View, CaseIterable {
     case hideNavigationBar
@@ -187,25 +182,25 @@ enum ToolbarPlaygroundType: View, CaseIterable {
         case .toolbarItemGroup:
             ToolbarItemGroupPlayground(placement: ToolbarItemPlacement.automatic)
         case .topLeadingItem:
-            #if os(macOS)
+            #if os(macOS) // ToolbarItemPlacement.topBarLeading unavailable on macOS
             Text("Not supported on macOS")
             #else
             ToolbarItemPlayground(placement: ToolbarItemPlacement.topBarLeading)
             #endif
         case .topLeadingItemGroup:
-            #if os(macOS)
+            #if os(macOS) // ToolbarItemPlacement.topBarLeading unavailable on macOS
             Text("Not supported on macOS")
             #else
             ToolbarItemGroupPlayground(placement: ToolbarItemPlacement.topBarLeading)
             #endif
         case .topLeadingBackButtonHidden:
-            #if os(macOS)
+            #if os(macOS) // ToolbarItemPlacement.topBarLeading unavailable on macOS
             Text("Not supported on macOS")
             #else
             ToolbarBackButtonHiddenPlayground()
             #endif
         case .topLeadingTrailingItems:
-            #if os(macOS)
+            #if os(macOS) // ToolbarItemPlacement.topBarLeading unavailable on macOS
             Text("Not supported on macOS")
             #else
             ToolbarItemPlayground(placement: ToolbarItemPlacement.topBarLeading, placement2: ToolbarItemPlacement.topBarTrailing)
@@ -213,31 +208,31 @@ enum ToolbarPlaygroundType: View, CaseIterable {
         case .principalItem:
             ToolbarItemPrincipalPlayground()
         case .bottom:
-            #if os(macOS)
+            #if os(macOS) // ToolbarItemPlacement.bottomBar unavailable on macOS
             Text("Not supported on macOS")
             #else
             ToolbarItemPlayground(placement: ToolbarItemPlacement.bottomBar, placement2: ToolbarItemPlacement.bottomBar)
             #endif
         case .bottomPlain:
-            #if os(macOS)
+            #if os(macOS) // ToolbarItemPlacement.bottomBar unavailable on macOS
             Text("Not supported on macOS")
             #else
             ToolbarItemPlainStylePlayground(placement: ToolbarItemPlacement.bottomBar, placement2: ToolbarItemPlacement.bottomBar)
             #endif
         case .bottomGroup:
-            #if os(macOS)
+            #if os(macOS) // ToolbarItemPlacement.bottomBar unavailable on macOS
             Text("Not supported on macOS")
             #else
             ToolbarBottomThreePlayground(spaced: false)
             #endif
         case .bottomSpaced:
-            #if os(macOS)
+            #if os(macOS) // ToolbarItemPlacement.bottomBar unavailable on macOS
             Text("Not supported on macOS")
             #else
             ToolbarBottomThreePlayground(spaced: true)
             #endif
         case .customToolbarContent:
-            #if os(macOS)
+            #if os(macOS) // ToolbarItemPlacement.topBarLeading unavailable on macOS
             Text("Not supported on macOS")
             #else
             ToolbarCustomContentPlayground()
@@ -249,8 +244,6 @@ enum ToolbarPlaygroundType: View, CaseIterable {
         }
     }
 }
-
-// MARK: - ToolbarPlayground
 
 struct ToolbarPlayground: View {
     var body: some View {
@@ -264,8 +257,6 @@ struct ToolbarPlayground: View {
         }
     }
 }
-
-// MARK: - Helper Views
 
 struct HideToolbarsPlayground: View {
     @Environment(\.dismiss) var dismiss
@@ -414,7 +405,7 @@ struct ToolbarPlaygroundStatefulItem: ToolbarContent {
     }
 }
 
-struct ToolbarPlaygroundSheetView: View {
+struct ToolbarPlaygroundSheetView : View {
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
@@ -591,7 +582,7 @@ struct ToolbarBottomThreePlayground: View {
             }
         }
         .toolbar {
-            #if os(macOS)
+            #if os(macOS) // ToolbarItemPlacement.bottomBar unavailable on macOS
             #else
             ToolbarItemGroup(placement: .bottomBar) {
                 Button("First: \(firstTapCount)") {
@@ -626,7 +617,7 @@ struct ToolbarBackButtonHiddenPlayground: View {
         }
         .navigationBarBackButtonHidden()
         .toolbar {
-            #if os(macOS)
+            #if os(macOS) // ToolbarItemPlacement.topBarLeading unavailable on macOS
             #else
             ToolbarItem(placement: .topBarLeading) {
                 Button("Cancel") {

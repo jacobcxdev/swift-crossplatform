@@ -1,7 +1,4 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-// Ported from skipapp-showcase-fuse ViewThatFitsPlayground.swift
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct ViewThatFitsPlayground: View {
@@ -10,7 +7,7 @@ struct ViewThatFitsPlayground: View {
             VStack(spacing: 16) {
                 Text("ViewThatFits (default: both axes)").bold()
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Constraint: 140x40").font(.caption)
+                    Text("Constraint: 140×40").font(.caption)
                     ZStack {
                         Color.black.opacity(0.1)
                         ViewThatFits {
@@ -58,3 +55,5 @@ struct ViewThatFitsPlayground: View {
         }
     }
 }
+
+

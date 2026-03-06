@@ -1,6 +1,4 @@
-// Licensed under the GNU General Public License v3.0 or later
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+// Copyright 2023–2025 Skip
 import SwiftUI
 
 struct SheetPlayground: View {
@@ -27,12 +25,13 @@ struct SheetPlayground: View {
             }
         }
         .sheet(isPresented: $isSheetPresented, onDismiss: { logger.info("onDismiss called") }) {
-            SheetPlaygroundContentView(dismissSheet: { isSheetPresented = false })
+            SheetContentView(dismissSheet: { isSheetPresented = false })
         }
         .sheet(isPresented: $isSimpleSheetPresented, onDismiss: { logger.info("onDismiss called") }) {
             Button("Tap to dismiss") {
                 isSimpleSheetPresented = false
             }
+
         }
         #else
         VStack(spacing: 16) {
@@ -57,7 +56,7 @@ struct SheetPlayground: View {
             }
         }
         .sheet(isPresented: $isSheetPresented, onDismiss: { logger.info("onDismiss called") }) {
-            SheetPlaygroundContentView(dismissSheet: { isSheetPresented = false })
+            SheetContentView(dismissSheet: { isSheetPresented = false })
         }
         .sheet(isPresented: $isSimpleSheetPresented, onDismiss: { logger.info("onDismiss called") }) {
             Button("Back button is disabled. Tap to dismiss") {
@@ -82,7 +81,7 @@ struct SheetPlayground: View {
             .presentationDetents([.medium])
         })
         .fullScreenCover(isPresented: $isFullScreenPresented) {
-            SheetPlaygroundContentView(dismissSheet: { isFullScreenPresented = false })
+            SheetContentView(dismissSheet: { isFullScreenPresented = false })
         }
         .fullScreenCover(isPresented: $isSimpleFullScreenPresented) {
             Button("Back button is disabled. Tap to dismiss") {
@@ -96,7 +95,7 @@ struct SheetPlayground: View {
     }
 }
 
-struct SheetPlaygroundContentView: View {
+struct SheetContentView: View {
     @State var isPresented = false
     @State var counter = 0
     @State var text = ""
@@ -131,7 +130,8 @@ struct SheetPlaygroundContentView: View {
             .navigationTitle("Sheet")
         }
         .sheet(isPresented: $isPresented) {
-            SheetPlaygroundContentView(dismissSheet: { isPresented = false })
+            SheetContentView(dismissSheet: { isPresented = false })
         }
     }
 }
+
