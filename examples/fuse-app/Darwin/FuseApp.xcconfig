@@ -9,7 +9,7 @@ SKIP_ACTION = launch
 //SKIP_ACTION = none
 
 // Point Skip's toolchain discovery at our custom no-assertions toolchain
-//SWIFT_TOOLCHAIN_DIR = $(SRCROOT)/../../../.toolchains
+SWIFT_TOOLCHAIN_DIR = $(SRCROOT)/../../../.toolchains
 
 ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon
 ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor

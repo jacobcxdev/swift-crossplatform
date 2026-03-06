@@ -5,10 +5,13 @@ import SwiftUI
 
 struct DocumentPickerPlayground: View {
     var body: some View {
-        ContentUnavailableView(
-            "Not Yet Ported",
-            systemImage: "doc.badge.plus",
-            description: Text("This playground requires platform-specific APIs.")
-        )
+        VStack(spacing: 12) {
+            Image(systemName: "doc.badge.plus")
+                .font(.largeTitle)
+            Text("Not Yet Ported")
+                .font(.title2)
+            Text("This playground requires platform-specific APIs.")
+                .foregroundStyle(.secondary)
+        }
     }
 }

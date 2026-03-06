@@ -210,7 +210,8 @@ A private app consuming these forks:
 | Just | any | `brew install just` |
 | JDK | 21+ | For Android builds |
 | Android SDK | API 36 | `skip android sdk install` |
-| Custom toolchain | 6.2.4 | `just setup-toolchain` (installs toolchain + Android SDK) |
+| Custom toolchain | 6.2.4 | `just setup-toolchain` (installs toolchain + Android SDK + ngtcp2 patch) |
+| patchelf | any | `brew install patchelf` (installed automatically by `just setup-toolchain`) |
 
 ## Platform Conditionals & Environment Variables
 
@@ -223,6 +224,7 @@ A private app consuming these forks:
 | `#if SKIP` | Swift conditional compilation | True only in Skip-transpiled Kotlin context (e.g., `loadPeerLibrary`) |
 | `FUSE_NAV_DEBUG` | Swift compiler define (opt-in) | Enables navigation debug logging. Add `.define("FUSE_NAV_DEBUG")` to relevant Package.swift targets |
 | `FUSE_TAB_DEBUG` | Swift compiler define (opt-in) | Enables tab debug logging. Add `.define("FUSE_TAB_DEBUG")` to SkipUI target |
+| `SWIFT_TOOLCHAIN_DIR` | Environment variable / xcconfig | Overrides Skip's toolchain search directory. Set in `FuseApp.xcconfig` (for Xcode builds) and as env var in justfile's `android-run`/`android-build`/`android-test` recipes |
 | `SKIPLOCAL` | Environment variable | When set, skip's Package.swift resolves skipstone as local source dependency instead of downloading binary. Not normally needed — justfile uses `scripts/skip` mechanism instead |
 
 ## Testing
@@ -263,3 +265,6 @@ Non-forked transitive dependencies (`skip-model`, `skip-bridge`, `skip-foundatio
 - **Nested submodule must be initialised**: `forks/skipstone/skip/` is a nested submodule. If `SkipDriveExternal` symlink is broken, run `just init` (which uses `--recursive`).
 - **`just android-run` streams logcat indefinitely**: The recipe tails `adb logcat` after launching the app — it will never "complete". Do not treat it as a finite task or poll for completion. The build/install/launch phase finishes when logcat output starts streaming; the command itself runs until manually interrupted (Ctrl+C).
 - **Skip.env files**: `examples/*/Skip.env` contains app metadata (bundle ID, version) shared between iOS (xcconfig) and Android (Gradle). These are standard upstream configuration — do not modify as part of infrastructure work.
+- **Swift 6.2.4 Android SDK missing ngtcp2**: The official SDK (from finagolfin's pipeline) bundles Termux's `libcurl.so` with HTTP/3 support but omits `libngtcp2.so` and `libngtcp2_crypto_ossl.so`. Without these, the app crashes at startup with `UnsatisfiedLinkError`. `just setup-toolchain` patches these in automatically.
+- **`ContentUnavailableView` unavailable on Android**: Use a VStack-based fallback instead. See `DocumentPickerPlayground.swift` for an example.
+- **`skip export` doesn't support `--toolchain`**: Use `SWIFT_TOOLCHAIN_DIR` environment variable instead to control toolchain discovery for APK export builds.

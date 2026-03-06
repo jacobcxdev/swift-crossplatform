@@ -320,7 +320,7 @@ android-run target:
     if [ -z "$apk" ] || [ -n "$(find "examples/{{ target }}/Sources" "examples/{{ target }}/Package.swift" forks/ -newer "$apk" -name '*.swift' -print -quit 2>/dev/null)" ]; then
       echo "Source changed — rebuilding APK..."
       rm -rf "$export_dir"
-      (cd "examples/{{ target }}" && "{{ skip }}" export --debug --android --no-ios --toolchain "{{ toolchain_dir }}" -d .build/export)
+      (cd "examples/{{ target }}" && SWIFT_TOOLCHAIN_DIR="{{ toolchain_link_dir }}" "{{ skip }}" export --debug --android --no-ios -d .build/export)
       apk=$(ls "$export_dir"/*-debug.apk 2>/dev/null | head -1 || true)
       if [ -z "$apk" ]; then echo "Error: no APK found in $export_dir" >&2; exit 1; fi
     else
@@ -484,6 +484,8 @@ doctor:
       "Run: just setup-toolchain"
     check "Swift Android SDK" "'{{ toolchain_dir }}/usr/bin/swift' sdk list 2>/dev/null | grep -q android" \
       "Run: just setup-toolchain"
+    check "Android SDK ngtcp2 patch" "test -f '$HOME/Library/org.swift.swiftpm/swift-sdks/swift-6.2.4-RELEASE-android-24-0.1.artifactbundle/swift-6.2.4-release-android-24-sdk/android-27d-sysroot/usr/lib/aarch64-linux-android/libngtcp2.so'" \
+      "Run: just setup-toolchain"
     check "SPM mirrors (skip identity)" \
       "test -f examples/fuse-app/.swiftpm/configuration/mirrors.json && \
        test -f examples/fuse-library/.swiftpm/configuration/mirrors.json && \
@@ -605,6 +607,42 @@ setup-toolchain:
       echo "Installing Swift Android SDK..."
       "{{ toolchain_dir }}/usr/bin/swift" sdk install swift-6.2.4-RELEASE-android-24-0.1
       echo "Swift Android SDK installed"
+    fi
+    # Patch missing ngtcp2 libraries into Android SDK (upstream bug: libngtcp2 omitted from Termux package list)
+    sdk_base="$HOME/Library/org.swift.swiftpm/swift-sdks/swift-6.2.4-RELEASE-android-24-0.1.artifactbundle/swift-6.2.4-release-android-24-sdk/android-27d-sysroot/usr/lib"
+    if [ ! -f "$sdk_base/aarch64-linux-android/libngtcp2.so" ]; then
+      echo "Patching missing ngtcp2 libraries into Android SDK..."
+      which patchelf >/dev/null 2>&1 || { echo "Installing patchelf..."; brew install patchelf; }
+      tmpdir=$(mktemp -d)
+      declare -A arch_map=( ["aarch64"]="aarch64-linux-android" ["arm"]="arm-linux-androideabi" ["x86_64"]="x86_64-linux-android" )
+      termux_url="https://packages.termux.dev/apt/termux-main"
+      for arch in aarch64 arm x86_64; do
+        echo "  Downloading libngtcp2 for ${arch}..."
+        # Find the deb filename from the Termux package index
+        deb_path=$(curl -fsSL "$termux_url/dists/stable/main/binary-${arch}/Packages" \
+          | grep "^Filename:.*libngtcp2_[0-9]" | head -1 | sed 's/^Filename: //')
+        if [ -z "$deb_path" ]; then
+          echo "  WARNING: Could not find libngtcp2 package for ${arch}"
+          continue
+        fi
+        deb="$tmpdir/libngtcp2_${arch}.deb"
+        curl -fsSL -o "$deb" "$termux_url/$deb_path"
+        mkdir -p "$tmpdir/extract_${arch}" && cd "$tmpdir/extract_${arch}"
+        tar xf "$deb" 2>/dev/null && tar xf data.tar.xz 2>/dev/null
+        libdir="data/data/com.termux/files/usr/lib"
+        for sofile in libngtcp2.so libngtcp2_crypto_ossl.so; do
+          if [ -f "$libdir/$sofile" ]; then
+            patchelf --set-rpath '$ORIGIN' "$libdir/$sofile"
+            patchelf --replace-needed libssl.so.3 libssl.so "$libdir/$sofile" 2>/dev/null
+            patchelf --replace-needed libcrypto.so.3 libcrypto.so "$libdir/$sofile" 2>/dev/null
+            cp "$libdir/$sofile" "$sdk_base/${arch_map[$arch]}/"
+          fi
+        done
+      done
+      rm -rf "$tmpdir"
+      echo "ngtcp2 libraries patched into Android SDK"
+    else
+      echo "ngtcp2 libraries already present in Android SDK"
     fi
     # Create .toolchains/ symlink dir so SWIFT_TOOLCHAIN_DIR finds only our toolchain
     mkdir -p "{{ toolchain_link_dir }}"

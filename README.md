@@ -64,12 +64,26 @@ All 12 Point-Free/GRDB forks track the `flote/service-app` branch. The 2 Skip fo
 | GRDB.swift | 7.9.0 | 1 | Database layer |
 | skip-ui | 1.49.0 | — | `ViewObservation` JNI hooks |
 
+## Getting Started
+
+```bash
+git clone --recursive https://github.com/jacobcxdev/swift-crossplatform.git
+cd swift-crossplatform
+just setup-toolchain   # install custom Swift 6.2.4 toolchain + Android SDK + ngtcp2 patch
+just doctor            # verify environment (16 checks)
+just ios-build fuse-app       # build for iOS
+just android-run fuse-app     # build + launch on Android emulator
+```
+
+**Prerequisites:** Swift 6.2+, Xcode 16+, [Skip](https://skip.tools) (`brew install skiptools/skip/skip`), [Just](https://github.com/casey/just) (`brew install just`), `gh` CLI. Android builds also need JDK 21+, Android SDK/NDK (`skip android sdk install`).
+
 ## Technology Stack
 
 | Technology | Purpose |
 |------------|---------|
 | [Skip Framework](https://skip.tools) 1.7+ | Cross-platform Swift-to-Android (Fuse mode) |
-| Swift Android SDK 6.2+ | Native Swift compilation for Android via NDK |
+| Swift 6.2.4 (custom toolchain) | No-assertions build for Android performance |
+| Swift Android SDK 6.2.4 | Native Swift compilation for Android via NDK |
 | Native `libswiftObservation.so` | `withObservationTracking` on Android (ships with SDK) |
 | [TCA](https://github.com/pointfreeco/swift-composable-architecture) 1.x | Application architecture |
 | [OpenCombine](https://github.com/OpenCombine/OpenCombine) 0.14+ | Combine compatibility on Android (until TCA 2.0) |
@@ -97,6 +111,7 @@ Phase 6 depends only on Phase 1 and can run in parallel with Phases 2–5.
 - `swiftThreadingFatal` stub required for `libswiftObservation.so` loading until Swift 6.3 ([swiftlang/swift#77890](https://github.com/swiftlang/swift/pull/77890))
 - `NavigationStack.init(path:root:destination:)` is fully guarded out on Android — needs skip-ui Compose equivalent
 - `jniContext` thread attachment for non-main threads needs verification for TCA effects
+- Swift 6.2.4 Android SDK missing `libngtcp2` libraries — patched automatically by `just setup-toolchain`
 
 ## Acknowledgements
 
