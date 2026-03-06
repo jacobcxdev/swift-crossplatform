@@ -1,10 +1,13 @@
 // Copyright 2023–2025 Skip
 import Foundation
 import SwiftUI
+#if canImport(SkipKit)
 import SkipKit
+#endif
 
 /// This component uses the `SkipKit` module from https://source.skip.tools/skip-kit
 struct DocumentPickerPlayground: View {
+#if canImport(SkipKit)
     @State var presentPreview = false
     @State var presentCamera = false
     @State var presentMediaPicker = false
@@ -45,4 +48,18 @@ struct DocumentPickerPlayground: View {
             }
         }
     }
+#else
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "doc.badge.plus")
+                .font(.largeTitle)
+            Text("Requires SkipKit")
+                .font(.title2)
+            Text("Add skip-kit dependency to enable document picking, camera, and media selection.")
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .padding()
+    }
+#endif
 }
