@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 /// All Showcase playgrounds, matching upstream skipapp-showcase-fuse exactly (84 cases).
-enum PlaygroundType: String, CaseIterable, Identifiable, Equatable, Hashable {
+public enum PlaygroundType: String, CaseIterable, Identifiable, Equatable, Hashable, Sendable {
     case accessibility
     case alert
     case animation
@@ -88,10 +88,10 @@ enum PlaygroundType: String, CaseIterable, Identifiable, Equatable, Hashable {
     case webView
     case zIndex
 
-    var id: String { rawValue }
+    public var id: String { rawValue }
 
     /// Display title matching upstream skipapp-showcase-fuse titles exactly.
-    var title: String {
+    public var title: String {
         switch self {
         case .accessibility: "Accessibility"
         case .alert: "Alert"
@@ -179,5 +179,4 @@ enum PlaygroundType: String, CaseIterable, Identifiable, Equatable, Hashable {
         case .zIndex: "ZIndex"
         }
     }
-
 }

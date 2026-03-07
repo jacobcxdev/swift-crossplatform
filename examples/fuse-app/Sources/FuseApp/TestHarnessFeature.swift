@@ -168,7 +168,13 @@ struct TestHarnessView: View {
         ZStack(alignment: .bottom) {
             TabView(selection: $store.selectedTab.sending(\.tabSelected)) {
                 ShowcaseView(store: store.scope(state: \.showcase, action: \.showcase))
-                    .tabItem { Label("Showcase", systemImage: "list.bullet.rectangle") }
+                    .tabItem {
+                        Label {
+                            Text("Showcase")
+                        } icon: {
+                            Image("widgets", bundle: .module, label: Text("Showcase Icon"))
+                        }
+                    }
                     .tag(TestHarnessFeature.State.Tab.showcase)
 
                 NavigationStack {

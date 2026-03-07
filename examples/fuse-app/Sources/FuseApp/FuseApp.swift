@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import ComposableArchitecture
+import Dependencies
 import Foundation
 import SkipFuse
+import SQLFeature
 import SwiftUI
 
 /// A logger for the FuseApp module.
@@ -44,6 +46,13 @@ let logger: Logger = Logger(subsystem: "dev.jacobcx.fuseApp", category: "FuseApp
     }
 
     /* SKIP @bridge */public func onInit() {
+        prepareDependencies {
+            do {
+                try $0.bootstrapDatabase()
+            } catch {
+                logger.error("bootstrapDatabase failed: \(error)")
+            }
+        }
         logger.debug("onInit")
     }
 

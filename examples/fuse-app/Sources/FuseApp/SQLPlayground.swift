@@ -1,11 +1,8 @@
 // Copyright 2023–2025 Skip
 import SwiftUI
-#if canImport(SkipSQLPlus)
 import SkipSQLPlus
-#endif
 
 struct SQLPlayground: View {
-#if canImport(SkipSQLPlus)
     /// The shared SQL context for the view hierarchy
     @State var database = try! SQLDatabase(name: "database.sqlite")
 
@@ -13,23 +10,8 @@ struct SQLPlayground: View {
         SQLItemListView()
             .environment(database)
     }
-#else
-    var body: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "cylinder")
-                .font(.largeTitle)
-            Text("Requires SkipSQLPlus")
-                .font(.title2)
-            Text("Add skip-sql dependency to enable SQL operations.")
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-        }
-        .padding()
-    }
-#endif
 }
 
-#if canImport(SkipSQLPlus)
 /// A list of `SQLItem` instances with create/read/update/delete capabilities
 struct SQLItemListView: View {
     @Environment(SQLDatabase.self) var database
@@ -267,4 +249,3 @@ public struct SQLItem: Identifiable, Hashable, SQLCodable {
         }
     }
 }
-#endif

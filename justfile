@@ -105,11 +105,12 @@ ios-build *targets:
     #!/usr/bin/env bash
     set -euo pipefail
     trap 'kill 0' INT TERM
+    SDK=$(xcrun --show-sdk-path --sdk iphonesimulator)
     targets="{{ targets }}"
     targets="${targets:-{{ examples }}}"
     for ex in $targets; do
       echo "=== Building $ex (iOS) ==="
-      (cd "examples/$ex" && swift build)
+      (cd "examples/$ex" && swift build --sdk "$SDK" --triple arm64-apple-ios17.0-simulator)
     done
 
 # Build example(s) for Android using local skipstone (default: fuse examples)
@@ -381,7 +382,7 @@ ios-test *targets:
     fi
     for ex in $targets; do
       echo "=== Testing $ex (iOS) ==="
-      (cd "examples/$ex" && swift test $filter_arg)
+      (cd "examples/$ex" && swift test --sdk "$(xcrun --show-sdk-path --sdk iphonesimulator)" --triple arm64-apple-ios17.0-simulator $filter_arg)
     done
 
 # Test example(s) on Android (default: fuse examples)
@@ -485,6 +486,8 @@ doctor:
     check "Swift Android SDK" "'{{ toolchain_dir }}/usr/bin/swift' sdk list 2>/dev/null | grep -q android" \
       "Run: just setup-toolchain"
     check "Android SDK ngtcp2 patch" "test -f '$HOME/Library/org.swift.swiftpm/swift-sdks/swift-6.2.4-RELEASE-android-24-0.1.artifactbundle/swift-6.2.4-release-android-24-sdk/android-27d-sysroot/usr/lib/aarch64-linux-android/libngtcp2.so'" \
+      "Run: just setup-toolchain"
+    check "Android SDK sqlite3 symlink" "test -L '$HOME/Library/org.swift.swiftpm/swift-sdks/swift-6.2.4-RELEASE-android-24-0.1.artifactbundle/swift-6.2.4-release-android-24-sdk/android-27d-sysroot/usr/lib/aarch64-linux-android/libsqlite3.so'" \
       "Run: just setup-toolchain"
     check "SPM mirrors (skip identity)" \
       "test -f examples/fuse-app/.swiftpm/configuration/mirrors.json && \
@@ -643,6 +646,20 @@ setup-toolchain:
       echo "ngtcp2 libraries patched into Android SDK"
     else
       echo "ngtcp2 libraries already present in Android SDK"
+    fi
+    # Patch missing libsqlite3.so symlinks in Android SDK (Termux ships versioned .51.2.so only)
+    if [ ! -e "$sdk_base/aarch64-linux-android/libsqlite3.so" ]; then
+      echo "Creating libsqlite3.so symlinks in Android SDK..."
+      for arch_dir in aarch64-linux-android arm-linux-androideabi x86_64-linux-android; do
+        versioned=$(ls "$sdk_base/$arch_dir"/libsqlite3*.so 2>/dev/null | head -1)
+        if [ -n "$versioned" ]; then
+          ln -sf "$(basename "$versioned")" "$sdk_base/$arch_dir/libsqlite3.so"
+          echo "  $arch_dir/libsqlite3.so -> $(basename "$versioned")"
+        fi
+      done
+      echo "libsqlite3.so symlinks created"
+    else
+      echo "libsqlite3.so symlinks already present in Android SDK"
     fi
     # Create .toolchains/ symlink dir so SWIFT_TOOLCHAIN_DIR finds only our toolchain
     mkdir -p "{{ toolchain_link_dir }}"

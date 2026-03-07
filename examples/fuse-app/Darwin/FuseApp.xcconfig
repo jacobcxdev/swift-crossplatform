@@ -22,6 +22,11 @@ GENERATE_INFOPLIST_FILE = YES
 //INFOPLIST_KEY_LSApplicationCategoryType = public.app-category.utilities
 //INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app uses your location to …"
 
+INFOPLIST_KEY_NSCameraUsageDescription = "This app accesses the camera to demonstrate using a photo picker";
+INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app accesses the media library to demonstrate using a photo picker";
+INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app uses the location to demonstrate the map component";
+INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "This app uses the location to demonstrate the map component";
+
 // iOS-specific Info.plist property keys
 INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphone*] = YES
 INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphone*] = YES

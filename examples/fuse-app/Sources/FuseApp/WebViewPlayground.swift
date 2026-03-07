@@ -1,12 +1,9 @@
 // Copyright 2025 Skip
 import SwiftUI
-#if canImport(SkipWeb)
 import SkipWeb
-#endif
 
 /// This component uses the `SkipWeb` module from https://source.skip.tools/skip-web
 struct WebViewPlayground: View {
-#if canImport(SkipWeb)
     @State var config = WebEngineConfiguration()
     @State var navigator = WebViewNavigator()
     @State var state = WebViewState()
@@ -109,18 +106,4 @@ struct WebViewPlayground: View {
             }
         }
     }
-#else
-    var body: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "globe")
-                .font(.largeTitle)
-            Text("Requires SkipWeb")
-                .font(.title2)
-            Text("Add skip-web dependency to enable web views.")
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-        }
-        .padding()
-    }
-#endif
 }

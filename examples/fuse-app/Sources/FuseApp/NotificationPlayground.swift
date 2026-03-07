@@ -1,14 +1,9 @@
 // Copyright 2023–2025 Skip
 import SwiftUI
-#if canImport(SkipKit)
 import SkipKit
-#endif
-#if canImport(SkipNotify)
 import SkipNotify
-#endif
 
 struct NotificationPlayground: View {
-#if canImport(SkipKit)
     @State var token: String = ""
     @State var notificationPermission: String = ""
 
@@ -58,18 +53,4 @@ struct NotificationPlayground: View {
         }
         .padding()
     }
-#else
-    var body: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "bell")
-                .font(.largeTitle)
-            Text("Requires SkipKit")
-                .font(.title2)
-            Text("Add skip-kit and skip-notify dependencies to enable notifications.")
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-        }
-        .padding()
-    }
-#endif
 }

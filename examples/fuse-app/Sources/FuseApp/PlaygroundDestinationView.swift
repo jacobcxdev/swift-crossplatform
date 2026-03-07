@@ -1,7 +1,11 @@
 // Licensed under the GNU General Public License v3.0 or later
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import AlertFeature
+import ComposableArchitecture
+import SQLFeature
 import SwiftUI
+import ToggleFeature
 
 /// Routes a `PlaygroundType` to its concrete playground view.
 struct PlaygroundDestinationView: View {
@@ -12,7 +16,7 @@ struct PlaygroundDestinationView: View {
         case .accessibility:
             AccessibilityPlayground()
         case .alert:
-            AlertPlayground()
+            AlertView(store: Store(initialState: AlertFeature.State()) { AlertFeature() })
         case .animation:
             AnimationPlayground()
         case .background:
@@ -138,7 +142,7 @@ struct PlaygroundDestinationView: View {
         case .spacer:
             SpacerPlayground()
         case .sql:
-            SQLPlayground()
+            SQLView(store: Store(initialState: SQLFeature.State()) { SQLFeature() })
         case .stack:
             StackPlayground()
         case .state:
@@ -160,7 +164,7 @@ struct PlaygroundDestinationView: View {
         case .timer:
             TimerPlayground()
         case .toggle:
-            TogglePlayground()
+            ToggleView(store: Store(initialState: ToggleFeature.State()) { ToggleFeature() })
         case .toolbar:
             ToolbarPlayground()
         case .tracking:

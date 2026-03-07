@@ -82,7 +82,7 @@ struct ShowcaseView: View {
             List {
                 ForEach(store.filteredPlaygrounds, id: \.self) { playground in
                     NavigationLink(state: ShowcasePath.State.playground(.init(type: playground))) {
-                        Label(playground.title, systemImage: playground.systemImage)
+                        Text(playground.title)
                     }
                 }
             }
