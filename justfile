@@ -318,7 +318,7 @@ android-run target:
     # Export APK
     export_dir="examples/{{ target }}/.build/export"
     apk=$(ls "$export_dir"/*-debug.apk 2>/dev/null | head -1 || true)
-    if [ -z "$apk" ] || [ -n "$(find "examples/{{ target }}/Sources" "examples/{{ target }}/Package.swift" forks/ -newer "$apk" -name '*.swift' -print -quit 2>/dev/null)" ]; then
+    if [ -z "$apk" ] || [ -n "$(find "examples/{{ target }}/Sources" "examples/{{ target }}/Package.swift" forks/ -newer "$apk" \( -name '*.swift' -o -name '*.kt' \) -print -quit 2>/dev/null)" ]; then
       echo "Source changed — rebuilding APK..."
       rm -rf "$export_dir"
       (cd "examples/{{ target }}" && SWIFT_TOOLCHAIN_DIR="{{ toolchain_link_dir }}" "{{ skip }}" export --debug --android --no-ios -d .build/export)
