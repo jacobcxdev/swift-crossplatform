@@ -112,6 +112,16 @@ cd forks/skipstone && ./scripts/skip version
 
 The justfile's `build`/`ios-run`/`run` recipes pass `SKIP_ACTION` to xcodebuild directly. When using Xcode manually (Cmd+R), `SKIP_ACTION` is read from `Darwin/<ProductName>.xcconfig`.
 
+### Android run without log streaming
+
+`just android-run` streams `adb logcat` indefinitely after launching. Set `NO_LOGCAT=1` to exit after launch:
+
+```bash
+NO_LOGCAT=1 just android-run fuse-app
+```
+
+**Agents must use `NO_LOGCAT=1`** when running `just android-run` via `Bash(run_in_background: true)` so the command terminates after the build/install/launch phase and the agent receives a completion notification.
+
 ### Android debugging
 
 ```bash
