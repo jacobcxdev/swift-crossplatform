@@ -42,9 +42,15 @@ swift-crossplatform/
 
 ## Build & Test (justfile)
 
-Run `just` or `just --list` to see all available recipes.
+Run `just` or `just --list` to see all available recipes. **Prefer `just do` for chaining multiple operations** — it dispatches words as `[ios|android] [build|test|run|clean] [target…]`:
 
 ```bash
+# Dispatch (preferred for multi-step operations)
+just do clean run fuse-app             # clean then run on both platforms
+just do clean ios build fuse-app       # clean then build iOS only
+just do android run fuse-app           # run on Android only
+just do clean android run fuse-app     # clean then run on Android only
+
 # Build (both platforms via xcodebuild — app targets only)
 just build fuse-app                    # build for iOS + Android (SKIP_ACTION=build)
 
@@ -112,15 +118,16 @@ cd forks/skipstone && ./scripts/skip version
 
 The justfile's `build`/`ios-run`/`run` recipes pass `SKIP_ACTION` to xcodebuild directly. When using Xcode manually (Cmd+R), `SKIP_ACTION` is read from `Darwin/<ProductName>.xcconfig`.
 
-### Android run without log streaming
+### Android log streaming
 
-`just android-run` streams `adb logcat` indefinitely after launching. Set `NO_LOGCAT=1` to exit after launch:
+`just android-run` does **not** stream `adb logcat` by default — it exits after launching the app. Pass `--logcat` to stream logs:
 
 ```bash
-NO_LOGCAT=1 just android-run fuse-app
+just android-run fuse-app --logcat   # stream logs indefinitely after launch
+just android-run fuse-app            # build + install + launch, then exit
 ```
 
-**Agents must use `NO_LOGCAT=1`** when running `just android-run` via `Bash(run_in_background: true)` so the command terminates after the build/install/launch phase and the agent receives a completion notification.
+**Agents must omit `--logcat`** when running `just android-run` via `Bash(run_in_background: true)` so the command terminates after the build/install/launch phase and the agent receives a completion notification.
 
 ### Android debugging
 
@@ -259,6 +266,10 @@ Non-forked transitive dependencies (`skip-model`, `skip-bridge`, `skip-foundatio
 - `just doctor` verifies mirrors are configured
 - `just setup-mirrors` can be run independently to (re)configure mirrors for all example dirs (fuse-app, fuse-library, skipapp-showcase, skipapp-showcase-fuse)
 - Mirror config lives in `examples/*/.swiftpm/configuration/mirrors.json` (gitignored — must be set up per-clone)
+
+## Agent Build/Run Policy
+
+**ALWAYS use justfile recipes** (`just ios-run`, `just android-run`, `just build`, etc.) to build and run apps. Do NOT use XcodeBuildMCP build/run tools (`build_run_sim`, `build_sim`, etc.) — they bypass the justfile's toolchain, environment, and Skip integration, producing builds that may be stale or misconfigured. XcodeBuildMCP tools are acceptable only for screenshots, UI snapshots, and simulator management (not building or launching).
 
 ## Gotchas
 
