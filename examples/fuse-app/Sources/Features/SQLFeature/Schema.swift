@@ -12,10 +12,15 @@ public struct SQLItem: Identifiable, Hashable, Sendable {
     public var name = ""
     public var date: Date = Date()
     public var sortOrder: Double?
+    public var pinnedAt: Date?
+
+    public var isPinned: Bool { pinnedAt != nil }
 }
 
 extension SQLItem.Draft: Sendable {}
 
+// NSLock used because GRDB's db.trace callback is synchronous (actor/async incompatible).
+// @unchecked Sendable is safe here: all access to _statements is guarded by lock.
 public final class StatementLog: @unchecked Sendable {
     private var _statements: [String] = []
     private let lock = NSLock()
@@ -50,7 +55,7 @@ extension DependencyValues {
         let log = statementLog
         var configuration = Configuration()
         configuration.prepareDatabase { db in
-            db.trace { event in
+            db.trace(options: .profile) { event in
                 log.append(event.expandedDescription)
             }
         }
@@ -70,6 +75,21 @@ extension DependencyValues {
             try db.alter(table: "sqlItems") { t in
                 t.add(column: "sortOrder", .real)
             }
+        }
+        migrator.registerMigration("v3") { db in
+            try db.alter(table: "sqlItems") { t in
+                t.add(column: "isPinned", .boolean).notNull().defaults(to: false)
+            }
+        }
+        migrator.registerMigration("v4") { db in
+            try db.alter(table: "sqlItems") { t in
+                t.add(column: "pinnedAt", .real)
+            }
+            try db.execute(
+                sql: "UPDATE sqlItems SET pinnedAt = ? WHERE isPinned = 1",
+                arguments: [Date()]
+            )
+            try db.execute(sql: "ALTER TABLE sqlItems DROP COLUMN isPinned")
         }
         try migrator.migrate(database)
         defaultDatabase = database

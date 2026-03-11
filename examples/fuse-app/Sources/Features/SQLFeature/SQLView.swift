@@ -17,39 +17,30 @@ public struct SQLView: View {
 
     public var body: some View {
         let _ = logger.debug("SQLView.body: items.count=\(store.items.count), statements.count=\(store.statements.count), editor=\(store.editor != nil ? "present" : "nil")")
-        List {
-            Section {
-                let _ = logger.debug("SQLView.body: Section content evaluating, items.count=\(store.items.count)")
-                ForEach(store.items) { item in
-                    let _ = logger.debug("SQLView.body: ForEach rendering item id=\(item.id) name=\(item.name)")
-                    Button {
-                        logger.debug("SQLView: itemTapped id=\(item.id)")
-                        store.send(.itemTapped(item))
-                    } label: {
-                        VStack(alignment: .leading) {
-                            if item.name.isEmpty {
-                                Text("New Item")
-                                    .foregroundStyle(.secondary)
-                            } else {
-                                Text(item.name)
-                            }
-                            Text(item.date.formatted())
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
+        let selectionBinding: Binding<Set<SQLItem.ID>>? = store.isEditing
+            ? Binding(get: { store.selection }, set: { store.send(.selectionChanged($0)) })
+            : nil
+        List(selection: selectionBinding) {
+            if !store.pinnedItems.isEmpty {
+                Section {
+                    ForEach(store.pinnedItems) { item in
+                        itemRow(item)
                     }
-                    .foregroundStyle(.primary)
+                } header: {
+                    Text("Pinned (\(store.pinnedItems.count))")
                 }
-                .onDelete { indices in
-                    logger.debug("SQLView: onDelete indices=\(Array(indices))")
-                    store.send(.deleteItems(offsets: Array(indices)))
+            }
+            Section {
+                ForEach(store.unpinnedItems) { item in
+                    itemRow(item)
                 }
                 .onMove { from, to in
                     logger.debug("SQLView: onMove from=\(Array(from)) to=\(to)")
                     store.send(.moveItems(from: Array(from), to: to))
                 }
+            } header: {
+                Text("Items (\(store.unpinnedItems.count))")
             } footer: {
-                let _ = logger.debug("SQLView.body: Section footer evaluating")
                 NavigationLink {
                     TextEditor(text: .constant(store.statements.joined(separator: "\n")))
                         .font(Font.body.monospaced())
@@ -69,19 +60,110 @@ public struct SQLView: View {
             let _ = logger.debug("SQLView: navigationDestination presenting editor")
             SQLItemEditorView(store: editorStore)
         }
-        .toolbar {
-            ToolbarItem {
-                Button {
-                    logger.debug("SQLView: + button tapped")
-                    store.send(.createItemTapped)
-                } label: {
-                    Label("Add", systemImage: "plus")
-                }
-            }
-        }
+        .navigationBarBackButtonHidden(store.isEditing)
+        .toolbar { toolbarContent }
+        .environment(
+            \.editMode,
+            .init(
+                get: { store.isEditing ? .active : .inactive },
+                set: { _ in store.send(.editButtonTapped, animation: .default) }
+            )
+        )
         .task {
             logger.debug("SQLView: .task fired, sending .task action")
             store.send(.task)
+        }
+    }
+
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+        let _ = logger.debug("toolbarContent: isEditing=\(store.isEditing), selection.count=\(store.selection.count), selection.isEmpty=\(store.selection.isEmpty)")
+        ToolbarItem(placement: .topBarTrailing) {
+            HStack {
+                if store.isEditing {
+                    Button {
+                        guard !store.selection.isEmpty else { return }
+                        store.send(.pinSelectedTapped)
+                    } label: {
+                        Label("Pin", systemImage: "pin")
+                    }
+                    .opacity(store.selection.isEmpty ? 0.4 : 1.0)
+
+                    Button(role: .destructive) {
+                        guard !store.selection.isEmpty else { return }
+                        store.send(.deleteSelectedTapped)
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                    .opacity(store.selection.isEmpty ? 0.4 : 1.0)
+                } else {
+                    Button {
+                        store.send(.editButtonTapped, animation: .default)
+                    } label: {
+                        Label("Select", systemImage: "checkmark.circle")
+                    }
+
+                    Button {
+                        store.send(.createItemTapped)
+                    } label: {
+                        Label("Add", systemImage: "plus")
+                    }
+                }
+            }
+        }
+        ToolbarItem(placement: .topBarLeading) {
+            if store.isEditing {
+                Button {
+                    store.send(.editButtonTapped, animation: .default)
+                } label: {
+                    Label("Cancel", systemImage: "xmark")
+                }
+            }
+        }
+    }
+
+    private func itemRow(_ item: SQLItem) -> some View {
+        Button {
+            store.send(.itemTapped(item))
+        } label: {
+            VStack(alignment: .leading) {
+                if item.name.isEmpty {
+                    Text("Untitled")
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text(item.name)
+                }
+                Text(item.date.formatted())
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                if let pinnedAt = item.pinnedAt {
+                    Text("Pinned \(pinnedAt.formatted())")
+                        .font(.caption2)
+                        .foregroundStyle(.orange)
+                }
+            }
+        }
+        .foregroundStyle(.primary)
+        .swipeActions(edge: .trailing) {
+            Button(role: .destructive) {
+                store.send(.deleteItem(id: item.id))
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
+            Button {
+                store.send(.itemTapped(item))
+            } label: {
+                Label("Edit", systemImage: "pencil")
+            }
+            .tint(.blue)
+        }
+        .swipeActions(edge: .leading, allowsFullSwipe: true) {
+            Button {
+                store.send(.togglePinned(id: item.id))
+            } label: {
+                Label(item.isPinned ? "Unpin" : "Pin", systemImage: item.isPinned ? "pin.slash" : "pin")
+            }
+            .tint(.orange)
         }
     }
 }

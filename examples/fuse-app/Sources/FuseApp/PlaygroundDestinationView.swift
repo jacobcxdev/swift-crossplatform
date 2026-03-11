@@ -142,7 +142,7 @@ struct PlaygroundDestinationView: View {
         case .spacer:
             SpacerPlayground()
         case .sql:
-            SQLView(store: Store(initialState: SQLFeature.State()) { SQLFeature() })
+            SQLFeaturePlaygroundView()
         case .stack:
             StackPlayground()
         case .state:
@@ -182,5 +182,14 @@ struct PlaygroundDestinationView: View {
         case .zIndex:
             ZIndexPlayground()
         }
+    }
+}
+
+/// Holds the TCA Store in @State so it persists across re-renders of the parent view.
+struct SQLFeaturePlaygroundView: View {
+    @State var store = Store(initialState: SQLFeature.State()) { SQLFeature() }
+
+    var body: some View {
+        SQLView(store: store)
     }
 }

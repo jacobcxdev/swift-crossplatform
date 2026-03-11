@@ -14,6 +14,9 @@ public struct SQLClient: Sendable {
     public var insert: @Sendable (_ draft: SQLItem.Draft) async throws -> Void
     public var update: @Sendable (_ item: SQLItem) async throws -> Void
     public var delete: @Sendable (_ ids: [Int64]) async throws -> Void
+    public var batchTogglePin: @Sendable (
+        _ toPin: [Int64], _ toUnpin: [Int64], _ date: Date
+    ) async throws -> Void
     public var fetchStatements: @Sendable () async -> [String] = { [] }
 }
 
@@ -50,11 +53,21 @@ extension SQLClient: DependencyKey {
             delete: { ids in
                 logger.debug("SQLClient.delete: ids=\(ids)")
                 try await database.write { db in
-                    for id in ids {
-                        try SQLItem.find(id).delete().execute(db)
-                    }
+                    try SQLItem.find(ids).delete().execute(db)
                 }
                 logger.debug("SQLClient.delete: done")
+            },
+            batchTogglePin: { toPin, toUnpin, date in
+                logger.debug("SQLClient.batchTogglePin: pin=\(toPin) unpin=\(toUnpin)")
+                try await database.write { db in
+                    if !toPin.isEmpty {
+                        try SQLItem.find(toPin).update { $0.pinnedAt = date }.execute(db)
+                    }
+                    if !toUnpin.isEmpty {
+                        try SQLItem.find(toUnpin).update { $0.pinnedAt = nil }.execute(db)
+                    }
+                }
+                logger.debug("SQLClient.batchTogglePin: done")
             },
             fetchStatements: {
                 let stmts = statementLog.statements
