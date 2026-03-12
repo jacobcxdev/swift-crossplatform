@@ -17,10 +17,7 @@ public struct SQLView: View {
 
     public var body: some View {
         let _ = logger.debug("SQLView.body: items.count=\(store.items.count), statements.count=\(store.statements.count), editor=\(store.editor != nil ? "present" : "nil")")
-        let selectionBinding: Binding<Set<SQLItem.ID>>? = store.isEditing
-            ? Binding(get: { store.selection }, set: { store.send(.selectionChanged($0)) })
-            : nil
-        List(selection: selectionBinding) {
+        List(selection: Binding(get: { store.selection }, set: { store.send(.selectionChanged($0)) })) {
             if !store.pinnedItems.isEmpty {
                 Section {
                     ForEach(store.pinnedItems) { item in
@@ -66,9 +63,12 @@ public struct SQLView: View {
             \.editMode,
             .init(
                 get: { store.isEditing ? .active : .inactive },
-                set: { _ in store.send(.editButtonTapped, animation: .default) }
+                set: {
+                    store.send(.toggleSelection($0.isEditing == true))
+                }
             )
         )
+        .animation(.default, value: store.isEditing)
         .task {
             logger.debug("SQLView: .task fired, sending .task action")
             store.send(.task)
@@ -126,7 +126,7 @@ public struct SQLView: View {
         Button {
             store.send(.itemTapped(item))
         } label: {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 if item.name.isEmpty {
                     Text("Untitled")
                         .foregroundStyle(.secondary)
@@ -138,10 +138,11 @@ public struct SQLView: View {
                     .foregroundStyle(.secondary)
                 if let pinnedAt = item.pinnedAt {
                     Text("Pinned \(pinnedAt.formatted())")
-                        .font(.caption2)
+                        .font(.caption)
                         .foregroundStyle(.orange)
                 }
             }
+            .padding(.vertical, 14)
         }
         .foregroundStyle(.primary)
         .swipeActions(edge: .trailing) {
@@ -164,6 +165,12 @@ public struct SQLView: View {
                 Label(item.isPinned ? "Unpin" : "Pin", systemImage: item.isPinned ? "pin.slash" : "pin")
             }
             .tint(.orange)
+            Button {
+                store.send(.itemTapped(item))
+            } label: {
+                Label("Edit", systemImage: "pencil")
+            }
+            .tint(.blue)
         }
     }
 }

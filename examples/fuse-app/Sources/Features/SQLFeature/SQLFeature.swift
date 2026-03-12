@@ -59,6 +59,7 @@ public struct SQLFeature {
         case moveItems(from: [Int], to: Int)
         case itemTapped(SQLItem)
         case editButtonTapped
+        case toggleSelection(Bool)
         case selectionChanged(Set<SQLItem.ID>)
         case deleteSelectedTapped
         case pinSelectedTapped
@@ -175,6 +176,13 @@ public struct SQLFeature {
             case .editButtonTapped:
                 state.isEditing.toggle()
                 if !state.isEditing {
+                    state.selection = []
+                }
+                return .none
+
+            case .toggleSelection(let isEditing):
+                state.isEditing = isEditing
+                if !isEditing {
                     state.selection = []
                 }
                 return .none
