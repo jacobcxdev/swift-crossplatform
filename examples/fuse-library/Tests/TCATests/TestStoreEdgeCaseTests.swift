@@ -140,7 +140,7 @@ struct TestStoreEdgeCaseTests {
             EdgeCaseCancelInFlightFeature()
         }
         store.exhaustivity = .off
-        store.timeout = 5_000_000_000
+        store.timeout = .seconds(5)
         // Send first fetch, then immediately re-send — first should be cancelled
         await store.send(.fetch) {
             $0.fetchCount = 1
@@ -159,7 +159,7 @@ struct TestStoreEdgeCaseTests {
         let store = TestStore(initialState: SlowEffectFeature.State()) {
             SlowEffectFeature()
         }
-        store.timeout = 5_000_000_000
+        store.timeout = .seconds(5)
         await store.send(.start)
         await store.receive(\.done) {
             $0.completed = true
@@ -173,7 +173,7 @@ struct TestStoreEdgeCaseTests {
             NonExhaustiveReceiveFeature()
         }
         store.exhaustivity = .off
-        store.timeout = 5_000_000_000
+        store.timeout = .seconds(5)
         // Send action that triggers an effect — don't call receive
         await store.send(.trigger) {
             $0.triggered = true

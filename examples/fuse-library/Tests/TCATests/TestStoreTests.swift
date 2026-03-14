@@ -359,7 +359,7 @@ struct TestStoreTests {
         let store = TestStore(initialState: TSFinishFeature.State()) {
             TSFinishFeature()
         }
-        store.timeout = 5_000_000_000
+        store.timeout = .seconds(5)
         await store.send(.start)
         await store.receive(\.done) {
             $0.completed = true
@@ -411,7 +411,7 @@ struct TestStoreTests {
             TSMergeEffectFeature()
         }
         store.exhaustivity = .off
-        store.timeout = 5_000_000_000
+        store.timeout = .seconds(5)
         await store.send(.start)
         await store.skipReceivedActions()
         // Both merged effects should have completed (order not guaranteed per R1b Guard 4)
