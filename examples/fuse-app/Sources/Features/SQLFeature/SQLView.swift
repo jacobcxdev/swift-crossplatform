@@ -133,16 +133,16 @@ public struct SQLView: View {
                 } else {
                     Text(item.name)
                 }
-                Text(item.date.formatted())
+                Text(item.date.deviceFormatted())
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 if let pinnedAt = item.pinnedAt {
-                    Text("Pinned \(pinnedAt.formatted())")
+                    Text("Pinned \(pinnedAt.deviceFormatted())")
                         .font(.caption)
                         .foregroundStyle(.orange)
                 }
             }
-            .padding(.vertical, 14)
+            .padding(.vertical, item.isPinned ? 5.5 : 0)
         }
         .foregroundStyle(.primary)
         .swipeActions(edge: .trailing) {

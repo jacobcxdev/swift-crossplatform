@@ -1,4 +1,5 @@
 // Copyright 2023–2025 Skip
+import SkipFuse
 import SwiftUI
 import SkipSQLPlus
 
@@ -28,7 +29,7 @@ struct SQLItemListView: View {
                             } else {
                                 Text(item.name)
                             }
-                            Text(item.date.formatted())
+                            Text(item.date.deviceFormatted())
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }

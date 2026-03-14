@@ -585,25 +585,32 @@ android-test *targets:
 
 # ── Clean ────────────────────────────────────────────────────────
 
-# Clean build artifacts for all examples (SPM .build + Xcode DerivedData)
-clean:
+# Clean build artifacts (default: all examples; pass target names to clean specific ones)
+clean *targets:
     #!/usr/bin/env bash
     set -euo pipefail
-    for ex in {{ examples }} {{ showcases }}; do
+    targets="{{ targets }}"
+    if [ -n "$targets" ]; then
+      all_targets="$targets"
+    else
+      all_targets="{{ examples }} {{ showcases }}"
+    fi
+    for ex in $all_targets; do
       if [ -d "examples/$ex" ]; then
         echo "=== Cleaning $ex ==="
         (cd "examples/$ex" && swift package clean && rm -rf .build/plugins/outputs .build/DerivedData)
       fi
     done
-    # Clean Xcode DerivedData for all example projects
-    for dd in ~/Library/Developer/Xcode/DerivedData/FuseApp-* \
-              ~/Library/Developer/Xcode/DerivedData/FuseLibrary-* \
-              ~/Library/Developer/Xcode/DerivedData/LiteApp-* \
-              ~/Library/Developer/Xcode/DerivedData/LiteLibrary-*; do
-      if [ -d "$dd" ]; then
-        echo "=== Removing $(basename "$dd") ==="
-        rm -rf "$dd"
-      fi
+    # Clean Xcode DerivedData for matching example projects
+    for ex in $all_targets; do
+      # Convert kebab-case to PascalCase for DerivedData dir names (fuse-app → FuseApp)
+      pascal=$(echo "$ex" | sed -E 's/(^|-)([a-z])/\U\2/g')
+      for dd in ~/Library/Developer/Xcode/DerivedData/${pascal}-*; do
+        if [ -d "$dd" ]; then
+          echo "=== Removing $(basename "$dd") ==="
+          rm -rf "$dd"
+        fi
+      done
     done
 
 # ── Setup & Diagnostics ─────────────────────────────────────────
