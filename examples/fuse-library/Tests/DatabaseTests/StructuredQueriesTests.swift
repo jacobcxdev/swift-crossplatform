@@ -446,7 +446,7 @@ struct StructuredQueriesTests {
 
             // Update: set value = 999 for items where value > 20
             try Item.where { $0.value.gt(20) }
-                .update { $0.value = 999 }
+                .update { $0.value = #bind(999) }
                 .execute(db)
 
             let highValue = try Item.where { $0.value.eq(999) }

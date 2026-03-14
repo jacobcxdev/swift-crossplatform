@@ -5,6 +5,7 @@ import Dependencies
 import DependenciesMacros
 import Foundation
 import SkipFuse
+import StructuredQueries
 
 private let logger = Logger(subsystem: "dev.jacobcx.fuseApp", category: "SQLClient")
 
@@ -61,10 +62,10 @@ extension SQLClient: DependencyKey {
                 logger.debug("SQLClient.batchTogglePin: pin=\(toPin) unpin=\(toUnpin)")
                 try await database.write { db in
                     if !toPin.isEmpty {
-                        try SQLItem.find(toPin).update { $0.pinnedAt = date }.execute(db)
+                        try SQLItem.find(toPin).update { $0.pinnedAt = #bind(date) }.execute(db)
                     }
                     if !toUnpin.isEmpty {
-                        try SQLItem.find(toUnpin).update { $0.pinnedAt = nil }.execute(db)
+                        try SQLItem.find(toUnpin).update { $0.pinnedAt = #bind(nil as Date?) }.execute(db)
                     }
                 }
                 logger.debug("SQLClient.batchTogglePin: done")

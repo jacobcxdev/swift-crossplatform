@@ -2,5 +2,5 @@
 # These are the commit SHAs that skip and skipstone Package.swift should match.
 # Update when syncing with upstream.
 
-skip: f7c1e82bc4731a11fc456fe9a53b8807ef9efcd7
-skipstone: 858cd1b3bacd41f3be5f856d1588937e6c2b1740
+skip: 9df13adb58e3799038927d1bdb6a68c5d38581cb
+skipstone: 935c2265195694b9d931298b7a263ee1dd6a6ccd
